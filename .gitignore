@@ -1,0 +1,15 @@
+# build directory
+build/
+
+# Visual Studio Code directory
+.vscode/
+
+# binary
+worms
+
+# CLion Cache
+.idea
+
+.git
+.vscode
+.vs
