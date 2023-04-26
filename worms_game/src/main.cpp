@@ -1,10 +1,20 @@
+#include <iostream>
 #include <SFML/Graphics.hpp>
+
+#include "Events/Events.hpp"
+
 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
+
+    OtherEvent other{};
+
+    TimeEvent dt_event{3};
+
+    std::cout << dt_event.dt_ << '\n';
 
     while (window.isOpen())
     {
