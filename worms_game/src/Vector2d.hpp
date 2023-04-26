@@ -1,0 +1,3 @@
+class Vector2d {
+
+};
