@@ -8,6 +8,8 @@ enum class EventTypes {
         KEYBOARD_KEY_UP,
         MOUSE_MOVE,
         TIME_PASSED,
+        QUIT_EVENT,
+        EXPLOSION_EVENT,
         OTHER_EVENT,
         EVENT_TYPE_CNT
     };

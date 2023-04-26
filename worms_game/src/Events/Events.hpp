@@ -5,6 +5,8 @@
 #include "Events/MouseEvents.hpp"
 #include "Events/KeyboardEvents.hpp"
 #include "Events/TimeEvent.hpp"
+#include "Events/QuitEvent.hpp"
+#include "Events/ExplosionEvent.hpp"
 
 class NoEvent : public BaseEvent {
   public:
