@@ -1,37 +1,15 @@
-#include <SFML/Graphics/CircleShape.hpp>
-#include <iostream>
+#include <cstdlib>
+#include <ctime>
 #include <SFML/Graphics.hpp>
 
-#include "Events/Events.hpp"
+#include "game.hpp"
 
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+    std::srand(std::time(nullptr));
 
-    OtherEvent other{};
-
-    TimeEvent dt_event{3};
-
-    std::cout << dt_event.dt_ << '\n';
-
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed) {
-                QuitEvent quit_event{};
-                window.close();
-            }
-        }
-
-        window.clear();
-        window.draw(shape);
-        window.display();
-    }
-
-    return 0;
+    WormsGame game(1920, 1080,
+                   1920, 1080);
+    game.run();
 }
