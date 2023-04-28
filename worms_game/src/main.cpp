@@ -1,15 +1,9 @@
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/Sprite.hpp>
-#include <SFML/Graphics/Text.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Window/VideoMode.hpp>
 #include <cstdlib>
 #include <ctime>
+#include <SFML/Graphics.hpp>
 
 #include "game.hpp"
 
-
-#include <SFML/Graphics.hpp>
 
 int main()
 {
