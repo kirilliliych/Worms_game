@@ -1,3 +1,4 @@
+#include <SFML/Graphics/CircleShape.hpp>
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
