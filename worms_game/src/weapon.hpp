@@ -9,11 +9,9 @@ class Weapon : public AbstractNode
 {
 public:
 
-    Weapon(AbstractNode *parent)
-      : AbstractNode(parent)
-    {
-
-    }
+    Weapon(AbstractNode *parent, Rect<int> area = Rect<int>())
+      : AbstractNode(parent, area)
+    {}
 
 private:
 

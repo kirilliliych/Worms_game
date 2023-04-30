@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <vector>
 #include "abstract_node.hpp"
+#include "game.hpp"
 #include "sfmlwrap/image.hpp"
 #include "sfmlwrap/rect.hpp"
 #include "sfmlwrap/texture.hpp"
@@ -12,8 +13,8 @@
 
 namespace string_consts
 {
-    const std::vector<std::string> landscape_images_names_pool{"worms_game/textures/seamless_sky.png",
-                                                               "worms_game/textures/dirt1.png"};
+    const std::vector<std::string> landscape_images_names_pool{"seamless_sky.png",
+                                                               "dirt1.png"};
 }
 
 
@@ -41,9 +42,7 @@ public:
         uint64_t landscape_types_quantity = string_consts::landscape_images_names_pool.size();
         for (uint64_t i = 0; i < landscape_types_quantity; ++i)
         {
-            landscape_images_[i] = new Image();
-            bool loading_result = landscape_images_[i]->load_from_file(string_consts::landscape_images_names_pool[i]);
-            assert(loading_result);
+            landscape_images_[i] = Game::imanager.get_image(string_consts::landscape_images_names_pool[i]);
         }
 
         texture_->create(width, height);
@@ -56,13 +55,7 @@ public:
     Map &operator =(Map &&other) = delete;
 
     ~Map()
-    {
-        uint64_t landscape_images_size = landscape_images_.size();
-        for (uint64_t i = 0; i < landscape_images_size; ++i)
-        {
-            delete landscape_images_[i];
-        }
-    }
+    {}
 //---------------------------------------------------------------------------------
     void create_map()
     {
@@ -78,8 +71,8 @@ public:
         {
             for (uint32_t x = 0; x < width_; ++x)
             {
-                map_[(height_ - y) * width_ + x] = y >= surface[x] * height_ ? MapPixelCondition::SKY :
-                                                                               MapPixelCondition::TERRAIN;  // currently there are two types of landscape...
+                map_[(height_ - 1 - y) * width_ + x] = y >= surface[x] * height_ ? MapPixelCondition::SKY :
+                                                                                   MapPixelCondition::TERRAIN;  // currently there are two types of landscape...
             }
         }
 
@@ -103,7 +96,7 @@ private:
                     case MapPixelCondition::SKY:                                                                                // copypaste?
                     {
                         uint32_t image_width  = landscape_images_[MapPixelCondition::SKY]->get_width();
-                        uint32_t image_height = landscape_images_[MapPixelCondition::SKY]->get_height(); 
+                        uint32_t image_height = landscape_images_[MapPixelCondition::SKY]->get_height();
                         pixels_data[y * width_ + x] = landscape_images_[MapPixelCondition::SKY]->get_pixel(x % image_width,
                                                                                                            y % image_height);
                         break;
@@ -115,7 +108,6 @@ private:
                         uint32_t image_height = landscape_images_[MapPixelCondition::TERRAIN]->get_height();
                         pixels_data[y * width_ + x] = landscape_images_[MapPixelCondition::TERRAIN]->get_pixel(x % image_width,
                                                                                                                y % image_height);
-                        // printf("TERRAIN x: %u, y: %u, color: %x\n", x, y, pixels_data[y * width_ + x]);
                         break;
                     }
 
@@ -128,7 +120,6 @@ private:
                 }
             }
         }
-
         
         texture_->update(pixels.data(), width_, height_, 0, 0);
     }
@@ -168,7 +159,7 @@ private:
     uint32_t height_;
     std::vector<uint8_t> map_;
 
-    std::vector<Image *> landscape_images_;
+    std::vector<const Image *> landscape_images_;
 };
 
 #endif

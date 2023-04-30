@@ -1,13 +1,14 @@
+#include "sfmlwrap/texture.hpp"
 #include "surface.hpp"
 
 Texture::Texture()
   : texture_(new Texture_())
 {}
 
-Texture::Texture(const std::string &file_name, const Rect<int> &area)  // better to use default no-arg constructor and then load from file: you get info whether it finishes successfully
-{
-    load_from_file(file_name, area);
-}
+// Texture::Texture(const std::string &file_name, const Rect<int> &area)  // better to use default no-arg constructor and then load from file: you get info whether it finishes successfully
+// {
+//     load_from_file(file_name, area);
+// }
 
 Texture::~Texture()
 {
@@ -22,6 +23,24 @@ bool Texture::create(uint32_t width, uint32_t height)
 bool Texture::load_from_file(const std::string &file_name, const Rect<int> &area)
 {
     return texture_->loadFromFile(file_name, area.to_SFML_rect());
+}
+
+bool Texture::load_from_image(const Image &image, const Rect<int> &area)
+{
+    return texture_->loadFromImage(*image.image_, area.to_SFML_rect());
+}
+
+Image Texture::copy_to_image() const
+{
+    sf::Image texture_image = texture_->copyToImage();
+    printf("texture: copied image size: %u %u\n", texture_image.getSize().x, texture_image.getSize().y);
+
+    Image result;
+    result.create(150, 200);
+    result.image_->copy(texture_image, 0, 0);
+    printf("texture: result image size: %u %u\n", result.get_width(), result.get_height());
+    
+    return result;
 }
 
 void Texture::update(const uint8_t *pixels, uint32_t width, uint32_t height, uint32_t x, uint32_t y)

@@ -2,7 +2,7 @@
 
 #include <SFML/Window.hpp>
 
-#include "Events/BaseEvent.hpp"
+#include "events/base_event.hpp"
 #include "Vector2d.hpp"
 
 class ExplosionEvent : public BaseEvent {

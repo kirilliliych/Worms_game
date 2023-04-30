@@ -2,8 +2,7 @@
 #define SPRITE_HPP
 
 
-#include <SFML/Graphics/Sprite.hpp>
-#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics.hpp>
 #include "../point2d.hpp"
 #include "texture.hpp"
 

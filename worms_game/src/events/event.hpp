@@ -2,11 +2,11 @@
 
 #include <SFML/Window.hpp>
 
-#include "Events/MouseEvents.hpp"
-#include "Events/KeyboardEvents.hpp"
-#include "Events/TimeEvent.hpp"
-#include "Events/QuitEvent.hpp"
-#include "Events/ExplosionEvent.hpp"
+#include "events/mouse_events.hpp"
+#include "events/key_events.hpp"
+#include "events/time_event.hpp"
+#include "events/quit_event.hpp"
+#include "events/explosion_event.hpp"
 
 class NoEvent : public BaseEvent {
   public:
