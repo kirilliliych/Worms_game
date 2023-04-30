@@ -1,5 +1,4 @@
-#ifndef ABSTRACT_NODE_HPP
-#define ABSTRACT_NODE_HPP
+#pragma once
 
 
 #include <cassert>
@@ -11,65 +10,21 @@
 
 class AbstractNode
 {
-public:
+protected:
 
-    AbstractNode(AbstractNode *parent, Rect<int> area = Rect<int>())
-      : parent_(parent),
-        children_(),
-        area_(area),    // NOTE: might be zero area!
-        texture_(new Texture())
-    {
-        if (parent != nullptr)
-        {
-            parent->children_.push_back(this);
-        }
-    }  
+    AbstractNode(AbstractNode *parent, const Rect<int> &area);
     
-    AbstractNode(AbstractNode *parent, Rect<int> area, const std::string &texture_file_name,
-                 Rect<int> texture_area = Rect<int>())
-      : parent_(parent),
-        children_(),
-        area_(area),
-        texture_(new Texture(texture_file_name, texture_area))
-    {}
+    AbstractNode(AbstractNode *parent, const Rect<int> &area, const std::string &image_file_name,
+                 const Rect<int> &texture_area = Rect<int>());
 
-    virtual ~AbstractNode()
-    {
-        delete texture_;
-    }
+    virtual ~AbstractNode();
 
-    void render(Surface *surface)
-    {
-        assert(surface != nullptr);
 
-        render_self(surface);
-        render_children(surface);
-    }
+    void render(Surface *surface);
 
-    virtual void render_self(Surface *surface)
-    {
-        assert(surface != nullptr);
+    virtual void render_self(Surface *surface);
 
-        Sprite self_sprite = Sprite(*texture_, area_.left_top());
-        surface->draw_sprite(self_sprite);
-    }
-
-    void render_children(Surface *surface)
-    {
-        assert(surface != nullptr);
-        // auto children_iterator = children_.begin();
-        // auto children_end = children_.end();
-        // while (children_iterator != children_end)
-        // {
-        //     (*children_iterator)->render(surface);
-        //     ++children_iterator;
-        // }
-
-        for (uint64_t child_index = 0; child_index < children_.size(); ++child_index)
-        {
-            children_[child_index]->render(surface);
-        }
-    }
+    void render_children(Surface *surface);
 
 protected:
 
@@ -82,7 +37,5 @@ protected:
 
 public:
 
-    int id;
+    int id;     // for debug
 };
-
-#endif

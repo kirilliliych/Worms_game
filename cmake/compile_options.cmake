@@ -1,4 +1,4 @@
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 if(BUILD_WITH_ASAN AND BUILD_WITH_TSAN)
     message(FATAL_ERROR "asan and tsan can not be enabled at the same time")

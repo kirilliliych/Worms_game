@@ -7,7 +7,7 @@
 
 class MouseButtonDownEvent : public BaseEvent {
   public:
-    MouseButtonDownEvent(sf::Mouse::Button button) : BaseEvent(EventTypes::MOUSE_BUTTON_DOWN), button_{button} {}
+    MouseButtonDownEvent(sf::Mouse::Button button) : BaseEvent(EventTypes::MOUSE_BUTTON_CLICKED), button_{button} {}
 
   public:
     sf::Mouse::Button button_;
@@ -15,7 +15,7 @@ class MouseButtonDownEvent : public BaseEvent {
 
 class MouseButtonUpEvent : public BaseEvent {
   public:
-    MouseButtonUpEvent(sf::Mouse::Button button) : BaseEvent(EventTypes::MOUSE_BUTTON_UP), button_{button} {}
+    MouseButtonUpEvent(sf::Mouse::Button button) : BaseEvent(EventTypes::MOUSE_BUTTON_RELEASED), button_{button} {}
 
   public:
     sf::Mouse::Button button_;
@@ -23,7 +23,7 @@ class MouseButtonUpEvent : public BaseEvent {
 
 class MouseMoveEvent : public BaseEvent {
   public:
-    MouseMoveEvent(Vector2d pos, Vector2d direction) : BaseEvent(EventTypes::MOUSE_MOVE), pos_{pos}, direction_{direction} {}
+    MouseMoveEvent(Vector2d pos, Vector2d direction) : BaseEvent(EventTypes::MOUSE_MOVED), pos_{pos}, direction_{direction} {}
   
   public:
     Vector2d pos_;

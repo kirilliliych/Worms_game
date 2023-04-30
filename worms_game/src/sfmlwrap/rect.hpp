@@ -43,11 +43,28 @@ public:
     {
         return {left_top_.x() + width_, left_top_.y() + height_};
     }
+
+    Type get_width() const
+    {
+        return width_;
+    }
+
+    Type get_height() const
+    {
+        return height_;
+    }
+
+    bool contains(Point2d<Type> position) const
+    {
+        return (left_top_.x() <= position.x()) && (position.x() < left_top_.x() + width_) &&
+               (left_top_.y() <= position.y()) && (position.y() < left_top_.y() + height_);
+    }
     
     sf::Rect<Type> to_SFML_rect() const
     {
         return {left_top_.x(), left_top_.y(), width_, height_};
     }
+
 
 private:
 
