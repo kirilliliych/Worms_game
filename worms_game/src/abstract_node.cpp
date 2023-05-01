@@ -1,5 +1,6 @@
 #include "abstract_node.hpp"
 #include "game.hpp"
+#include "sfmlwrap/events/base_event.hpp"
 #include "sfmlwrap/texture.hpp"
 
 
@@ -67,4 +68,15 @@
         }
     }
 
+    bool handle_event(const BaseEvent &event)
+    {
+        switch (event.get_type())
+        {
+            case EventType::MOUSE_BUTTON_CLICKED:
+            {
+                return false;
+            }
 
+            // bla-bla-bla
+        }
+    }

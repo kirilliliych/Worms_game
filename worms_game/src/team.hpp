@@ -50,6 +50,20 @@ public:
         }
     }
 
+    bool handle_event(const BaseEvent &event) override
+    {
+        switch (event.get_type())   // maybe characters should be children of team, not a special members vector?
+        {
+            // case ...:
+            // {
+            //      for (int i = 0; i < members_.size(); ++i)
+            //      {
+            //          members[i]->handle_event(event);
+            //      }
+            // }
+        }
+    }
+
 private:
 
     std::vector<int> randomize_positions_(int spawn_position_center_x, int variance)

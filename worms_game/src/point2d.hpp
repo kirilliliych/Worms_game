@@ -33,6 +33,16 @@ public:
         return y_;
     }
 
+    void set_x(Type x)
+    {
+        x_ = x;
+    }
+
+    void set_y(Type y) 
+    {
+        y_ = y;
+    }
+
     void operator +=(const Point2d &another_point)
     {
         x_ += another_point.x;

@@ -3,6 +3,9 @@
 
 #include "abstract_node.hpp"
 #include "physics_object.hpp"
+#include "sfmlwrap/event.hpp"
+#include "sfmlwrap/events/base_event.hpp"
+#include "sfmlwrap/events/keyboard_events.hpp"
 #include "sfmlwrap/texture.hpp"
 #include "weapon.hpp"
 #include <math.h>
@@ -54,6 +57,59 @@ public:
         Sprite self_sprite(*texture_, area_.left_top());
         self_sprite.set_scale(texture_scale_, texture_scale_);
         surface->draw_sprite(self_sprite);
+    }
+
+    bool handle_event(const BaseEvent &event)
+    {
+        switch (event.get_type())
+        {
+            // pupupu skip
+            
+            case EventType::KEY_PRESSED:
+            {
+                const KeyPressedEvent &kpevent = reinterpret_cast<const KeyPressedEvent &> (event);
+                switch (kevent.code_)
+                {
+                    case KeyboardKey::A:
+                    {
+                        velocity_.set_x(-228);
+                    }
+                    
+                    case KeyboardKey::D:
+                    {
+                        velocity_.set_x(228);
+                    }
+                }
+            }
+
+            case EventType::KEY_RELEASED:
+            {
+                const KeyReleasedEvent &krevent = reinterpret_cast<const KeyReleasedEvent &> (event);
+                switch (kevent.code_)
+                {
+                    case KeyboardKey::A:
+                    {
+                        if (velocity_.x() < 0)
+                        {
+                            velocity_.set_x(0);
+                        }
+                    }
+
+                    case KeyboardKey::D:
+                    {
+                        if (velocity_.x() > 0)
+                        {
+                            velocity_.set_x(0);
+                        }
+                    }
+                }
+            }
+
+            case EventType::TIME_PASSED:
+            {
+                // check_collision();
+            }
+        }
     }
 
 private:

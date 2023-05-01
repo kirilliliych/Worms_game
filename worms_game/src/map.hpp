@@ -2,10 +2,12 @@
 #define MAP_HPP
 
 
+#include <SFML/Window/Event.hpp>
 #include <cstdlib>
 #include <vector>
 #include "abstract_node.hpp"
 #include "game.hpp"
+#include "sfmlwrap/events/base_event.hpp"
 #include "sfmlwrap/image.hpp"
 #include "sfmlwrap/rect.hpp"
 #include "sfmlwrap/texture.hpp"
@@ -78,6 +80,24 @@ public:
 
         update_map_texture_();
     }
+
+    bool handle_event(const BaseEvent &event)
+    {
+        switch (event.get_type())
+        {
+            // pupupu skip
+
+            case EventType::EXPLOSION_EVENT:
+            {
+                for (uint32_t i = 0; i < children_.size(); ++i)
+                {
+                    children_[i]->handle_event(event);
+                }
+
+                // make_crater(radius);
+            }
+        }
+    } 
 
 private:
 
