@@ -7,7 +7,7 @@
       : parent_(parent),
         children_(),
         area_(area),
-        texture_(new Texture())
+        texture_(new Texture()) // do we need that?
     {
         if (parent != nullptr)
         {
@@ -30,8 +30,6 @@
         const Image *texture_image = Game::imanager.get_image(image_file_name);
         assert(texture_image != nullptr);
         texture_->load_from_image(*texture_image, texture_area);
-
-        // rewrite to sprite; do scale
     }
 
     AbstractNode::~AbstractNode()

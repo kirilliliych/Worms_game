@@ -48,6 +48,10 @@ public:
 
     bool is_repeated() const;
 
+    uint32_t get_width() const;
+
+    uint32_t get_height() const;
+
 private:
 public:
     Texture_ *texture_;

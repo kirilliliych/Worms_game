@@ -42,9 +42,19 @@ public:
         delete sprite_;
     }
     
+    void set_texture(const Texture &texture)
+    {
+        sprite_->setTexture(*texture.texture_);
+    }
+
     void set_position(Point2d<int> position)
     {
         sprite_->setPosition(sf::Vector2f(position.x(), position.y()));
+    }
+
+    void set_scale(float factor_x, float factor_y)
+    {
+        sprite_->setScale(factor_x, factor_y);
     }
 
 private:

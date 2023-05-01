@@ -1,9 +1,10 @@
 #include "game.hpp"
 #include "image_manager.hpp"
 #include "map.hpp"
+#include "team.hpp"
 
 
-ImageManager Game::imanager{};          // here all textures from 
+ImageManager Game::imanager{};
 
 
 Game::Game(uint32_t window_width, uint32_t window_height,
@@ -12,9 +13,7 @@ Game::Game(uint32_t window_width, uint32_t window_height,
   : state_(GameState::UNINITIALIZED),
     main_window_(window_width, window_height, title),
     map_(new Map(&main_window_, map_width, map_height)),
-    camera_(new Camera(window_width, window_height)),
-    test_dude_(new Character(map_, {100, 100, {150, 200}},  // currently width and height does not make sense; they will be needed for scaling
-                        "standing.png"))
+    camera_(new Camera(window_width, window_height))
 {}
 
 Game::~Game()
@@ -22,7 +21,7 @@ Game::~Game()
     delete map_;
     delete camera_;
 
-    delete test_dude_;
+    delete test_team_;
 }
 
 
@@ -34,7 +33,9 @@ void Game::run()
     map_->create_map();
 
     // state_ = GameState::GENERATING_UNITS;
-    // here alloc team 
+    test_team_ = new Team(map_, 4, 400, 300, 40, 40);
+
+    // state_ = GameState::READY;
 
     main_window_.open();
     while (main_window_.is_open())

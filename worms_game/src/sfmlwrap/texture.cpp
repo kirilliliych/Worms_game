@@ -58,3 +58,13 @@ bool Texture::is_repeated() const
 {
     return texture_->isRepeated();
 }
+
+uint32_t Texture::get_width() const
+{
+    return texture_->getSize().x;
+}
+
+uint32_t Texture::get_height() const
+{
+    return texture_->getSize().y;
+}
