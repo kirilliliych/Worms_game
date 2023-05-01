@@ -9,9 +9,9 @@
 
 #include "abstract_node.hpp"
 #include "camera.hpp"
-#include "character.hpp"
 #include "desktop.hpp"
 #include "image_manager.hpp"
+#include "team.hpp"
 #include "sfmlwrap/surface.hpp"
 
 
@@ -60,5 +60,5 @@ private:
     Map *map_;
     Camera *camera_;
 
-    Character *test_dude_;
+    Team *test_team_;
 };

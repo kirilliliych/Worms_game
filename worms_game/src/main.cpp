@@ -1,4 +1,3 @@
-#include <SFML/Graphics/BlendMode.hpp>
 #include <cstdlib>
 #include <ctime>
 #include <SFML/Graphics.hpp>
@@ -7,7 +6,7 @@
 #include "sfmlwrap/texture.hpp"
 
 
-// TODO: include guard через pragma; texture заменить на sprite; friend не класс, а отдельные функции
+// TODO: include guard через pragma; friend не класс, а отдельные функции
 
 int main()
 {
@@ -18,7 +17,14 @@ int main()
     game.run();
 
 
-
+    // sf::Texture texture;
+    // texture.create(40, 60);
+    // sf::Sprite sprite(texture);
+    // sf::Vector2u v1 = sprite.getTexture()->getSize();
+    // printf("v1: %u %u\n", v1.x, v1.y);
+    // sprite.scale(2, 3);
+    // sf::Vector2u v2 = sprite.getTexture()->getSize();
+    // printf("v2: %u %u\n", v2.x, v2.y);
 
 
     // // sf::RenderWindow window(sf::VideoMode(800, 600), "works?");

@@ -54,6 +54,16 @@ public:
         return height_;
     }
 
+    void set_width(Type width)
+    {
+        width_ = width;
+    }
+
+    void set_height(Type height)
+    {
+        height_ = height;
+    }
+
     bool contains(Point2d<Type> position) const
     {
         return (left_top_.x() <= position.x()) && (position.x() < left_top_.x() + width_) &&
