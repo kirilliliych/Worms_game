@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <ctime>
 #include <iostream>
 #include <list>
@@ -54,6 +55,10 @@ private:
 
 public:
     static ImageManager imanager;
+
+    using clock = std::chrono::system_clock;
+    using time_point = std::chrono::time_point<std::chrono::system_clock>;
+    static std::chrono::time_point<std::chrono::system_clock> prev_time_point;
 private:
 
     Desktop main_window_;

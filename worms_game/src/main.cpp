@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstdlib>
 #include <ctime>
 #include <SFML/Graphics.hpp>
@@ -12,9 +13,19 @@ int main()
 {
     std::srand(std::time(nullptr));
 
-    Game game(1920, 1080,
-                   1920, 1080);
-    game.run();
+    // Game game(1920, 1080,
+    //                1920, 1080);
+    // game.run();
+
+
+
+    // std::chrono::steady_clock clock{};                                          // example
+    // std::chrono::time_point<std::chrono::steady_clock> p1 = clock.now();
+    // for (int i = 0; i < 200000; ++i)
+    // {}
+    // std::chrono::time_point<std::chrono::steady_clock> p2 = clock.now();
+    // auto diff = p2 - p1;
+    // std::cout << diff.count() << std::endl;
 
 
     // sf::Texture texture;

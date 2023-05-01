@@ -1,6 +1,8 @@
 #pragma once
 
+
 #include "abstract_node.hpp"
+#include "sfmlwrap/events/base_event.hpp"
 #include "sfmlwrap/rect.hpp"
 #include "sfmlwrap/surface.hpp"
 #include "sfmlwrap/texture.hpp"
@@ -45,6 +47,8 @@ public:
 
         update();
     }
+
+    void process_events() const;
 
 private:
 

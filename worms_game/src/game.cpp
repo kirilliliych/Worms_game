@@ -1,3 +1,4 @@
+#include <chrono>
 #include "game.hpp"
 #include "image_manager.hpp"
 #include "map.hpp"
@@ -5,6 +6,7 @@
 
 
 ImageManager Game::imanager{};
+Game::time_point Game::prev_time_point{};
 
 
 Game::Game(uint32_t window_width, uint32_t window_height,
@@ -36,10 +38,15 @@ void Game::run()
     test_team_ = new Team(map_, 4, 400, 300, 40, 40);
 
     // state_ = GameState::READY;
+    
+    clock clock{};
+    prev_time_point = clock.now();
 
     main_window_.open();
     while (main_window_.is_open())
     {
+        main_window_.process_events();
+
         main_window_.redraw();
     }
 }   

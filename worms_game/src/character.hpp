@@ -12,7 +12,7 @@ class Character : public PhysicsObject
 {
 public:
 
-    Character(AbstractNode *parent, const Rect<int> &area)    // do we need?
+    Character(AbstractNode *parent, const Rect<int> &area)    // do we need this?
       : PhysicsObject(parent, area),
         texture_scale_(1),
         hp_(100),

@@ -2,14 +2,13 @@
 #define WINDOW_HPP
 
 
-#include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
-#include <SFML/Window/VideoMode.hpp>
-#include <SFML/Window/Window.hpp>
 #include <string>
 #include <SFML/Graphics.hpp>
-
-#include "event.hpp"
+#include "events/event.hpp"
+#include "sfmlwrap/events/keyboard_events.hpp"
+#include "sfmlwrap/events/mouse_events.hpp"
+#include "sfmlwrap/events/quit_event.hpp"
 #include "surface.hpp"
 
 
@@ -72,22 +71,96 @@ public:
     }
 
 
-    bool poll_event(Event &event)
+protected:
+
+    BaseEvent poll_event(bool *event_polled) const
     {
-        // transformation of sf::Event to event
-
-        sf::Event ev;
-        if (window_->pollEvent(ev))
+        sf::Event sf_event;
+        if (window_->pollEvent(sf_event))
         {
-            if (ev.type == sf::Event::Closed)
-            {
-                window_->close();
-            }
+            *event_polled = true;
 
-            return true;
+            switch (sf_event.type)
+            {
+                case sf::Event::KeyPressed:
+                {
+                    return KeyPressedEvent(*(reinterpret_cast<KeyboardKey *> (&sf_event.key)));
+                }
+
+                case sf::Event::KeyReleased:
+                {
+                    return KeyReleasedEvent(*(reinterpret_cast<KeyboardKey *> (&sf_event.key)));
+                }
+
+                case sf::Event::Closed:
+                {
+                    return QuitEvent();
+                }
+
+                case sf::Event::MouseButtonPressed:
+                {
+                    return MouseClickedEvent(recognize_mouse_button_(sf_event), {sf_event.mouseButton.x,
+                                                                                  sf_event.mouseButton.y});
+                }
+
+                case sf::Event::MouseButtonReleased:
+                {
+                    return MouseReleasedEvent(recognize_mouse_button_(sf_event), {sf_event.mouseButton.x,
+                                                                                         sf_event.mouseButton.y});
+                }
+
+                case sf::Event::MouseMoved:
+                {
+                    return MouseMovedEvent({sf_event.mouseMove.x,
+                                             sf_event.mouseMove.y});
+                }
+
+                default:
+                {
+                    return OtherEvent();
+                }
+            }
         }
 
-        return false;
+        *event_polled = false;
+    }
+
+private:
+
+    MouseButton recognize_mouse_button_(const sf::Event &event) const
+    {
+        switch (event.mouseButton.button)
+        {
+            case sf::Mouse::Left:
+            {
+                return MouseButton::Left;
+            }
+
+            case sf::Mouse::Right:
+            {
+                return MouseButton::Right;
+            }
+
+            case sf::Mouse::Middle:
+            {
+                return MouseButton::Wheel;
+            }
+
+            case sf::Mouse::XButton1:
+            {
+                return MouseButton::Extra1;
+            }
+
+            case sf::Mouse::XButton2:
+            {
+                return MouseButton::Extra2;
+            }
+
+            default:
+            {
+                return MouseButton::Unknown;
+            }
+        }
     }
 
 private:
