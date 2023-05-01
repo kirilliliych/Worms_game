@@ -1,3 +1,4 @@
+#include <SFML/Graphics/BlendMode.hpp>
 #include <cstdlib>
 #include <ctime>
 #include <SFML/Graphics.hpp>

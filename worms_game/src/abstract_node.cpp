@@ -7,7 +7,7 @@
       : parent_(parent),
         children_(),
         area_(area),
-        texture_(new Texture())
+        texture_(new Texture()) // remove?
     {
         if (parent != nullptr)
         {

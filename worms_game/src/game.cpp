@@ -3,7 +3,7 @@
 #include "map.hpp"
 
 
-ImageManager Game::imanager{};          // here all textures from 
+ImageManager Game::imanager{};
 
 
 Game::Game(uint32_t window_width, uint32_t window_height,
