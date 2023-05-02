@@ -2,7 +2,6 @@
 #define WINDOW_HPP
 
 
-#include <SFML/Window/Event.hpp>
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "events/event.hpp"
@@ -73,56 +72,96 @@ public:
 
 protected:
 
-    BaseEvent poll_event(bool *event_polled) const
+    bool poll_event(Event *event) const
     {
         sf::Event sf_event;
         if (window_->pollEvent(sf_event))
         {
-            *event_polled = true;
-
             switch (sf_event.type)
             {
                 case sf::Event::KeyPressed:
                 {
-                    return KeyPressedEvent(*(reinterpret_cast<KeyboardKey *> (&sf_event.key)));
+                    event->set_type(EventType::KEY_PRESSED);
+                    event->kedata_ = *reinterpret_cast<KeyEventData *> (&sf_event.key);
+
+                    break;
+                    // printf("sfml polling events: key_pressed\n");
+                    // return KeyPressedEvent(*(reinterpret_cast<KeyboardKey *> (&sf_event.key)));
                 }
 
                 case sf::Event::KeyReleased:
                 {
-                    return KeyReleasedEvent(*(reinterpret_cast<KeyboardKey *> (&sf_event.key)));
+                    event->set_type(EventType::KEY_RELEASED);
+                    event->kedata_ = *reinterpret_cast<KeyEventData *> (&sf_event.key);
+
+                    break;
+                    // printf("sfml polling events: key_released\n");
+                    // return KeyReleasedEvent(*(reinterpret_cast<KeyboardKey *> (&sf_event.key)));
                 }
 
                 case sf::Event::Closed:
                 {
-                    return QuitEvent();
+                    event->set_type(EventType::QUIT_EVENT);
+
+                    break;
+                    // printf("sfml polling events: quit_event\n");
+                    // return QuitEvent();
                 }
 
                 case sf::Event::MouseButtonPressed:
                 {
-                    return MouseClickedEvent(recognize_mouse_button_(sf_event), {sf_event.mouseButton.x,
-                                                                                  sf_event.mouseButton.y});
+                    event->set_type(EventType::MOUSE_BUTTON_PRESSED);
+                    event->mbedata_.button = recognize_mouse_button_(sf_event);
+                    event->mbedata_.position = {sf_event.mouseButton.x,
+                                                sf_event.mouseButton.y
+                                               };
+
+                    break;
+                    // printf("sfml polling events: mouse_button_pressed\n");
+                    // return MouseClickedEvent(recognize_mouse_button_(sf_event), {sf_event.mouseButton.x,
+                                                                                //   sf_event.mouseButton.y});
                 }
 
                 case sf::Event::MouseButtonReleased:
                 {
-                    return MouseReleasedEvent(recognize_mouse_button_(sf_event), {sf_event.mouseButton.x,
-                                                                                         sf_event.mouseButton.y});
+                    event->set_type(EventType::MOUSE_BUTTON_RELEASED);
+                    event->mbedata_.button = recognize_mouse_button_(sf_event);
+                    event->mbedata_.position = {sf_event.mouseButton.x,
+                                                sf_event.mouseButton.y
+                                               };
+
+                    break;
+                    // printf("sfml polling events: mouse_button_released\n");
+                    // return MouseReleasedEvent(recognize_mouse_button_(sf_event), {sf_event.mouseButton.x,
+                                                                                        //  sf_event.mouseButton.y});
                 }
 
                 case sf::Event::MouseMoved:
                 {
-                    return MouseMovedEvent({sf_event.mouseMove.x,
-                                             sf_event.mouseMove.y});
+                    event->set_type(EventType::MOUSE_MOVED);
+                    event->mmedata_.position = {sf_event.mouseMove.x,
+                                                sf_event.mouseMove.y
+                                               };
+
+                    break;
+                    // printf("sfml polling events: mouse_moved\n");
+                    // return MouseMovedEvent({sf_event.mouseMove.x,
+                                            //  sf_event.mouseMove.y});
                 }
 
                 default:
                 {
-                    return OtherEvent();
+                    event->set_type(EventType::OTHER_EVENT);
+
+                    return false;
+                    // return OtherEvent();
                 }
             }
+
+            return true;
         }
 
-        *event_polled = false;
+        return false;
     }
 
 private:
@@ -133,32 +172,32 @@ private:
         {
             case sf::Mouse::Left:
             {
-                return MouseButton::Left;
+                return MouseButton::LEFT;
             }
 
             case sf::Mouse::Right:
             {
-                return MouseButton::Right;
+                return MouseButton::RIGHT;
             }
 
             case sf::Mouse::Middle:
             {
-                return MouseButton::Wheel;
+                return MouseButton::WHEEL;
             }
 
             case sf::Mouse::XButton1:
             {
-                return MouseButton::Extra1;
+                return MouseButton::EXTRA1;
             }
 
             case sf::Mouse::XButton2:
             {
-                return MouseButton::Extra2;
+                return MouseButton::EXTRA2;
             }
 
             default:
             {
-                return MouseButton::Unknown;
+                return MouseButton::UNKNOWN;
             }
         }
     }

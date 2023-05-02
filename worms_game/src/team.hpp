@@ -6,6 +6,7 @@
 #include "abstract_node.hpp"
 #include "character.hpp"
 #include "point2d.hpp"
+#include "sfmlwrap/events/event.hpp"
 
 
 namespace character_consts
@@ -23,7 +24,7 @@ public:
       : AbstractNode(parent, {0, 0, {0, 0}}),
         members_quantity_(members_quantity),
         members_(members_quantity),
-        priority_(members_quantity, 0)
+        priority_(members_quantity)
     {
         std::vector<int> spawn_positions_x = randomize_positions_(spawn_position_center_x,
                                                                   variance);
@@ -36,6 +37,8 @@ public:
                                                             character_consts::SPAWN_Y_COORD}},
                                                    "standing.png");
         }
+
+        form_priority_();
     }
 
     ~Team()
@@ -50,18 +53,27 @@ public:
         }
     }
 
-    bool handle_event(const BaseEvent &event) override
+    bool handle_event(const Event &event) override
     {
-        switch (event.get_type())   // maybe characters should be children of team, not a special members vector?
+        bool result = false;
+        // printf("entered team handle_event\n");
+
+        if (event.get_type() == EventType::KEY_PRESSED)
         {
-            // case ...:
-            // {
-            //      for (int i = 0; i < members_.size(); ++i)
-            //      {
-            //          members[i]->handle_event(event);
-            //      }
-            // }
+            printf("team event code: %d\n", event.get_type());
         }
+        switch (event.get_type())
+        {
+            default:
+            {
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    result = children_[child_index]->handle_event(event);
+                }
+            }
+        }
+
+        return result;
     }
 
 private:
@@ -80,14 +92,18 @@ private:
     void form_priority_()
     {
         uint32_t left_to_generate = members_quantity_;
+        std::vector<uint32_t> marks(members_quantity_);
+        for (uint32_t i = 0; i < members_quantity_; ++i)
+        {
+            marks[i] = i;
+        }
         while (left_to_generate > 0)
         {
             uint32_t index = std::rand() % left_to_generate;
-            if (priority_[index] == 0)
-            {
-                priority_[index] = members_quantity_ + 1 - left_to_generate;
-                --left_to_generate;
-            }
+            priority_[members_quantity_ - left_to_generate] = marks[index];
+
+            marks.erase(marks.cbegin() + index);
+            --left_to_generate;
         }
     }
 

@@ -9,8 +9,6 @@
 #include <list>
 
 #include "abstract_node.hpp"
-#include "camera.hpp"
-#include "desktop.hpp"
 #include "image_manager.hpp"
 #include "team.hpp"
 #include "sfmlwrap/surface.hpp"
@@ -23,6 +21,7 @@ namespace string_consts
 
 
 class Map;
+class Desktop;
 
 class Game
 {
@@ -51,19 +50,27 @@ public:
 
 private:
 //-----------------------------------Variables-------------------------------------
-    GameState state_;
+    using clock = std::chrono::system_clock;
+    using time_point = std::chrono::time_point<clock>;
+    using time_delta_t = std::chrono::duration<float, std::milli>;
+    static time_point prev_time_point;
 
 public:
-    static ImageManager imanager;
 
-    using clock = std::chrono::system_clock;
-    using time_point = std::chrono::time_point<std::chrono::system_clock>;
-    static std::chrono::time_point<std::chrono::system_clock> prev_time_point;
+    static ImageManager imanager;
+    static time_delta_t time_delta;
+
+    static uint32_t window_width_;
+    static uint32_t window_height_;
+    static uint32_t map_width_;
+    static uint32_t map_height_;
+    
 private:
 
-    Desktop main_window_;
-    Map *map_;
-    Camera *camera_;
+    GameState state_;
 
-    Team *test_team_;
+    Desktop *main_window_;
+    Map *map_;
+
+    Team *test_team_;   // list of teams?
 };

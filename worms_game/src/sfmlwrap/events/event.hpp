@@ -1,28 +1,204 @@
 #pragma once
 
 
-#include "base_event.hpp"
-#include "explosion_event.hpp"
-#include "keyboard_events.hpp"
-#include "mouse_events.hpp"
-#include "quit_event.hpp"
-#include "time_event.hpp"
+#include <chrono>
+#include "point2d.hpp"
 
 
-class NoEvent : public BaseEvent
+enum class EventType
 {
-public:
-
-    NoEvent()
-      : BaseEvent(EventType::NO_EVENT)
-    {}
+    NO_EVENT,
+    MOUSE_BUTTON_PRESSED,
+    MOUSE_BUTTON_RELEASED,
+    MOUSE_MOVED,
+    KEY_PRESSED,
+    KEY_RELEASED,
+    TIME_PASSED,
+    QUIT_EVENT,
+    EXPLOSION_EVENT,
+    OTHER_EVENT,
+    EVENT_TYPE_CNT
 };
 
-class OtherEvent : public BaseEvent
+
+enum class KeyboardKey
+{
+    Unknown = -1, 
+    A = 0,        
+    B,            
+    C,            
+    D,            
+    E,            
+    F,            
+    G,            
+    H,            
+    I,            
+    J,            
+    K,            
+    L,            
+    M,            
+    N,            
+    O,            
+    P,            
+    Q,            
+    R,            
+    S,            
+    T,            
+    U,            
+    V,            
+    W,            
+    X,            
+    Y,            
+    Z,            
+    Num0,         
+    Num1,         
+    Num2,         
+    Num3,         
+    Num4,         
+    Num5,         
+    Num6,         
+    Num7,         
+    Num8,         
+    Num9,         
+    Escape,       
+    LControl,     
+    LShift,       
+    LAlt,         
+    LSystem,      
+    RControl,     
+    RShift,       
+    RAlt,         
+    RSystem,      
+    Menu,         
+    LBracket,     
+    RBracket,     
+    Semicolon,    
+    Comma,        
+    Period,       
+    Quote,        
+    Slash,        
+    Backslash,    
+    Tilde,        
+    Equal,        
+    Hyphen,       
+    Space,        
+    Enter,        
+    Backspace,    
+    Tab,          
+    PageUp,       
+    PageDown,     
+    End,          
+    Home,         
+    Insert,       
+    Delete,       
+    Add,          
+    Subtract,     
+    Multiply,     
+    Divide,       
+    Left,         
+    Right,        
+    Up,           
+    Down,         
+    Numpad0,      
+    Numpad1,      
+    Numpad2,      
+    Numpad3,      
+    Numpad4,      
+    Numpad5,      
+    Numpad6,      
+    Numpad7,      
+    Numpad8,      
+    Numpad9,      
+    F1,           
+    F2,           
+    F3,           
+    F4,           
+    F5,           
+    F6,           
+    F7,           
+    F8,           
+    F9,           
+    F10,          
+    F11,          
+    F12,          
+    F13,          
+    F14,          
+    F15,          
+    Pause
+};
+
+struct KeyEventData
+{
+    KeyboardKey key_code;
+};
+
+
+enum class MouseButton
+{
+    UNKNOWN = -1,
+    LEFT,
+    RIGHT,
+    WHEEL,
+    EXTRA1,
+    EXTRA2
+};
+
+struct MouseButtonEventData
+{
+    MouseButton button;
+    Point2d<int> position;
+};
+
+struct MouseMoveEventData
+{
+    Point2d<int> position;
+};
+
+struct MouseWheelEventData
+{
+    int delta;
+    Point2d<int> position;
+};
+
+
+enum class EventHandlerState
+{
+    Skipped,
+    Accepted
+};
+
+
+class Event
 {
 public:
 
-    OtherEvent()
-      : BaseEvent(EventType::OTHER_EVENT)
+    Event()
+      : type_(EventType::NO_EVENT)
     {}
+
+    EventType get_type() const
+    {
+        return type_;
+    }
+
+    void set_type(EventType type)
+    {
+        type_ = type;
+    }
+
+private:
+
+    EventType type_;
+
+public:
+
+    using time_delta_t = std::chrono::duration<float, std::chrono::milliseconds::period>;
+    union
+    {
+        MouseButtonEventData mbedata_;
+        MouseMoveEventData   mmedata_;
+        MouseWheelEventData  mwedata_;
+        KeyEventData         kedata_;
+        time_delta_t         dt_;
+    };
 };

@@ -64,6 +64,21 @@ public:
         height_ = height;
     }
 
+    void set_left_top(Point2d<Type> position)
+    {
+        left_top_ = position;
+    }
+
+    void set_left_top_x(int x)
+    {
+        left_top_.set_x(x);
+    }
+
+    void set_left_top_y(int y)
+    {
+        left_top_.set_y(y);
+    }
+
     bool contains(Point2d<Type> position) const
     {
         return (left_top_.x() <= position.x()) && (position.x() < left_top_.x() + width_) &&

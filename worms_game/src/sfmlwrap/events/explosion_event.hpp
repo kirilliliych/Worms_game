@@ -5,19 +5,19 @@
 #include "Vector2d.hpp"
 
 
-class ExplosionEvent : public BaseEvent
-{
+// class ExplosionEvent : public BaseEvent
+// {
 
-public:
+// public:
 
-    ExplosionEvent(Vector2d pos, float r, float force)
-      : BaseEvent(EventType::EXPLOSION_EVENT),
-        pos_(pos), r_(r), force_(force)
-     {}
+//     ExplosionEvent(Vector2d pos, float r, float force)
+//       : BaseEvent(EventType::EXPLOSION_EVENT),
+//         pos_(pos), r_(r), force_(force)
+//      {}
   
-public:
+// public:
 
-    Vector2d pos_;
-    float r_;
-    float force_;
-};
+//     Vector2d pos_;
+//     float r_;
+//     float force_;
+// };

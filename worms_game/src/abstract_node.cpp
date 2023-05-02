@@ -1,7 +1,5 @@
 #include "abstract_node.hpp"
 #include "game.hpp"
-#include "sfmlwrap/events/base_event.hpp"
-#include "sfmlwrap/texture.hpp"
 
 
     AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area)
@@ -38,23 +36,23 @@
         delete texture_;
     }
 
-    void AbstractNode::render(Surface *surface)
+    void AbstractNode::render(Surface *surface, const Point2d<int> &camera_offset)
     {
         assert(surface != nullptr);
 
-        render_self(surface);
-        render_children(surface);
+        render_self(surface, camera_offset);
+        render_children(surface, camera_offset);
     }
 
-    void AbstractNode::render_self(Surface *surface)
+    void AbstractNode::render_self(Surface *surface, const Point2d<int> &camera_offset)
     {
         assert(surface != nullptr);
 
-        Sprite self_sprite(*texture_, area_.left_top());
+        Sprite self_sprite(*texture_, area_.left_top() - camera_offset);
         surface->draw_sprite(self_sprite);
     }
 
-    void AbstractNode::render_children(Surface *surface)
+    void AbstractNode::render_children(Surface *surface, const Point2d<int> &camera_offset)
     {
         assert(surface != nullptr);
 
@@ -62,21 +60,27 @@
         auto children_end = children_.end();
         while (children_iterator != children_end)
         {
-            (*children_iterator)->render(surface);
+            (*children_iterator)->render(surface, camera_offset);
             
             ++children_iterator;
         }
     }
 
-    bool handle_event(const BaseEvent &event)
+    bool AbstractNode::handle_event(const Event &event)
     {
+        bool result = false;
+        printf("entered abstract node handle event\n");
+
         switch (event.get_type())
         {
-            case EventType::MOUSE_BUTTON_CLICKED:
+            default:
             {
-                return false;
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    result = children_[child_index]->handle_event(event);
+                }
             }
+        };
 
-            // bla-bla-bla
-        }
+        return result;
     }

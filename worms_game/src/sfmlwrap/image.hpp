@@ -27,12 +27,6 @@ public:
     Image()
       : image_(new Image_())
     {}
-    
-    Image &operator =(const Image &other)   // incorrect
-    {
-        // *image_ = *other.image_;     // incorrect
-        image_->copy(*other.image_, 0, 0);  // incorrect
-    }
 
     ~Image()
     {

@@ -4,11 +4,11 @@
 #include "base_event.hpp"
 
 
-class QuitEvent : public BaseEvent
-{
-public:
+// class QuitEvent : public BaseEvent
+// {
+// public:
 
-    QuitEvent()
-      : BaseEvent(EventType::QUIT_EVENT)
-    {}
-};
+//     QuitEvent()
+//       : BaseEvent(EventType::QUIT_EVENT)
+//     {}
+// };

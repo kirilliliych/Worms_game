@@ -3,7 +3,7 @@
 
 #include <cassert>
 #include "point2d.hpp"
-#include "sfmlwrap/events/base_event.hpp"
+#include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/surface.hpp"
 #include "sfmlwrap/texture.hpp"
 #include "sfmlwrap/rect.hpp"
@@ -21,15 +21,15 @@ protected:
     virtual ~AbstractNode();
 
 
-    void render(Surface *surface);
+    void render(Surface *surface, const Point2d<int> &camera_offset);
 
-    virtual void render_self(Surface *surface);
+    virtual void render_self(Surface *surface, const Point2d<int> &camera_offset);
 
-    void render_children(Surface *surface);
+    void render_children(Surface *surface, const Point2d<int> &camera_offset);
 
 public:
 
-    virtual bool handle_event(const BaseEvent &event);
+    virtual bool handle_event(const Event &event);
 
 protected:
 

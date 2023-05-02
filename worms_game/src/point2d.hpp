@@ -58,13 +58,13 @@ public:
     Point2d operator +(const Point2d &another_point) const
     {      
         return {this->x_ + another_point.x_,
-                this->y_ + another_point.y};
+                this->y_ + another_point.y_};
     }
     
     Point2d operator -(const Point2d &another_point) const
     {
         return {this->x_ - another_point.x_,
-                this->y_ - another_point.y};
+                this->y_ - another_point.y_};
     }
 
     Point2d operator -() const

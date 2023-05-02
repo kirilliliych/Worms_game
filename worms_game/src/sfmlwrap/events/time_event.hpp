@@ -1,20 +1,23 @@
 #pragma once
 
-#include <SFML/Window.hpp>
 
+#include <chrono>
+#include <ratio>
 #include "base_event.hpp"
 
 
-class TimeEvent : public BaseEvent
-{
-public:
+// class TimeEvent : public BaseEvent
+// {
+//     using time_delta_t = std::chrono::duration<float, std::chrono::milliseconds::period>;
 
-  TimeEvent(float dt)
-    : BaseEvent(EventType::TIME_PASSED),
-      dt_(dt)
-  {}
+// public:
 
-public:
+//   TimeEvent(time_delta_t dt)
+//     : BaseEvent(EventType::TIME_PASSED),
+//       dt_(dt)
+//   {}
 
-    float dt_;
-};
+// public:
+
+//     time_delta_t dt_;
+// };

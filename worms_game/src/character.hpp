@@ -3,12 +3,9 @@
 
 #include "abstract_node.hpp"
 #include "physics_object.hpp"
-#include "sfmlwrap/event.hpp"
-#include "sfmlwrap/events/base_event.hpp"
-#include "sfmlwrap/events/keyboard_events.hpp"
+#include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/texture.hpp"
 #include "weapon.hpp"
-#include <math.h>
 
 
 class Character : public PhysicsObject
@@ -50,75 +47,183 @@ public:
         }
     }
 
-    void render_self(Surface *surface) override
+    void render_self(Surface *surface, const Point2d<int> &camera_offset) override
     {
         assert(surface != nullptr);
 
-        Sprite self_sprite(*texture_, area_.left_top());
+        Sprite self_sprite(*texture_, area_.left_top() - camera_offset);
         self_sprite.set_scale(texture_scale_, texture_scale_);
         surface->draw_sprite(self_sprite);
     }
 
-    bool handle_event(const BaseEvent &event)
+    bool handle_event(const Event &event) override
     {
-        switch (event.get_type())
+        bool result = false;
+        // printf("entered character handle event\n");
+
+        if (event.get_type() == EventType::KEY_PRESSED)
         {
-            // pupupu skip
-            
-            case EventType::KEY_PRESSED:
-            {
-                const KeyPressedEvent &kpevent = reinterpret_cast<const KeyPressedEvent &> (event);
-                switch (kevent.code_)
-                {
-                    case KeyboardKey::A:
-                    {
-                        velocity_.set_x(-228);
-                    }
+            printf("character event code: %d\n", event.get_type());
+        }
+        switch (event.get_type())
+        {            
+            // case EventType::KEY_PRESSED:
+            // {
+            //     const KeyPressedEvent &kpevent = reinterpret_cast<const KeyPressedEvent &> (event);
+            //     switch (kpevent.code_)
+            //     {
+            //         case KeyboardKey::A:    // how to climb? 
+            //         {
+            //             printf("character key_pressed a\n");
+                        
+            //             if (under_control_)
+            //             {
+            //                 velocity_.set_x(-228);
+            //             }
+
+            //             for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+            //             {
+            //                 result = children_[child_index]->handle_event(event);
+            //             }
+
+            //             break;
+            //         }
                     
-                    case KeyboardKey::D:
-                    {
-                        velocity_.set_x(228);
-                    }
-                }
-            }
+            //         case KeyboardKey::D:
+            //         {
+            //             printf("character key_pressed d\n");
 
-            case EventType::KEY_RELEASED:
+            //             if (under_control_)
+            //             {
+            //                 velocity_.set_x(228);
+            //             }
+
+            //             for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+            //             {
+            //                 result = children_[child_index]->handle_event(event);
+            //             }
+
+            //             break;
+            //         }
+
+            //         case KeyboardKey::Enter:
+            //         {
+            //             printf("character key_pressed enter\n");
+
+            //             for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+            //             {
+            //                 result = children_[child_index]->handle_event(event);
+            //             }
+
+            //             break;
+            //         }
+
+            //         default:
+            //         {
+            //             break;
+            //         }
+            //     }
+
+            //     break;
+            // }
+
+            // case EventType::KEY_RELEASED:
+            // {
+            //     const KeyReleasedEvent &krevent = reinterpret_cast<const KeyReleasedEvent &> (event);
+            //     switch (krevent.code_)
+            //     {
+            //         case KeyboardKey::A:
+            //         {
+            //             printf("character key_released a\n");
+            //             if (under_control_)
+            //             {
+            //                 if (velocity_.x() < 0)
+            //                 {
+            //                     velocity_.set_x(0);
+            //                 }
+            //             }
+
+            //             for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+            //             {
+            //                 result = children_[child_index]->handle_event(event);
+            //             }
+                        
+            //             break;
+            //         }
+
+            //         case KeyboardKey::D:
+            //         {
+            //             printf("character key_released d\n");
+            //             if (under_control_)
+            //             {
+            //                 if (velocity_.x() > 0)
+            //                 {
+            //                     velocity_.set_x(0);
+            //                 }
+            //             }
+
+            //             for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+            //             {
+            //                 result = children_[child_index]->handle_event(event);
+            //             }
+
+            //             break;
+            //         }
+
+            //         case KeyboardKey::Enter:
+            //         {
+            //             printf("character key_released enter\n");
+
+            //             for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+            //             {
+            //                 result = children_[child_index]->handle_event(event);
+            //             }
+
+            //             break;
+            //         }
+
+            //         default:
+            //         {
+            //             break;
+            //         }
+            //     }
+
+            //     break;
+            // }
+
+            // case EventType::TIME_PASSED:
+            // {
+            //     printf("character time_passed\n");
+            //     // check_collision();
+
+            //     for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+            //     {
+            //         result = children_[child_index]->handle_event(event);
+            //     }
+
+            //     break;
+            // }
+
+            default:
             {
-                const KeyReleasedEvent &krevent = reinterpret_cast<const KeyReleasedEvent &> (event);
-                switch (kevent.code_)
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
                 {
-                    case KeyboardKey::A:
-                    {
-                        if (velocity_.x() < 0)
-                        {
-                            velocity_.set_x(0);
-                        }
-                    }
-
-                    case KeyboardKey::D:
-                    {
-                        if (velocity_.x() > 0)
-                        {
-                            velocity_.set_x(0);
-                        }
-                    }
+                    result = children_[child_index]->handle_event(event);
                 }
-            }
-
-            case EventType::TIME_PASSED:
-            {
-                // check_collision();
             }
         }
+
+        return result;
     }
 
 private:
+public:
 
     float texture_scale_;
 
     // Weapon cur_weapon_;
     // Crosshair crosshair_;
-public:
+
     int hp_;
 
     bool under_control_;

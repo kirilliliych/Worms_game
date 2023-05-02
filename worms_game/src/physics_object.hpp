@@ -4,6 +4,7 @@
 
 #include "abstract_node.hpp"
 #include "point2d.hpp"
+#include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/rect.hpp"
 
 
@@ -25,6 +26,25 @@ protected:
         acceleration_({0, 0}),
         is_stable_(true)
     {}
+    
+    bool handle_event(const Event &event) override
+    {
+        bool result = false;
+        printf("entered physics object handle event\n");
+
+        switch (event.get_type())
+        {
+            default:
+            {
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    result = children_[child_index]->handle_event(event);
+                }
+            }
+        };
+
+        return result;
+    }
 
 protected:
 

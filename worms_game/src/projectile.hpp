@@ -10,13 +10,36 @@ class Projectile : public PhysicsObject
 {
 public:
 
-    Projectile(AbstractNode *parent)
-      : PhysicsObject(parent)
+    Projectile(AbstractNode *parent, const Rect<int> &area)
+      : PhysicsObject(parent, area)
     {}
 
-    Projectile(AbstractNode *parent, const std::string &texture_file_name, const Rect<int> &area = Rect<int>())
-      : PhysicsObject(parent, texture_file_name, area)
+    Projectile(AbstractNode *parent, const Rect<int> &area, const std::string &texture_file_name,
+               const Rect<int> &texture_area = Rect<int>())
+      : PhysicsObject(parent, area, texture_file_name, area)
     {}
+
+    bool handle_event(const Event &event) override
+    {
+        bool result = false;
+
+        switch (event.get_type())
+        {
+            // nothing or explosion_event
+
+            default:
+            {
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    result = children_[child_index]->handle_event(event);
+                }
+
+                break;
+            }
+        }
+
+        return result;
+    }
 
 private:
 
