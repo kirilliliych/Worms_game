@@ -6,11 +6,13 @@
 #include "image_manager.hpp"
 #include "map.hpp"
 #include "physics_object.hpp"
+#include "projectile.hpp"
 #include "sfmlwrap/events/time_event.hpp"
 #include "team.hpp"
 
 
 Game *Game::game = nullptr;
+
 
 ImageManager Game::imanager{};
 Game::time_point Game::prev_time_point{};
@@ -28,7 +30,9 @@ Game::Game(uint32_t window_width, uint32_t window_height,
     main_window_(new Desktop(window_width, window_height, title)),
     map_(new Map(main_window_, {static_cast<int> (map_width),
                                             static_cast<int> (map_height),
-                                                    {0, 0}}))
+                                                    {0, 0}})),
+    under_control_(nullptr),
+    rocket_(new Projectile(map_, {40, 40, {500, 200}}, "rocket.png"))
 {
     assert(game == nullptr);    // singleton
     game = this;
@@ -41,9 +45,11 @@ Game::Game(uint32_t window_width, uint32_t window_height,
 
 Game::~Game()
 {
+    delete main_window_;
     delete map_;
+    delete team_;
 
-    delete test_team_;
+    delete rocket_;
 }
 
 
@@ -55,8 +61,8 @@ void Game::run()
     map_->create_map();
 
     // state_ = GameState::GENERATING_UNITS;
-    test_team_ = new Team(map_, 3, 400, 300, 40, 40);
-
+    team_ = new Team(map_, 3, 400, 300, 40, 40);
+    under_control_ = team_->get_next_character();
     // state_ = GameState::READY;
     
     clock clock{};
@@ -97,4 +103,19 @@ bool Game::check_collision(const void *checker_address, PhysicsEntity checker, c
     collision_event.cedata_.position = collision_point;
     
     return main_window_->handle_event(collision_event);
+}
+
+void Game::process_explosion(float radius, const Point2d<int> &position)
+{
+    Event explosion_event;
+    explosion_event.set_type(EventType::EXPLOSION_EVENT);
+    explosion_event.eedata_.radius   = radius;
+    explosion_event.eedata_.position = position;
+
+    main_window_->handle_event(explosion_event); 
+}
+
+const Character *Game::get_character_under_control() const
+{
+    return under_control_;
 }

@@ -79,7 +79,7 @@ public:
         left_top_.set_y(y);
     }
 
-    bool contains(Point2d<Type> position) const
+    bool contains(const Point2d<Type> &position) const
     {
         return (left_top_.x() <= position.x()) && (position.x() < left_top_.x() + width_) &&
                (left_top_.y() <= position.y()) && (position.y() < left_top_.y() + height_);

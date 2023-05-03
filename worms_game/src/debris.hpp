@@ -11,26 +11,29 @@ class Debris : public PhysicsObject
 public:
 
     Debris(AbstractNode *parent, const Rect<int> &area)
-      : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION)
+      : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION, 8)
     {
         type_ = PhysicsEntity::DEBRIS;
 
-        velocity_.set_x(200.f * cosf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
-        velocity_.set_y(200.f * sinf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
+        velocity_.set_x(80.f * cosf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
+        velocity_.set_y(80.f * sinf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
     }
 
     Debris(AbstractNode *parent, const Rect<int> &area,
            const std::string &texture_file_name, const Rect<int> &texture_area = Rect<int>())
-      : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION,
-                      texture_file_name, texture_area),
+      : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION, 8,
+                      texture_file_name, texture_area)
     {
         type_ = PhysicsEntity::DEBRIS;
 
-        velocity_.set_x(200.f * cosf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
-        velocity_.set_y(200.f * sinf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
+        velocity_.set_x(80.f * cosf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
+        velocity_.set_y(80.f * sinf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
     }
 
-    bool handle_event(const Event &event)
+    void on_bounce_death(const Point2d<int> &death_position) override
+    {}
+
+    bool handle_event(const Event &event) override
     {
         bool result = false;
 
@@ -50,6 +53,7 @@ public:
                         result = true;
                     }
                 }
+                // result = children_handle_event(event);
 
                 break;
             }
@@ -63,6 +67,7 @@ public:
                         result = true;
                     }
                 }
+                // result = children_handle_event(event);
             }
         }
 

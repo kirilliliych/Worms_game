@@ -4,9 +4,8 @@
 #include <ratio>
 
 #include <SFML/Graphics.hpp>
+#include <type_traits>
 #include "game.hpp"
-#include "sfmlwrap/texture.hpp"
-
 
 // TODO: include guard через pragma; friend не класс, а отдельные функции
 
@@ -17,6 +16,23 @@ int main()
     Game game(1200, 800,
                         1920, 1080);
     game.run();
+
+    // std::vector<int> v(7);
+    // for (int i = 0; i < 7; ++i)
+    // {
+    //     v[i] = i + 1;
+    // }
+    // for (int i = 0; i < v.size(); ++i)
+    // {
+    //     std::cout << v[i] << " ";
+    // }
+    // std::cout << std::endl;
+    // v.erase(std::remove_if(v.begin(), v.end(), [](int val) {return val % 2 == 0;}), v.end());
+    // for (int i = 0; i < v.size(); ++i)
+    // {
+    //     std::cout << v[i] << " ";
+    // }
+    // std::cout << std::endl <<  "size: " << v.size() << std::endl;
 
 
     // std::chrono::system_clock clock{};                                          // example

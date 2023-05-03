@@ -23,7 +23,6 @@ protected:
         acceleration_(acceleration),
         friction_(friction),
         bounces_before_death_(bounces_before_death),
-        exists_(true),
         is_stable_(true),
         radius_(std::max(area.get_width(), area.get_height()))
     {}
@@ -37,11 +36,15 @@ protected:
         acceleration_(acceleration),
         friction_(friction),
         bounces_before_death_(bounces_before_death),
-        exists_(true),
         is_stable_(true),
         radius_(std::max(area.get_width(), area.get_height()))
-    {}
+    {
+    }
+
+    virtual void on_bounce_death(const Point2d<int> &death_position) = 0;
     
+public:
+
     PhysicsEntity get_physics_entity_type() const
     {
         return type_;
@@ -55,10 +58,13 @@ protected:
         {
             case EventType::TIME_PASSED:
             {
-                acceleration_.set_y(6000);
+                acceleration_.set_y(1000);
 
                 velocity_ += acceleration_ * Game::time_delta.count();
-                // printf("velocity: %g %g\n", velocity_.x(), velocity_.y());
+                if (this == reinterpret_cast<const PhysicsObject *> (Game::game->get_character_under_control()))
+                {
+                    printf("chosen velocity: %g %g\n", velocity_.x(), velocity_.y());
+                }
 
                 float new_x = area_.left_top().x() + velocity_.x() * Game::time_delta.count();
                 float new_y = area_.left_top().y() + velocity_.y() * Game::time_delta.count();
@@ -72,7 +78,7 @@ protected:
                 bool collision_happened = false;
                 float response_x = 0;
                 float response_y = 0;
-                for (float r = angle - 3.14159f / 2.0f; r < angle + 3.14159f / 2.0f; r += 3.14159f / 8.0f)
+                for (float r = angle - 3.14159f / 2.0f; r < angle + 3.14159f / 2.0f; r += 3.14159f / 16.0f)
                 {
                     float test_pos_x = radius_ * cosf(r) + new_x;
                     float test_pos_y = radius_ * sinf(r) + new_y;
@@ -109,16 +115,34 @@ protected:
                                                     velocity_.y() * velocity_.y());
                 if (collision_happened)
                 {
+                    // if (this->get_physics_entity_type() == PhysicsEntity::CHARACTER)
+                    // {
+                    //     (reinterpret_cast<Character *> (this))->init_falling_ = false;
+                    // }
+
                     is_stable_ = true;
                     
                     float response_magnitude = sqrtf(response_x * response_x +
                                                         response_y * response_y);
                     
                     // reflection vector
-                    float dot = velocity_.x() * (response_x / response_magnitude) +
-                                velocity_.y() * (response_y / response_magnitude);
-                    velocity_.set_x((-2.0f * dot * (response_x / response_magnitude) + velocity_.x()) * friction_);
-                    velocity_.set_y((-2.0f * dot * (response_y / response_magnitude) + velocity_.y()) * friction_); 
+                    float response_x_norm = response_x / response_magnitude;
+                    float response_y_norm = response_y / response_magnitude;
+                    float dot = velocity_.x() * (response_x_norm) +
+                                velocity_.y() * (response_y_norm);
+                    velocity_.set_x((-2.0f * dot * (response_x_norm) + velocity_.x()) * friction_);
+                    velocity_.set_y((-2.0f * dot * (response_y_norm) + velocity_.y()) * friction_);
+
+                    if (bounces_before_death_ > 0)
+                    {
+                        --bounces_before_death_;
+                        exists_ = bounces_before_death_ > 0;
+
+                        if (!exists_)
+                        {
+                            on_bounce_death(area_.left_top() + Point2d<int>(area_.get_width() / 2, area_.get_height() / 2));
+                        }
+                    }
                 }
                 else
                 {
@@ -126,14 +150,17 @@ protected:
                     area_.set_left_top_y(new_y);
                 }
 
-                if (velocity_magnitude < 0.1f)
+                if (velocity_magnitude < 5.f)
                 {
+
+                    printf("set to true\n");
                     is_stable_ = true;
 
-                    velocity_.set_x(0);
-                    velocity_.set_y(0);
+                    // velocity_.set_x(0);
+                    // velocity_.set_y(0);
                 }
 
+                // result = children_handle_event(event);
                 for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
                 {
                     if (children_[child_index]->handle_event(event))
@@ -154,6 +181,7 @@ protected:
                         result = true;
                     }
                 }
+                // result = children_handle_event(event);
             }
         }
 
@@ -169,7 +197,6 @@ protected:
     float friction_;
 
     int bounces_before_death_;
-    bool exists_; 
 
     bool is_stable_;
 

@@ -24,7 +24,6 @@ public:
         camera_(new Camera(this, {static_cast<int> (width),
                                   static_cast<int> (height), {0, 0}}))
     {
-        id = 0;
         main_surface_->create(width, height);
     }
 
@@ -52,7 +51,10 @@ public:
 
         switch (event.get_type())
         {
-            // quit_event
+            case EventType::QUIT_EVENT:
+            {
+                close();
+            }
 
             default:
             {
@@ -63,6 +65,7 @@ public:
                         result = true;
                     }
                 }
+                // result = children_handle_event(event);
             }
         }
 
@@ -74,6 +77,15 @@ public:
         Event event;
         while (poll_event(&event))
         {
+            if ((event.get_type() == EventType::MOUSE_BUTTON_PRESSED)  ||
+                (event.get_type() == EventType::MOUSE_BUTTON_RELEASED))
+            {
+                event.mbedata_.position += camera_->get_position();
+            }
+            if (event.get_type() == EventType::MOUSE_MOVED)
+            {
+                event.mmedata_.position += camera_->get_position();
+            }
             handle_event(event);
         }
     }

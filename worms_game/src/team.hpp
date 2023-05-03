@@ -24,7 +24,8 @@ public:
       : AbstractNode(parent, {0, 0, {0, 0}}),
         members_quantity_(members_quantity),
         members_(members_quantity),
-        priority_(members_quantity)
+        priority_(members_quantity),
+        cur_character_priority_index_(0)
     {
         std::vector<int> spawn_positions_x = randomize_positions_(spawn_position_center_x,
                                                                   variance);
@@ -32,9 +33,11 @@ public:
         for (uint32_t member_index = 0; member_index < members_quantity; ++member_index)
         {
             members_[member_index] = new Character(this, {static_cast<int> (character_pixel_width),
-                                                                static_cast<int> (character_pixel_height),
-                                                        {spawn_positions_x[member_index], 
-                                                            character_consts::SPAWN_Y_COORD}},
+                                                          static_cast<int> (character_pixel_height),
+                                                          {spawn_positions_x[member_index], 
+                                                           character_consts::SPAWN_Y_COORD
+                                                          }
+                                                         },
                                                    "standing.png");
         }
 
@@ -43,14 +46,23 @@ public:
 
     ~Team()
     {
-        auto members_iterator = members_.cbegin();
-        auto members_end = members_.cend();
-        while (members_iterator != members_end)
-        {
-            delete *members_iterator;
+        // auto members_iterator = members_.cbegin();
+        // auto members_end = members_.cend();
+        // while (members_iterator != members_end)
+        // {
+        //     delete *members_iterator;
 
-            ++members_iterator;
-        }
+        //     ++members_iterator;
+        // }
+    }
+
+    const Character *get_next_character()
+    {
+        const Character *result = members_[cur_character_priority_index_]; 
+        ++cur_character_priority_index_;
+        cur_character_priority_index_ %= members_quantity_;
+
+        return result;
     }
 
     bool handle_event(const Event &event) override
@@ -68,6 +80,7 @@ public:
                         result = true;
                     }
                 }
+                // result = children_handle_event(event);
             }
         }
 
@@ -108,4 +121,5 @@ private:
     uint32_t members_quantity_;
     std::vector<Character *> members_;
     std::vector<uint32_t> priority_;
+    uint32_t cur_character_priority_index_;
 };

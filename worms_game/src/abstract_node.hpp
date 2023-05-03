@@ -2,6 +2,7 @@
 
 
 #include <cassert>
+#include <memory>
 #include "point2d.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/surface.hpp"
@@ -11,7 +12,7 @@
 
 class AbstractNode
 {
-protected:
+public:
 
     AbstractNode(AbstractNode *parent, const Rect<int> &area);
     
@@ -30,19 +31,21 @@ protected:
 public:
 
     uint32_t add_child(AbstractNode *child);
-    
+
+    bool does_exist() const;
+
     virtual bool handle_event(const Event &event);
+
+    bool children_handle_event(const Event &event);
 
 protected:
 
     AbstractNode *parent_;
-    std::vector<AbstractNode *> children_;
+    std::vector<std::unique_ptr<AbstractNode>> children_;
 
     Rect<int> area_;
 
     Texture *texture_;
 
-public:
-
-    int id;     // for debug
+    bool exists_;
 };

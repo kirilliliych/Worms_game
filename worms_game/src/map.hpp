@@ -2,13 +2,14 @@
 #define MAP_HPP
 
 
-#include <SFML/Window/Event.hpp>
+#include <algorithm>
 #include <cstdlib>
 #include <vector>
 #include "abstract_node.hpp"
 #include "collidable.hpp"
 #include "debris.hpp"
 #include "game.hpp"
+#include "physics_object.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/image.hpp"
 #include "sfmlwrap/rect.hpp"
@@ -38,8 +39,6 @@ public:
         map_(static_cast<uint32_t> (area_.get_width() * area.get_height()), 0),
         landscape_images_(string_consts::landscape_images_names_pool.size())
     {
-        id = 1;
-
         uint64_t landscape_types_quantity = string_consts::landscape_images_names_pool.size();
         for (uint64_t i = 0; i < landscape_types_quantity; ++i)
         {
@@ -92,12 +91,7 @@ public:
         {
             case EventType::MOUSE_BUTTON_PRESSED:
             {
-                for (uint32_t i = 0; i < 20; ++i)
-                {
-                    Debris *debris = new Debris(this, {8, 8, event.mbedata_.position},
-                                                "debris.png");
-
-                }
+                Game::game->process_explosion(40, event.mbedata_.position);
 
                 for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
                 {
@@ -106,6 +100,25 @@ public:
                         result = true;
                     }
                 }
+                // result = children_handle_event(event);
+
+                break;
+            }
+
+            case EventType::EXPLOSION_EVENT:
+            {
+                make_crater_(event.eedata_.position, event.eedata_.radius);
+                update_map_texture_();
+
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
+                }
+
+                // result = children_handle_event(event);
 
                 break;
             }
@@ -124,6 +137,26 @@ public:
                         result = true;
                     }
                 }
+                // result = children_handle_event(event);
+
+                break;
+            }
+
+            case EventType::TIME_PASSED:
+            {
+                children_.erase(std::remove_if(children_.begin(),
+                                                     children_.end(),
+                                                     [](const std::unique_ptr<AbstractNode> &object) {return !object->does_exist();}),
+                                children_.cend());
+
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
+                }
+                // result = children_handle_event(event);
 
                 break;
             }
@@ -139,6 +172,7 @@ public:
                         result = true;
                     }
                 }
+                // result = children_handle_event(event);
             }
         }
 
@@ -221,6 +255,36 @@ private:
 
         return result;
 	}
+
+    void make_crater_(const Point2d<int> &position, float radius)
+    {
+        auto CircleBresenham = [&](Point2d<int> position, int radius)
+		{
+			int x = 0;
+			int y = radius;
+			int p = 3 - 2 * radius;
+			if (!radius) return;
+
+			auto drawline = [&](int sx, int ex, int ny)
+			{
+				for (int i = sx; i < ex; i++)
+					if (ny >= 0 && ny < area_.get_height() && i >= 0 && i < area_.get_width())
+						map_[ny * area_.get_width() + i] = MapPixelCondition::SKY;
+			};
+
+			while (y >= x) 
+			{
+				drawline(position.x() - x, position.x() + x, position.y() - y);
+				drawline(position.x() - y, position.x() + y, position.y() - x);
+				drawline(position.x() - x, position.x() + x, position.y() + y);
+				drawline(position.x() - y, position.x() + y, position.y() + x);
+				if (p < 0) p += 4 * x++ + 6;
+				else p += 4 * (x++ - y--) + 10;
+			}
+		};
+
+		CircleBresenham(position, radius);
+    }
 
 private:
 //-----------------------------------Variables-------------------------------------

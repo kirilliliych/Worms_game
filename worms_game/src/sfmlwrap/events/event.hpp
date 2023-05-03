@@ -169,6 +169,12 @@ struct CollisionEventData
     Point2d<int> position;
 };
 
+struct ExplosionEventData
+{
+    float radius;
+    Point2d<int> position;
+};
+
 
 enum class EventHandlerState
 {
@@ -209,6 +215,7 @@ public:
         MouseWheelEventData  mwedata_;
         KeyEventData         kedata_;
         CollisionEventData   cedata_;
+        ExplosionEventData   eedata_;
         time_delta_t         dt_;
     };
 };

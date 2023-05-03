@@ -23,6 +23,8 @@ namespace string_consts
 class Map;
 class Desktop;
 class Team;
+class Projectile;
+class Character;
 
 class Game
 {
@@ -53,6 +55,10 @@ public:
 
     bool check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const;
 
+    void process_explosion(float radius, const Point2d<int> &position);
+
+    const Character *get_character_under_control() const;
+
 private:
 //-----------------------------------Variables-------------------------------------
     using clock = std::chrono::system_clock;
@@ -79,5 +85,8 @@ private:
     Desktop *main_window_;
     Map *map_;
 
-    Team *test_team_;   // list of teams?
+    const Character *under_control_;
+    Team *team_;   // list of teams?
+
+    Projectile *rocket_;
 };

@@ -6,11 +6,12 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area)
   : parent_(parent),
     children_(),
     area_(area),
-    texture_(new Texture())
+    texture_(new Texture()),
+    exists_(true)
 {
     if (parent != nullptr)
     {
-        parent->children_.push_back(this);
+        parent->children_.push_back(std::unique_ptr<AbstractNode> (this));
     }
 }  
     
@@ -19,11 +20,12 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area, const st
   : parent_(parent),
     children_(),
     area_(area),
-    texture_(new Texture())
+    texture_(new Texture()),
+    exists_(true)
 {
     if (parent != nullptr)
     {
-        parent->children_.push_back(this);
+        parent->children_.push_back(std::unique_ptr<AbstractNode> (this));
     }
 
     const Image *texture_image = Game::imanager.get_image(image_file_name);
@@ -34,10 +36,6 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area, const st
 AbstractNode::~AbstractNode()
 {
     delete texture_;
-    for (uint32_t i = 0; i < children_.size(); ++i)
-    {
-        delete children_[i];
-    }
 }
 
 void AbstractNode::render(Surface *surface, const Point2d<int> &camera_offset)
@@ -70,6 +68,21 @@ void AbstractNode::render_children(Surface *surface, const Point2d<int> &camera_
     }
 }
 
+uint32_t AbstractNode::add_child(AbstractNode *child)
+{
+    assert(child != nullptr);
+
+    children_.push_back(std::unique_ptr<AbstractNode> (child));
+    child->parent_ = this;
+
+    return children_.size() - 1;
+}
+
+bool AbstractNode::does_exist() const
+{
+    return exists_;
+}
+
 bool AbstractNode::handle_event(const Event &event)
 {
     bool result = false;
@@ -85,18 +98,24 @@ bool AbstractNode::handle_event(const Event &event)
                     result = true;
                 }
             }
+            // result = children_handle_event(event);
         }
     };
 
     return result;
 }
 
-uint32_t AbstractNode::add_child(AbstractNode *child)
+bool AbstractNode::children_handle_event(const Event &event)
 {
-    assert(child != nullptr);
+    bool result = false;
 
-    children_.push_back(child);
-    child->parent_ = this;
+    for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+    {
+        if (children_[child_index]->handle_event(event))
+        {
+            result = true;
+        }
+    }
 
-    return children_.size() - 1;
+    return result;
 }

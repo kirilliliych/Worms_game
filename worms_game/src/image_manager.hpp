@@ -39,7 +39,7 @@ public:
     const Image *get_image(const std::string &file_name)
     {
         const Image *result = images_[file_name];
-        std::cout << "get_image: filename is " << file_name << std::endl;
+        // std::cout << "get_image: filename is " << file_name << std::endl;
 
         return result;
     }
@@ -65,12 +65,14 @@ void put_textures_to_image_manager_()
     }
 
     Image worms_sprite_sheet_image;
-    assert(worms_sprite_sheet_image.load_from_file("worms_game/images/worms_sprite_sheet.png"));
+    assert(worms_sprite_sheet_image.load_from_file("./worms_game/images/worms_sprite_sheet.png"));
     extract_part_of_image_(worms_sprite_sheet_image, {23, 27, {7, 7}}, "standing.png");
-                                                    // magic numbers for extracting dude as accurately as it is possible
+
     Image debris_base_image;
-    assert(debris_base_image.load_from_file("worms_game/images/dirt2.png"));
+    assert(debris_base_image.load_from_file("./worms_game/images/dirt2.png"));
     extract_part_of_image_(debris_base_image, {8, 8, {0, 0}}, "debris.png");
+
+    extract_part_of_image_(worms_sprite_sheet_image, {25, 30, {123, 378}}, "rocket.png");
 }
 
 void extract_part_of_image_(const Image &sprite_sheet, const Rect<int> &area, const std::string &image_file_name)
@@ -87,7 +89,6 @@ void extract_part_of_image_(const Image &sprite_sheet, const Rect<int> &area, co
         {
             if (pixels[y * image->get_width() + x] == 0xff000000)
             {
-                // printf("FOUND FORBIDDEN PIXEL\n");
                 image->set_pixel(x, y, 0x00000000);
             }
         }

@@ -45,14 +45,14 @@ public:
 
     void operator +=(const Point2d &another_point)
     {
-        x_ += another_point.x;
-        y_ += another_point.y;
+        x_ += another_point.x_;
+        y_ += another_point.y_;
     }
 
     void operator -=(const Point2d &another_point)
     {
-        x_ -= another_point.x;
-        y_ -= another_point.y;
+        x_ -= another_point.x_;
+        y_ -= another_point.y_;
     }
 
     Point2d operator +(const Point2d &another_point) const
@@ -75,7 +75,7 @@ public:
 
     bool operator ==(const Point2d &another_point) const
     {
-        return ((x_ == another_point.x) && (y_ == another_point.y));
+        return ((x_ == another_point.x_) && (y_ == another_point.y_));
     }
 
     bool operator !=(const Point2d &another_point) const
@@ -85,22 +85,22 @@ public:
 
     bool operator <=(const Point2d &another_point) const
     {
-        return x_ == another_point.x ? y_ <= another_point.y : x_ <= another_point.x;
+        return x_ == another_point.x_ ? y_ <= another_point.y_ : x_ <= another_point.x_;
     }
 
     bool operator <(const Point2d &another_point) const
     {
-        return x_ == another_point.x ? y_ <  another_point.y : x_  < another_point.x;
+        return x_ == another_point.x_ ? y_ <  another_point.y_ : x_  < another_point.x_;
     }
 
     bool operator >=(const Point2d &another_point) const
     {
-        return x_ == another_point.x ? y_ >= another_point.y : x_ >= another_point.x;
+        return x_ == another_point.x_ ? y_ >= another_point.y_ : x_ >= another_point.x_;
     }
 
     bool operator >(const Point2d &another_point) const
     {
-        return x_ == another_point.x ? y_ >  another_point.y : x_ >  another_point.x; 
+        return x_ == another_point.x_ ? y_ >  another_point.y_ : x_ >  another_point.x_; 
     }
 
 

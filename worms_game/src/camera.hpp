@@ -56,35 +56,25 @@ public:
     bool handle_event(const Event &event)
     {
         bool result = false;
-        // if (event.get_type() == EventType::MOUSE_MOVED)
-        // {
-        //     printf("entered camera handle event mouse moved\n");
-        //     const MouseMovedEvent &mme = reinterpret_cast<const MouseMovedEvent &> (event);
-        //     printf("position x: %d y: %d\n", mme.position_.x(), mme.position_.y());
-        // }
+
         switch (event.get_type())
         {
             case EventType::MOUSE_MOVED:
             {
-                // const MouseMovedEvent &mme = reinterpret_cast<const MouseMovedEvent &> (event);
-                if (event.mmedata_.position.x() < DEFAULT_CAMERA_MOVE_MARGIN)
+                if (event.mmedata_.position.x() - area_.left_top().x() < DEFAULT_CAMERA_MOVE_MARGIN)
                 {
-                    // printf("time: %lg\n", Game::time_delta.count());
                     area_.set_left_top_x(static_cast<float> (area_.left_top().x()) - move_speed_ * Game::time_delta.count());
                 }
-                if (event.mmedata_.position.x() > area_.get_width() - DEFAULT_CAMERA_MOVE_MARGIN)
+                if (event.mmedata_.position.x() - area_.left_top().x() > area_.get_width() - DEFAULT_CAMERA_MOVE_MARGIN)
                 {
-                    // printf("time: %lg\n", Game::time_delta.count());
                     area_.set_left_top_x(static_cast<float> (area_.left_top().x()) + move_speed_ * Game::time_delta.count());
                 }
-                if (event.mmedata_.position.y() < DEFAULT_CAMERA_MOVE_MARGIN)
+                if (event.mmedata_.position.y() - area_.left_top().y() < DEFAULT_CAMERA_MOVE_MARGIN)
                 {
-                    // printf("time: %lg\n", Game::time_delta.count());
                     area_.set_left_top_y(static_cast<float> (area_.left_top().y()) - move_speed_ * Game::time_delta.count());
                 }
-                if (event.mmedata_.position.y() > area_.get_height() - DEFAULT_CAMERA_MOVE_MARGIN)
+                if (event.mmedata_.position.y() - area_.left_top().y() > area_.get_height() - DEFAULT_CAMERA_MOVE_MARGIN)
                 {
-                    // printf("time: %lg\n", Game::time_delta.count());
                     area_.set_left_top_y(static_cast<float> (area_.left_top().y()) + move_speed_ * Game::time_delta.count());
                 }
                 
@@ -110,10 +100,7 @@ public:
 
             default:
             {
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
-                {
-                    result = children_[child_index]->handle_event(event);
-                }
+                result = children_handle_event(event);
             }
         }
 
