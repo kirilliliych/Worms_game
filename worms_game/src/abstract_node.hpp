@@ -29,6 +29,8 @@ protected:
 
 public:
 
+    uint32_t add_child(AbstractNode *child);
+    
     virtual bool handle_event(const Event &event);
 
 protected:

@@ -2,32 +2,40 @@
 
 
 #include "abstract_node.hpp"
+#include "collidable.hpp"
 #include "physics_object.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/texture.hpp"
 #include "weapon.hpp"
 
 
-class Character : public PhysicsObject
+class Character : public PhysicsObject, public Collidable
 {
 public:
 
     Character(AbstractNode *parent, const Rect<int> &area)    // do we need this?
-      : PhysicsObject(parent, area),
-        texture_scale_(1),
-        hp_(100),
-        under_control_(true),
-        is_alive_(true)
-    {}
-
-    Character(AbstractNode *parent, const Rect<int> &area, const std::string &texture_file_name,
-              const Rect<int> &texture_area = Rect<int>())
-      : PhysicsObject(parent, area, texture_file_name, texture_area),
+      : PhysicsObject(parent, area, {0, 100}, {0, 0}, DEFAULT_FRICTION),
+        Collidable(CollidableEntity::CHARACTER),
         texture_scale_(1),
         hp_(100),
         under_control_(true),
         is_alive_(true)
     {
+        PhysicsObject::type_ = PhysicsEntity::CHARACTER;
+    }
+
+    Character(AbstractNode *parent, const Rect<int> &area, const std::string &texture_file_name,
+              const Rect<int> &texture_area = Rect<int>())
+      : PhysicsObject(parent, area, {0, 100}, {0, 0},
+                      DEFAULT_FRICTION, texture_file_name, texture_area),
+        Collidable(CollidableEntity::CHARACTER),
+        texture_scale_(1),
+        hp_(100),
+        under_control_(true),
+        is_alive_(true)
+    {
+        PhysicsObject::type_ = PhysicsEntity::CHARACTER;
+
         uint32_t texture_width  = texture_->get_width();
         uint32_t texture_height = texture_->get_height();
         assert(area.get_width()  >= 0);
@@ -59,12 +67,7 @@ public:
     bool handle_event(const Event &event) override
     {
         bool result = false;
-        // printf("entered character handle event\n");
 
-        if (event.get_type() == EventType::KEY_PRESSED)
-        {
-            printf("character event code: %d\n", event.get_type());
-        }
         switch (event.get_type())
         {            
             // case EventType::KEY_PRESSED:
@@ -191,24 +194,32 @@ public:
             //     break;
             // }
 
-            // case EventType::TIME_PASSED:
-            // {
-            //     printf("character time_passed\n");
-            //     // check_collision();
+            case EventType::TIME_PASSED:
+            {
+                if (PhysicsObject::handle_event(event))
+                {
+                    result = true;
+                }
 
-            //     for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
-            //     {
-            //         result = children_[child_index]->handle_event(event);
-            //     }
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
+                }
 
-            //     break;
-            // }
+                break;
+            }
 
             default:
             {
                 for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
                 {
-                    result = children_[child_index]->handle_event(event);
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
                 }
             }
         }
@@ -218,6 +229,8 @@ public:
 
 private:
 public:
+
+    static constexpr float DEFAULT_FRICTION = 0.00003;
 
     float texture_scale_;
 

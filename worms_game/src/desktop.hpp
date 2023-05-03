@@ -22,7 +22,7 @@ public:
                                         {0, 0})),
         main_surface_(new Surface()),
         camera_(new Camera(this, {static_cast<int> (width),
-                                  static_cast<int> (height), {300, 0}}))
+                                  static_cast<int> (height), {0, 0}}))
     {
         id = 0;
         main_surface_->create(width, height);
@@ -32,11 +32,6 @@ public:
     {
         delete main_surface_;
     }
-
-    // void render_self(Surface *surface, const Point2d<int> &camera_offset) override
-    // {
-    //     assert(surface != nullptr);
-    // }
 
     void redraw()
     {
@@ -55,23 +50,18 @@ public:
     {
         bool result = false;
 
-        if (event.get_type() == EventType::KEY_PRESSED)
-        {
-            printf("desktop event code: %d\n", event.get_type());
-        }
         switch (event.get_type())
         {
-            // mouse_moved
-            // time_passed
             // quit_event
 
             default:
             {
-                // printf("entered desktop handle event\n");
-
                 for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
                 {
-                    result = children_[child_index]->handle_event(event);
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
                 }
             }
         }
@@ -86,13 +76,6 @@ public:
         {
             handle_event(event);
         }
-
-        // bool event_is_polled = true;
-        // handle_event(poll_event(&event_is_polled));
-        // while (event_is_polled)
-        // {
-        //     handle_event(poll_event(&event_is_polled));
-        // }
     }
 
 private:

@@ -56,19 +56,17 @@ public:
     bool handle_event(const Event &event) override
     {
         bool result = false;
-        // printf("entered team handle_event\n");
 
-        if (event.get_type() == EventType::KEY_PRESSED)
-        {
-            printf("team event code: %d\n", event.get_type());
-        }
         switch (event.get_type())
         {
             default:
             {
                 for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
                 {
-                    result = children_[child_index]->handle_event(event);
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
                 }
             }
         }

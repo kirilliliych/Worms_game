@@ -9,9 +9,9 @@
 #include <list>
 
 #include "abstract_node.hpp"
+#include "collidable.hpp"
 #include "image_manager.hpp"
-#include "team.hpp"
-#include "sfmlwrap/surface.hpp"
+#include "physics_entity.hpp"
 
 
 namespace string_consts
@@ -22,6 +22,7 @@ namespace string_consts
 
 class Map;
 class Desktop;
+class Team;
 
 class Game
 {
@@ -48,14 +49,20 @@ public:
 
     void run();
 
+    uint32_t add_to_map_children(AbstractNode *object);
+
+    bool check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const;
+
 private:
 //-----------------------------------Variables-------------------------------------
     using clock = std::chrono::system_clock;
     using time_point = std::chrono::time_point<clock>;
-    using time_delta_t = std::chrono::duration<float, std::milli>;
+    using time_delta_t = std::chrono::duration<float, std::chrono::seconds::period>;
     static time_point prev_time_point;
 
 public:
+
+    static Game *game;
 
     static ImageManager imanager;
     static time_delta_t time_delta;

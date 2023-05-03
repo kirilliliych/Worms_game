@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <vector>
 #include "abstract_node.hpp"
+#include "collidable.hpp"
+#include "debris.hpp"
 #include "game.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/image.hpp"
@@ -20,7 +22,7 @@ namespace string_consts
 }
 
 
-class Map : public AbstractNode
+class Map : public AbstractNode, public Collidable
 {
     enum MapPixelCondition
     {
@@ -32,6 +34,7 @@ public:
 //---------------------------------------------------------------------------------
     Map(AbstractNode *parent, const Rect<int> &area)
       : AbstractNode(parent, area),
+        Collidable(CollidableEntity::MAP),
         map_(static_cast<uint32_t> (area_.get_width() * area.get_height()), 0),
         landscape_images_(string_consts::landscape_images_names_pool.size())
     {
@@ -84,21 +87,57 @@ public:
     bool handle_event(const Event &event)
     {
         bool result = false;
-        // printf("entered map handle_event\n");
 
-        if (event.get_type() == EventType::KEY_PRESSED)
-        {
-            printf("map event code: %d\n", event.get_type());
-        }
         switch (event.get_type())
         {
-            
+            case EventType::MOUSE_BUTTON_PRESSED:
+            {
+                for (uint32_t i = 0; i < 20; ++i)
+                {
+                    Debris *debris = new Debris(this, {8, 8, event.mbedata_.position},
+                                                "debris.png");
+
+                }
+
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
+                }
+
+                break;
+            }
+
+            case EventType::COLLISION_EVENT:
+            {
+                if (map_[event.cedata_.position.y() * area_.get_width() + event.cedata_.position.x()] != MapPixelCondition::SKY)
+                {
+                    result = true;
+                }
+
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
+                }
+
+                break;
+            }
+
             // explosion_event
+
             default:
             {
                 for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
                 {
-                    result = children_[child_index]->handle_event(event);
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
                 }
             }
         }

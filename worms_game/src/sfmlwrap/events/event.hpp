@@ -2,6 +2,7 @@
 
 
 #include <chrono>
+#include "physics_entity.hpp"
 #include "point2d.hpp"
 
 
@@ -16,6 +17,7 @@ enum class EventType
     TIME_PASSED,
     QUIT_EVENT,
     EXPLOSION_EVENT,
+    COLLISION_EVENT,
     OTHER_EVENT,
     EVENT_TYPE_CNT
 };
@@ -160,6 +162,13 @@ struct MouseWheelEventData
     Point2d<int> position;
 };
 
+struct CollisionEventData
+{
+    const void *checker_address;
+    PhysicsEntity checker;
+    Point2d<int> position;
+};
+
 
 enum class EventHandlerState
 {
@@ -192,13 +201,14 @@ private:
 
 public:
 
-    using time_delta_t = std::chrono::duration<float, std::chrono::milliseconds::period>;
+    using time_delta_t = std::chrono::duration<float, std::chrono::seconds::period>;
     union
     {
         MouseButtonEventData mbedata_;
         MouseMoveEventData   mmedata_;
         MouseWheelEventData  mwedata_;
         KeyEventData         kedata_;
+        CollisionEventData   cedata_;
         time_delta_t         dt_;
     };
 };

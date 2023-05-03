@@ -1,12 +1,16 @@
 #include <chrono>
+#include <cstdlib>
 #include "character.hpp"
 #include "desktop.hpp"
 #include "game.hpp"
 #include "image_manager.hpp"
 #include "map.hpp"
+#include "physics_object.hpp"
 #include "sfmlwrap/events/time_event.hpp"
 #include "team.hpp"
 
+
+Game *Game::game = nullptr;
 
 ImageManager Game::imanager{};
 Game::time_point Game::prev_time_point{};
@@ -26,6 +30,9 @@ Game::Game(uint32_t window_width, uint32_t window_height,
                                             static_cast<int> (map_height),
                                                     {0, 0}}))
 {
+    assert(game == nullptr);    // singleton
+    game = this;
+
     window_width_  = window_width;
     window_height_ = window_height;
     map_width_     = map_width;
@@ -67,8 +74,27 @@ void Game::run()
         Event time_event;
         time_event.set_type(EventType::TIME_PASSED);
         time_event.dt_ = Game::time_delta;
-        // main_window_.handle_event(time_event);
+        main_window_->handle_event(time_event);
 
         main_window_->redraw();
     }
-}   
+}
+
+uint32_t Game::add_to_map_children(AbstractNode *object)
+{
+    assert(object != nullptr);
+
+    return map_->add_child(object);
+}
+
+bool Game::check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const
+{
+    assert(checker_address != nullptr);
+
+    Event collision_event;
+    collision_event.set_type(EventType::COLLISION_EVENT);
+    collision_event.cedata_.checker  = checker;
+    collision_event.cedata_.position = collision_point;
+    
+    return main_window_->handle_event(collision_event);
+}

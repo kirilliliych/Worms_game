@@ -66,11 +66,14 @@ void put_textures_to_image_manager_()
 
     Image worms_sprite_sheet_image;
     assert(worms_sprite_sheet_image.load_from_file("worms_game/images/worms_sprite_sheet.png"));
+    extract_part_of_image_(worms_sprite_sheet_image, {23, 27, {7, 7}}, "standing.png");
+                                                    // magic numbers for extracting dude as accurately as it is possible
+    Image debris_base_image;
+    assert(debris_base_image.load_from_file("worms_game/images/dirt2.png"));
+    extract_part_of_image_(debris_base_image, {8, 8, {0, 0}}, "debris.png");
+}
 
-    extract_image_from_sprite_sheet_(worms_sprite_sheet_image, {23, 27, {7, 7}}, "standing.png");
-}                                                                                 // magic numbers for extracting dude as accurately as it is possible
-
-void extract_image_from_sprite_sheet_(const Image &sprite_sheet, const Rect<int> &area, const std::string &image_file_name)
+void extract_part_of_image_(const Image &sprite_sheet, const Rect<int> &area, const std::string &image_file_name)
 {
     Texture proxy_texture;
     proxy_texture.load_from_image(sprite_sheet, area);

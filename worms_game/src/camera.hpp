@@ -69,22 +69,22 @@ public:
                 // const MouseMovedEvent &mme = reinterpret_cast<const MouseMovedEvent &> (event);
                 if (event.mmedata_.position.x() < DEFAULT_CAMERA_MOVE_MARGIN)
                 {
-                    printf("time: %lg\n", Game::time_delta.count());
+                    // printf("time: %lg\n", Game::time_delta.count());
                     area_.set_left_top_x(static_cast<float> (area_.left_top().x()) - move_speed_ * Game::time_delta.count());
                 }
                 if (event.mmedata_.position.x() > area_.get_width() - DEFAULT_CAMERA_MOVE_MARGIN)
                 {
-                    printf("time: %lg\n", Game::time_delta.count());
+                    // printf("time: %lg\n", Game::time_delta.count());
                     area_.set_left_top_x(static_cast<float> (area_.left_top().x()) + move_speed_ * Game::time_delta.count());
                 }
                 if (event.mmedata_.position.y() < DEFAULT_CAMERA_MOVE_MARGIN)
                 {
-                    printf("time: %lg\n", Game::time_delta.count());
+                    // printf("time: %lg\n", Game::time_delta.count());
                     area_.set_left_top_y(static_cast<float> (area_.left_top().y()) - move_speed_ * Game::time_delta.count());
                 }
                 if (event.mmedata_.position.y() > area_.get_height() - DEFAULT_CAMERA_MOVE_MARGIN)
                 {
-                    printf("time: %lg\n", Game::time_delta.count());
+                    // printf("time: %lg\n", Game::time_delta.count());
                     area_.set_left_top_y(static_cast<float> (area_.left_top().y()) + move_speed_ * Game::time_delta.count());
                 }
                 
@@ -122,7 +122,7 @@ public:
 
 private:
 
-    static constexpr float DEFAULT_MOVE_SPEED = 5.f;
+    static constexpr float DEFAULT_MOVE_SPEED = 5000.f;
     static constexpr int DEFAULT_CAMERA_MOVE_MARGIN = 30;
     
     float move_speed_;

@@ -11,13 +11,17 @@ class Projectile : public PhysicsObject
 public:
 
     Projectile(AbstractNode *parent, const Rect<int> &area)
-      : PhysicsObject(parent, area)
-    {}
+      : PhysicsObject(parent, area, {0, 0}, {0, 0})
+    {
+        type_ = PhysicsEntity::PROJECTILE;
+    }
 
     Projectile(AbstractNode *parent, const Rect<int> &area, const std::string &texture_file_name,
                const Rect<int> &texture_area = Rect<int>())
-      : PhysicsObject(parent, area, texture_file_name, area)
-    {}
+      : PhysicsObject(parent, area, {0, 0}, {0, 0}, texture_file_name, area)
+    {
+        type_ = PhysicsEntity::PROJECTILE;
+    }
 
     bool handle_event(const Event &event) override
     {
@@ -25,7 +29,7 @@ public:
 
         switch (event.get_type())
         {
-            // nothing or explosion_event
+            // nothing or explosion_event ? 
 
             default:
             {
