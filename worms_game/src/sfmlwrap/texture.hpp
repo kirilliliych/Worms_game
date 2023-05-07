@@ -30,8 +30,6 @@ public:
 
     Texture();
 
-    // Texture(const std::string &file_name, const Rect<int> &area = Rect<int>());
-
     ~Texture();
 
     bool create(uint32_t width, uint32_t height);

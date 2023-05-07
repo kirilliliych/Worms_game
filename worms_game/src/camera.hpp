@@ -60,7 +60,7 @@ public:
         assert(surface != nullptr);
     }
 
-    bool handle_event(const Event &event)
+    bool handle_event(const Event &event) override
     {
         bool result = false;
 

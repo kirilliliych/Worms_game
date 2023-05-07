@@ -2,6 +2,7 @@
 
 
 #include "abstract_node.hpp"
+#include "crosshair.hpp"
 #include "debris.hpp"
 #include "physics_entity.hpp"
 #include "physics_object.hpp"
@@ -18,6 +19,8 @@ public:
       : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION, -1),
         texture_scale_(1),
         hp_(100),
+        crosshair_(new Crosshair(this, {10, 10, area_.center()},
+                                 std::max(area.get_width(), area_.get_height()) + 30)),
         is_alive_(true)
     {
         PhysicsObject::type_ = PhysicsEntity::CHARACTER;
@@ -29,14 +32,14 @@ public:
                       DEFAULT_FRICTION, -1, texture_file_name, texture_area),
         texture_scale_(1),
         hp_(100),
+        crosshair_(new Crosshair(this, {10, 10, area_.center()},
+                                 std::max(area.get_width(), area_.get_height()) + 30)),
         is_alive_(true)
     {
         PhysicsObject::type_ = PhysicsEntity::CHARACTER;
 
         uint32_t texture_width  = texture_->get_width();
         uint32_t texture_height = texture_->get_height();
-        assert(area.get_width()  >= 0);
-        assert(area.get_height() >= 0);
         float asked_width  = static_cast<float> (area.get_width());
         float asked_height = static_cast<float> (area.get_height());
         float x_scale = asked_width  / static_cast<float> (texture_width);
@@ -51,6 +54,11 @@ public:
             area_.set_height(x_scale * static_cast<int> (texture_height));
             texture_scale_ = x_scale;
         }
+    }
+
+    ~Character()
+    {
+        delete crosshair_;
     }
 
     void on_bounce_death(const Point2d<int> &death_position) override
@@ -225,7 +233,7 @@ public:
     float texture_scale_;
 
     // Weapon cur_weapon_;
-    
+    Crosshair *crosshair_;    
 
     int hp_;
 

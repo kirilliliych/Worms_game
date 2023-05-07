@@ -44,6 +44,23 @@ public:
         return {left_top_.x() + width_ - 1, left_top_.y() + height_ - 1};
     }
 
+    Point2d<Type> center() const
+    {
+        return {left_top_.x() + (width_  - 1) / 2,
+                left_top_.y() + (height_ - 1) / 2
+               };
+    }
+
+    Type center_x() const
+    {
+        return center().x();
+    }
+
+    Type center_y() const
+    {
+        return center().y();
+    }
+
     Type get_left_x() const
     {
         return left_top_.x();

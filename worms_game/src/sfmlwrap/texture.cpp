@@ -1,14 +1,10 @@
 #include "sfmlwrap/texture.hpp"
 #include "surface.hpp"
 
+
 Texture::Texture()
   : texture_(new Texture_())
 {}
-
-// Texture::Texture(const std::string &file_name, const Rect<int> &area)  // better to use default no-arg constructor and then load from file: you get info whether it finishes successfully
-// {
-//     load_from_file(file_name, area);
-// }
 
 Texture::~Texture()
 {

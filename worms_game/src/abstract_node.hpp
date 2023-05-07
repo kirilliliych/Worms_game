@@ -22,6 +22,8 @@ public:
     virtual ~AbstractNode();
 
 
+    const Rect<int> &get_area() const;
+
     void render(Surface *surface, const Point2d<int> &camera_offset);
 
     virtual void render_self(Surface *surface, const Point2d<int> &camera_offset);

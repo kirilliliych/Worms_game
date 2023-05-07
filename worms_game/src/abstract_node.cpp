@@ -46,6 +46,11 @@ AbstractNode::~AbstractNode()
     delete texture_;
 }
 
+const Rect<int> &AbstractNode::get_area() const
+{
+    return area_;
+}
+
 void AbstractNode::render(Surface *surface, const Point2d<int> &camera_offset)
 {
     assert(surface != nullptr);
