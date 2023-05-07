@@ -2,7 +2,6 @@
 
 
 #include "abstract_node.hpp"
-#include "collidable.hpp"
 #include "debris.hpp"
 #include "physics_entity.hpp"
 #include "physics_object.hpp"
@@ -11,30 +10,26 @@
 #include "weapon.hpp"
 
 
-class Character : public PhysicsObject, public Collidable
+class Character : public PhysicsObject
 {
 public:
 
     Character(AbstractNode *parent, const Rect<int> &area)    // do we need this?
-      : PhysicsObject(parent, area, {0, 100}, {0, 0}, DEFAULT_FRICTION, -1),
-        Collidable(CollidableEntity::CHARACTER),
+      : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION, -1),
         texture_scale_(1),
         hp_(100),
-        is_alive_(true),
-        init_falling(true)
+        is_alive_(true)
     {
         PhysicsObject::type_ = PhysicsEntity::CHARACTER;
     }
 
     Character(AbstractNode *parent, const Rect<int> &area, const std::string &texture_file_name,
               const Rect<int> &texture_area = Rect<int>())
-      : PhysicsObject(parent, area, {0, 100}, {0, 0},
+      : PhysicsObject(parent, area, {0, 0}, {0, 0},
                       DEFAULT_FRICTION, -1, texture_file_name, texture_area),
-        Collidable(CollidableEntity::CHARACTER),
         texture_scale_(1),
         hp_(100),
-        is_alive_(true),
-        init_falling(true)
+        is_alive_(true)
     {
         PhysicsObject::type_ = PhysicsEntity::CHARACTER;
 
@@ -76,9 +71,18 @@ public:
 
         switch (event.get_type())
         {
+            case EventType::MOUSE_BUTTON_PRESSED:
+            {
+            //     printf("mbedata: %d %d\n", event.mbedata_.position.x(), event.mbedata_.position.y());
+            //     if (area_.contains(event.mbedata_.position))
+            //     printf("mouse is pointing at character with this %p; character under control is %p\n", this, Game::game->get_character_under_control());
+
+            //     break;
+            }
+
             case EventType::KEY_PRESSED:
             {
-                printf("CHARACTER CATCHES KEY AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
+                // printf("CHARACTER CATCHES KEY AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
                 if ((this == Game::game->get_character_under_control()) && 
                     (is_stable_))
                 {
@@ -86,8 +90,9 @@ public:
                     {
                         case KeyboardKey::Z:
                         {
-                            velocity_.set_x(-120.0f);
-                            velocity_.set_y(-160.0f);
+                            printf("CHARACTER CAUGHT KEY Z\n");
+                            velocity_.set_x(-200.0f);
+                            velocity_.set_y(-400.0f);
                             is_stable_ = false;
 
                             break;
@@ -95,8 +100,9 @@ public:
                         
                         case KeyboardKey::X:
                         {
-                            velocity_.set_x(+120.0f);
-                            velocity_.set_y(-160.0f);
+                            printf("CHARACTER CAUGHT KEY X\n");
+                            velocity_.set_x(+200.0f);
+                            velocity_.set_y(-400.0f);
                             is_stable_ = false;
 
                             break;
@@ -112,8 +118,7 @@ public:
 
             case EventType::COLLISION_EVENT:
             {
-                if ((event.cedata_.checker != PhysicsEntity::CHARACTER) &&
-                    (event.cedata_.checker != PhysicsEntity::DEBRIS)    &&
+                if ((event.cedata_.checker == PhysicsEntity::PROJECTILE) && 
                     (area_.contains(event.cedata_.position)))
                 {
                     result = true;
@@ -146,8 +151,8 @@ public:
                 }
                 if (distance < event.eedata_.radius)
                 {
-                    velocity_.set_x(3 * dx / (distance - std::min(area_.get_width() / 2, area_.get_height() / 2)) * event.eedata_.radius);
-                    velocity_.set_y(3 * dy / (distance - std::min(area_.get_width() / 2, area_.get_height() / 2)) * event.eedata_.radius);
+                    velocity_.set_x(15.f * dx / (distance /*- std::min(area_.get_width() / 2, area_.get_height() / 2)*/) * event.eedata_.radius);
+                    velocity_.set_y(15.f * dy / (distance /*- std::min(area_.get_width() / 2, area_.get_height() / 2)*/) * event.eedata_.radius);
                     // printf("velocity: x %g y %g\n", velocity_.x(), velocity_.y());
 
                     is_stable_ = false;
@@ -179,7 +184,7 @@ public:
 
             case EventType::TIME_PASSED:
             {
-                if (PhysicsObject::handle_event(event))
+                if (PhysicsObject::handle_event(event))     // 
                 {
                     result = true;
                 }
@@ -215,16 +220,14 @@ public:
 private:
 public:
 
-    static constexpr float DEFAULT_FRICTION = 0.00003;
+    static constexpr float DEFAULT_FRICTION = 0.05;
 
     float texture_scale_;
 
     // Weapon cur_weapon_;
-    // Crosshair crosshair_;
+    
 
     int hp_;
 
     bool is_alive_; // shows whether worm or grave will be drawn 
-
-    bool init_falling;
 };

@@ -41,7 +41,7 @@ public:
 protected:
 
     AbstractNode *parent_;
-    std::vector<std::unique_ptr<AbstractNode>> children_;
+    std::vector<std::unique_ptr<AbstractNode>> children_;       // on_delete event instead
 
     Rect<int> area_;
 

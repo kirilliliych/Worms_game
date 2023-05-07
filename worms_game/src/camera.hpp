@@ -13,8 +13,10 @@ class Camera : public AbstractNode
 {
 public:
 
-    Camera(AbstractNode *parent, const Rect<int> &area)
+    Camera(AbstractNode *parent, const Rect<int> &area, uint32_t max_x, uint32_t max_y)
       : AbstractNode(parent, area),
+        max_x_(max_x),
+        max_y_(max_y),
         move_speed_(DEFAULT_MOVE_SPEED)
     {}
     
@@ -61,6 +63,9 @@ public:
         {
             case EventType::MOUSE_MOVED:
             {
+                // printf("mmedata: %d %d\n", event.mmedata_.position.x(), event.mmedata_.position.y());
+                // printf("area x: %d y: %d\n", area_.left_top().x(), area_.left_top().y());
+
                 if (event.mmedata_.position.x() - area_.left_top().x() < DEFAULT_CAMERA_MOVE_MARGIN)
                 {
                     area_.set_left_top_x(static_cast<float> (area_.left_top().x()) - move_speed_ * Game::time_delta.count());
@@ -82,17 +87,17 @@ public:
                 {
                     area_.set_left_top_x(0);
                 }
-                if (area_.left_top().x() > static_cast<int> (Game::map_width_ - Game::window_width_))
+                if (area_.left_top().x() > static_cast<int> (max_x_))
                 {
-                    area_.set_left_top_x(Game::map_width_ - Game::window_width_);
+                    area_.set_left_top_x(static_cast<int> (max_x_));
                 }
                 if (area_.left_top().y() < 0)
                 {
                     area_.set_left_top_y(0);
                 }
-                if (area_.left_top().y() > static_cast<int> (Game::map_height_ - Game::window_height_))
+                if (area_.left_top().y() > static_cast<int> (max_y_))
                 {
-                    area_.set_left_top_y(Game::map_height_ - Game::window_height_);
+                    area_.set_left_top_y(static_cast<int> (max_y_));
                 }
 
                 break;
@@ -112,5 +117,8 @@ private:
     static constexpr float DEFAULT_MOVE_SPEED = 5000.f;
     static constexpr int DEFAULT_CAMERA_MOVE_MARGIN = 30;
     
+    uint32_t max_x_;
+    uint32_t max_y_;
+
     float move_speed_;
 };

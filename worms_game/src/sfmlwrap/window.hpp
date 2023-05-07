@@ -2,6 +2,7 @@
 #define WINDOW_HPP
 
 
+#include <SFML/System/Vector2.hpp>
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "events/event.hpp"
@@ -69,8 +70,15 @@ public:
         window_->draw(*surface_sprite.sprite_);
     }
 
+    uint32_t get_width() const
+    {
+        return window_->getSize().x;
+    }
 
-protected:
+    uint32_t get_height() const
+    {
+        return window_->getSize().y;
+    }
 
     bool poll_event(Event *event) const
     {

@@ -31,17 +31,37 @@ public:
 
     Point2d<Type> right_top() const
     {
-        return {left_top_.x() + width_, left_top_.y()};
+        return {left_top_.x() + width_ - 1, left_top_.y()};
     }
 
     Point2d<Type> left_bottom() const
     {
-        return {left_top_.x(), left_top_.y() + height_};
+        return {left_top_.x(), left_top_.y() + height_ - 1};
     }
 
     Point2d<Type> right_bottom() const
     {
-        return {left_top_.x() + width_, left_top_.y() + height_};
+        return {left_top_.x() + width_ - 1, left_top_.y() + height_ - 1};
+    }
+
+    Type get_left_x() const
+    {
+        return left_top_.x();
+    }
+
+    Type get_right_x() const
+    {
+        return right_bottom().x();
+    }
+
+    Type get_top_y() const
+    {
+        return right_top().y();
+    }
+
+    Type get_bottom_y() const
+    {
+        return right_bottom().y();
     }
 
     Type get_width() const

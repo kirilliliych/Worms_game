@@ -3,11 +3,11 @@
 #include <ctime>
 #include <ratio>
 
+
 #include <SFML/Graphics.hpp>
-#include <type_traits>
 #include "game.hpp"
 
-// TODO: include guard через pragma; friend не класс, а отдельные функции
+// TODO: include guard через pragma; friend не класс, а отдельные функции; erase лишнего в отдельный ивент; eventmanager, garb holder
 
 int main()
 {

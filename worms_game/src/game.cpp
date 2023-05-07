@@ -1,12 +1,15 @@
 #include <chrono>
 #include <cstdlib>
+#include "camera.hpp"
 #include "character.hpp"
 #include "desktop.hpp"
+#include "event_manager.hpp"
 #include "game.hpp"
 #include "image_manager.hpp"
 #include "map.hpp"
 #include "physics_object.hpp"
 #include "projectile.hpp"
+#include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/events/time_event.hpp"
 #include "team.hpp"
 
@@ -17,10 +20,6 @@ Game *Game::game = nullptr;
 ImageManager Game::imanager{};
 Game::time_point Game::prev_time_point{};
 Game::time_delta_t Game::time_delta{};
-uint32_t Game::window_width_  = 0;
-uint32_t Game::window_height_ = 0;
-uint32_t Game::map_width_     = 0;
-uint32_t Game::map_height_    = 0;
 
 
 Game::Game(uint32_t window_width, uint32_t window_height,
@@ -31,25 +30,25 @@ Game::Game(uint32_t window_width, uint32_t window_height,
     map_(new Map(main_window_, {static_cast<int> (map_width),
                                             static_cast<int> (map_height),
                                                     {0, 0}})),
-    under_control_(nullptr),
-    rocket_(new Projectile(map_, {40, 40, {500, 200}}, "rocket.png"))
+    camera_(new Camera(map_, {static_cast<int> (window_width),
+                                  static_cast<int> (window_height), {0, 0}},
+                       map_width  - window_width,
+                       map_height - window_height)),
+    emanager_(new EventManager(main_window_)),
+    under_control_(nullptr)
 {
     assert(game == nullptr);    // singleton
     game = this;
-
-    window_width_  = window_width;
-    window_height_ = window_height;
-    map_width_     = map_width;
-    map_height_    = map_height; 
 }
 
 Game::~Game()
 {
     delete main_window_;
     delete map_;
-    delete team_;
+    delete camera_;
+    delete emanager_;
 
-    delete rocket_;
+    delete team_;
 }
 
 
@@ -61,7 +60,7 @@ void Game::run()
     map_->create_map();
 
     // state_ = GameState::GENERATING_UNITS;
-    team_ = new Team(map_, 3, 400, 300, 40, 40);
+    team_ = new Team(map_, 3, 700, 300, 40, 40);
     under_control_ = team_->get_next_character();
     // state_ = GameState::READY;
     
@@ -75,14 +74,17 @@ void Game::run()
         Game::time_delta = cur_time_point - prev_time_point;
         prev_time_point = cur_time_point;
 
-        main_window_->process_events();
+        // main_window_->process_events();
+        for (int i = 0; i < 2000; ++i)
+        emanager_->process_external_events(main_window_);
 
         Event time_event;
         time_event.set_type(EventType::TIME_PASSED);
         time_event.dt_ = Game::time_delta;
-        main_window_->handle_event(time_event);
+        // main_window_->handle_event(time_event);
+        emanager_->handle_event(time_event);
 
-        main_window_->redraw();
+        main_window_->redraw(camera_->get_position());
     }
 }
 
@@ -115,7 +117,37 @@ void Game::process_explosion(float radius, const Point2d<int> &position)
     main_window_->handle_event(explosion_event); 
 }
 
+bool Game::launch_event(const Event &event)
+{
+    return emanager_->handle_event(event);
+}
+
 const Character *Game::get_character_under_control() const
 {
     return under_control_;
+}
+
+uint32_t Game::get_window_width() const
+{
+    return main_window_->get_width();
+}
+    
+uint32_t Game::get_window_height() const
+{
+    return main_window_->get_height();
+}
+
+uint32_t Game::get_map_width() const
+{
+    return map_->get_width();
+}
+
+uint32_t Game::get_map_height() const
+{
+    return map_->get_height();
+}
+
+Point2d<int> Game::get_camera_position() const
+{
+    return camera_->get_position();
 }

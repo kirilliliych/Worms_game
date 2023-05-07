@@ -6,10 +6,10 @@
 #include <cstdlib>
 #include <vector>
 #include "abstract_node.hpp"
-#include "collidable.hpp"
 #include "debris.hpp"
 #include "game.hpp"
 #include "physics_object.hpp"
+#include "projectile.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/image.hpp"
 #include "sfmlwrap/rect.hpp"
@@ -23,19 +23,20 @@ namespace string_consts
 }
 
 
-class Map : public AbstractNode, public Collidable
+class Map : public AbstractNode
 {
+public:
     enum MapPixelCondition
     {
         SKY = 0,
-        TERRAIN
+        TERRAIN,
+        COLLISION
     };
 
 public:
 //---------------------------------------------------------------------------------
     Map(AbstractNode *parent, const Rect<int> &area)
       : AbstractNode(parent, area),
-        Collidable(CollidableEntity::MAP),
         map_(static_cast<uint32_t> (area_.get_width() * area.get_height()), 0),
         landscape_images_(string_consts::landscape_images_names_pool.size())
     {
@@ -83,6 +84,16 @@ public:
         update_map_texture_();
     }
 
+    uint32_t get_width() const
+    {
+        return area_.get_width();
+    }
+
+    uint32_t get_height() const
+    {
+        return area_.get_height();
+    }
+
     bool handle_event(const Event &event)
     {
         bool result = false;
@@ -91,7 +102,27 @@ public:
         {
             case EventType::MOUSE_BUTTON_PRESSED:
             {
-                Game::game->process_explosion(40, event.mbedata_.position);
+                switch (event.mbedata_.button)
+                {
+                    case MouseButton::LEFT:
+                    {
+                        Game::game->process_explosion(40, event.mbedata_.position);
+
+                        break;
+                    }
+
+                    case MouseButton::RIGHT:
+                    {
+                        Game::game->add_to_map_children(new Projectile(this, {40, 40, event.mbedata_.position}, "rocket.png"));
+
+                        break;
+                    }
+
+                    default:
+                    {
+                        break;
+                    }
+                }
 
                 for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
                 {
@@ -107,6 +138,7 @@ public:
 
             case EventType::EXPLOSION_EVENT:
             {
+                printf("map explosion position: %d %d camera: %d %d\n", event.eedata_.position.x(), event.eedata_.position.y(), Game::game->get_camera_position().x(), Game::game->get_camera_position().y());
                 make_crater_(event.eedata_.position, event.eedata_.radius);
                 update_map_texture_();
 
@@ -161,8 +193,6 @@ public:
                 break;
             }
 
-            // explosion_event
-
             default:
             {
                 for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
@@ -180,7 +210,7 @@ public:
     }
 
 private:
-
+public:
     void update_map_texture_()      // ВНИМАНИЕ: ЦВЕТ, ВЫТАСКИВАЕМЫЙ ЧЕРЕЗ to_Integer ИЗ sf::Color, НЕКОРРЕКТЕН! ТРЕБУЕТСЯ ПОБАЙТОВОЕ РАЗВОРАЧИВАНИЕ
     {
         uint32_t width  = static_cast<uint32_t> (area_.get_width());
@@ -211,6 +241,13 @@ private:
                         uint32_t image_height = landscape_images_[MapPixelCondition::TERRAIN]->get_height();
                         pixels_data[y * width + x] = landscape_images_[MapPixelCondition::TERRAIN]->get_pixel(x % image_width,
                                                                                                               y % image_height);
+                        break;
+                    }
+
+                    case MapPixelCondition::COLLISION:
+                    {
+                        pixels_data[y * width + x] = 0xff0000ff;
+                        
                         break;
                     }
 
@@ -287,6 +324,7 @@ private:
     }
 
 private:
+public:
 //-----------------------------------Variables-------------------------------------
     std::vector<uint8_t> map_;
 

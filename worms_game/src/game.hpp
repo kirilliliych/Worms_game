@@ -9,7 +9,6 @@
 #include <list>
 
 #include "abstract_node.hpp"
-#include "collidable.hpp"
 #include "image_manager.hpp"
 #include "physics_entity.hpp"
 
@@ -20,11 +19,13 @@ namespace string_consts
 }
 
 
-class Map;
-class Desktop;
-class Team;
-class Projectile;
+class Camera;
 class Character;
+class Desktop;
+class EventManager;
+class Map;
+class Projectile;
+class Team;
 
 class Game
 {
@@ -57,7 +58,19 @@ public:
 
     void process_explosion(float radius, const Point2d<int> &position);
 
+    bool launch_event(const Event &event);
+
     const Character *get_character_under_control() const;
+
+    uint32_t get_window_width() const;
+    
+    uint32_t get_window_height() const;
+
+    uint32_t get_map_width() const;
+    
+    uint32_t get_map_height() const;
+
+    Point2d<int> get_camera_position() const;
 
 private:
 //-----------------------------------Variables-------------------------------------
@@ -73,20 +86,16 @@ public:
     static ImageManager imanager;
     static time_delta_t time_delta;
 
-    static uint32_t window_width_;
-    static uint32_t window_height_;
-    static uint32_t map_width_;
-    static uint32_t map_height_;
-    
 private:
-
+public:
     GameState state_;
 
     Desktop *main_window_;
     Map *map_;
+    Camera *camera_;
+
+    EventManager *emanager_;
 
     const Character *under_control_;
     Team *team_;   // list of teams?
-
-    Projectile *rocket_;
 };
