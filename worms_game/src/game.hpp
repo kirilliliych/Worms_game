@@ -52,7 +52,7 @@ public:
 
     void run();
 
-    uint32_t add_to_map_children(AbstractNode *object);
+    void add_to_map_children(AbstractNode *object);
 
     bool check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const;
 
@@ -98,4 +98,6 @@ public:
 
     const Character *under_control_;
     Team *team_;   // list of teams?
+
+    Projectile *pr_;
 };

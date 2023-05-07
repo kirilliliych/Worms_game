@@ -68,14 +68,12 @@ void AbstractNode::render_children(Surface *surface, const Point2d<int> &camera_
     }
 }
 
-uint32_t AbstractNode::add_child(AbstractNode *child)
+void AbstractNode::add_child(AbstractNode *child)
 {
     assert(child != nullptr);
 
     children_.push_back(std::unique_ptr<AbstractNode> (child));
-    child->parent_ = this;
-
-    return children_.size() - 1;
+    // child->parent_ = this;
 }
 
 bool AbstractNode::does_exist() const

@@ -30,7 +30,7 @@ public:
 
 public:
 
-    uint32_t add_child(AbstractNode *child);
+    void add_child(AbstractNode *child);
 
     bool does_exist() const;
 

@@ -35,7 +35,8 @@ Game::Game(uint32_t window_width, uint32_t window_height,
                        map_width  - window_width,
                        map_height - window_height)),
     emanager_(new EventManager(main_window_)),
-    under_control_(nullptr)
+    under_control_(nullptr),
+    pr_(new Projectile(map_, {50, 50, {600, 0}}, "rocket.png"))
 {
     assert(game == nullptr);    // singleton
     game = this;
@@ -88,11 +89,11 @@ void Game::run()
     }
 }
 
-uint32_t Game::add_to_map_children(AbstractNode *object)
+void Game::add_to_map_children(AbstractNode *object)
 {
     assert(object != nullptr);
 
-    return map_->add_child(object);
+    map_->add_child(object);
 }
 
 bool Game::check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const

@@ -449,8 +449,8 @@ public:
                     // printf("set to true\n");
                     is_stable_ = true;
 
-                    velocity_.set_x(0);
-                    velocity_.set_y(0);
+                    // velocity_.set_x(0);
+                    // velocity_.set_y(0);
                 }
 
                 // result = children_handle_event(event);

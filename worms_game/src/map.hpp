@@ -113,7 +113,8 @@ public:
 
                     case MouseButton::RIGHT:
                     {
-                        Game::game->add_to_map_children(new Projectile(this, {40, 40, event.mbedata_.position}, "rocket.png"));
+                        // Game::game->add_to_map_children(new Projectile(this, {40, 40, event.mbedata_.position}, "rocket.png"));
+                        new Projectile(this, {40, 40, event.mbedata_.position}, "rocket.png");
 
                         break;
                     }
@@ -138,7 +139,7 @@ public:
 
             case EventType::EXPLOSION_EVENT:
             {
-                printf("map explosion position: %d %d camera: %d %d\n", event.eedata_.position.x(), event.eedata_.position.y(), Game::game->get_camera_position().x(), Game::game->get_camera_position().y());
+                // printf("map explosion position: %d %d camera: %d %d\n", event.eedata_.position.x(), event.eedata_.position.y(), Game::game->get_camera_position().x(), Game::game->get_camera_position().y());
                 make_crater_(event.eedata_.position, event.eedata_.radius);
                 update_map_texture_();
 

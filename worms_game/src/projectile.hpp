@@ -48,7 +48,7 @@ public:
 
     void on_bounce_death(const Point2d<int> &death_position) override
     {
-        Game::game->process_explosion(40, death_position);
+        Game::game->process_explosion(80, death_position);
     }
 
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override

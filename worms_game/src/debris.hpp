@@ -15,8 +15,8 @@ public:
     {
         type_ = PhysicsEntity::DEBRIS;
 
-        velocity_.set_x(80.f * cosf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
-        velocity_.set_y(80.f * sinf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
+        velocity_.set_x(400.f * cosf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
+        velocity_.set_y(400.f * sinf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
     }
 
     Debris(AbstractNode *parent, const Rect<int> &area,
@@ -26,8 +26,8 @@ public:
     {
         type_ = PhysicsEntity::DEBRIS;
 
-        velocity_.set_x(80.f * cosf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
-        velocity_.set_y(80.f * sinf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX))) * 2.0f * 3.14159f);
+        velocity_.set_x(400.f * cosf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX)) * 2.0f * 3.14159f));
+        velocity_.set_y(400.f * sinf((static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX)) * 2.0f * 3.14159f));
     }
 
     void on_bounce_death(const Point2d<int> &death_position) override
