@@ -13,6 +13,14 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area)
     {
         parent->children_.push_back(std::unique_ptr<AbstractNode> (this));
     }
+
+    uint32_t width  = static_cast<uint32_t> (area.get_width());
+    uint32_t height = static_cast<uint32_t> (area.get_height()); 
+    if ((width  != 0) &&
+        (height != 0))
+    {
+        texture_->create(width, height);
+    }
 }  
     
 AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area, const std::string &image_file_name,

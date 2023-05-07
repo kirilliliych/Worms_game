@@ -83,11 +83,11 @@ public:
                 acceleration_.set_y(0);
                 is_stable_ = false;
 
-                float angle = atan2f(velocity_.y(), velocity_.x()); // here y and x were accidentally swapped, this bug was since Wednesday, May 3 omg
+                // float angle = atan2f(velocity_.y(), velocity_.x()); // here y and x were accidentally swapped, this bug was since Wednesday, May 3 omg
 
                 if (std::abs(velocity_.y()) < 0.01)
                 {
-                    velocity_.set_y(0.01);
+                    velocity_.set_y(velocity_.y() > 0 ? 0.001 : -0.01);
                 }
                 float semicircle_flat_part_k_coef = -velocity_.x() / velocity_.y(); // k1 * k2 = -1
                 bool above_semicircle_flat_part = true; //
@@ -97,24 +97,23 @@ public:
                 }
 
                 std::vector<bool> is_corner_in_correct_halfplane(4, false);
-                // next calculations relative to new_pos_center
-                if (( above_semicircle_flat_part && (-area_.get_height() < semicircle_flat_part_k_coef * -area_.get_width())) || // maybe <=?
-                    (!above_semicircle_flat_part && (-area_.get_height() > semicircle_flat_part_k_coef * -area_.get_width())))
+                if (( above_semicircle_flat_part && (-area_.get_height() <= semicircle_flat_part_k_coef * -area_.get_width())) ||
+                    (!above_semicircle_flat_part && (-area_.get_height() >  semicircle_flat_part_k_coef * -area_.get_width())))
                 {
                     is_corner_in_correct_halfplane[0] = true;
                 }
-                if (( above_semicircle_flat_part && (-area_.get_height() < semicircle_flat_part_k_coef * area_.get_width())) || // maybe <=?
-                    (!above_semicircle_flat_part && (-area_.get_height() > semicircle_flat_part_k_coef * area_.get_width())))
+                if (( above_semicircle_flat_part && (-area_.get_height() <= semicircle_flat_part_k_coef * area_.get_width()))  ||
+                    (!above_semicircle_flat_part && (-area_.get_height() >  semicircle_flat_part_k_coef * area_.get_width())))
                 {
                     is_corner_in_correct_halfplane[1] = true;
                 }
-                if (( above_semicircle_flat_part && (area_.get_height() < semicircle_flat_part_k_coef * area_.get_width())) || // maybe <=?
-                    (!above_semicircle_flat_part && (area_.get_height() > semicircle_flat_part_k_coef * area_.get_width())))
+                if (( above_semicircle_flat_part && (area_.get_height() <= semicircle_flat_part_k_coef * area_.get_width()))   ||
+                    (!above_semicircle_flat_part && (area_.get_height() >  semicircle_flat_part_k_coef * area_.get_width())))
                 {
                     is_corner_in_correct_halfplane[2] = true;
                 }
-                if (( above_semicircle_flat_part && (area_.get_height() < semicircle_flat_part_k_coef * -area_.get_width())) || // maybe <=?
-                    (!above_semicircle_flat_part && (area_.get_height() > semicircle_flat_part_k_coef * -area_.get_width())))
+                if (( above_semicircle_flat_part && (area_.get_height() <= semicircle_flat_part_k_coef * -area_.get_width()))  ||
+                    (!above_semicircle_flat_part && (area_.get_height() >  semicircle_flat_part_k_coef * -area_.get_width())))
                 {
                     is_corner_in_correct_halfplane[3] = true;
                 }
@@ -132,8 +131,8 @@ public:
                     {
                         float test_pos_x = new_x;
                         float test_pos_y = new_y + i;
-                        if (( above_semicircle_flat_part && (test_pos_y < semicircle_flat_part_k_coef * test_pos_x)) ||
-                            (!above_semicircle_flat_part && (test_pos_y > semicircle_flat_part_k_coef * test_pos_x)))
+                        if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
+                            (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
                         {
                             Event check_collision_event;
                             check_collision_event.set_type(EventType::COLLISION_EVENT);
@@ -156,8 +155,8 @@ public:
                     {
                         float test_pos_x = new_x + i;
                         float test_pos_y = new_y;
-                        if (( above_semicircle_flat_part && (test_pos_y < semicircle_flat_part_k_coef * test_pos_x)) ||
-                            (!above_semicircle_flat_part && (test_pos_y > semicircle_flat_part_k_coef * test_pos_x)))
+                        if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
+                            (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
                         {
                             Event check_collision_event;
                             check_collision_event.set_type(EventType::COLLISION_EVENT);
@@ -182,9 +181,9 @@ public:
                     for (float i = 0; i < area_.get_height(); i += 0.95f)
                     {
                         float test_pos_x = new_x + area_.get_width() - 1;
-                        float test_pos_y = new_y - i;
-                        if (( above_semicircle_flat_part && (test_pos_y < semicircle_flat_part_k_coef * test_pos_x)) ||
-                            (!above_semicircle_flat_part && (test_pos_y > semicircle_flat_part_k_coef * test_pos_x)))
+                        float test_pos_y = new_y + i;
+                        if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
+                            (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
                         {
                             Event check_collision_event;
                             check_collision_event.set_type(EventType::COLLISION_EVENT);
@@ -207,8 +206,8 @@ public:
                     {
                         float test_pos_x = new_x + i;
                         float test_pos_y = new_y + area_.get_height() - 1;
-                        if (( above_semicircle_flat_part && (test_pos_y < semicircle_flat_part_k_coef * test_pos_x)) ||
-                            (!above_semicircle_flat_part && (test_pos_y > semicircle_flat_part_k_coef * test_pos_x)))
+                        if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
+                            (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
                         {
                             Event check_collision_event;
                             check_collision_event.set_type(EventType::COLLISION_EVENT);
@@ -236,8 +235,8 @@ public:
                         {
                             float test_pos_x = new_x + area_.get_width() - 1;
                             float test_pos_y = new_y + i;
-                            if (( above_semicircle_flat_part && (test_pos_y < semicircle_flat_part_k_coef * test_pos_x)) ||
-                                (!above_semicircle_flat_part && (test_pos_y > semicircle_flat_part_k_coef * test_pos_x)))
+                            if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
+                                (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
                             {
                                 Event check_collision_event;
                                 check_collision_event.set_type(EventType::COLLISION_EVENT);
@@ -263,8 +262,8 @@ public:
                         {
                             float test_pos_x = new_x + i;
                             float test_pos_y = new_y;
-                            if (( above_semicircle_flat_part && (test_pos_y < semicircle_flat_part_k_coef * test_pos_x)) ||
-                                (!above_semicircle_flat_part && (test_pos_y > semicircle_flat_part_k_coef * test_pos_x)))
+                            if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
+                                (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
                             {
                                 Event check_collision_event;
                                 check_collision_event.set_type(EventType::COLLISION_EVENT);
@@ -293,8 +292,8 @@ public:
                         {
                             float test_pos_x = new_x;
                             float test_pos_y = new_y + i;
-                            if (( above_semicircle_flat_part && (test_pos_y < semicircle_flat_part_k_coef * test_pos_x)) ||
-                                (!above_semicircle_flat_part && (test_pos_y > semicircle_flat_part_k_coef * test_pos_x)))
+                            if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
+                                (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
                             {
                                 Event check_collision_event;
                                 check_collision_event.set_type(EventType::COLLISION_EVENT);
@@ -320,8 +319,8 @@ public:
                         {
                             float test_pos_x = new_x + i;
                             float test_pos_y = new_y + area_.get_height() - 1;
-                            if (( above_semicircle_flat_part && (test_pos_y < semicircle_flat_part_k_coef * test_pos_x)) ||
-                                (!above_semicircle_flat_part && (test_pos_y > semicircle_flat_part_k_coef * test_pos_x)))
+                            if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
+                                (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
                             {
                                 Event check_collision_event;
                                 check_collision_event.set_type(EventType::COLLISION_EVENT);
@@ -420,8 +419,11 @@ public:
                     // reflection vector
                     float response_x_norm = response_x / response_magnitude;
                     float response_y_norm = response_y / response_magnitude;
+                    // printf("response_x_norm: %g\n", response_x_norm);
+                    // printf("response_y_norm: %g\n", response_y_norm);
                     float dot = velocity_.x() * (response_x_norm) +
                                 velocity_.y() * (response_y_norm);
+
                     // printf("before collision velocity is %g %g\n", velocity_.x(), velocity_.y());
                     velocity_.set_x((-2.0f * dot * response_x_norm + velocity_.x()) * friction_);
                     velocity_.set_y((-2.0f * dot * response_y_norm + velocity_.y()) * friction_);
@@ -444,7 +446,14 @@ public:
                     area_.set_left_top_y(new_y);
                 }
 
-                if (velocity_magnitude < 30.f)
+                if (get_physics_entity_type() == PhysicsEntity::CHARACTER)
+                {
+                    if (velocity_magnitude < 50.f)
+                    {
+                        is_stable_ = true;
+                    }
+                }
+                else if (velocity_magnitude < 30.f)
                 {
                     // printf("set to true\n");
                     is_stable_ = true;

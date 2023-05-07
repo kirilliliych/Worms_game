@@ -76,7 +76,6 @@ public:
         return image_->getPixelsPtr();
     }
 
-
     uint32_t get_width() const
     {
         return image_->getSize().x;

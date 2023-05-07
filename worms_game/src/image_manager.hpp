@@ -67,12 +67,12 @@ void put_textures_to_image_manager_()
     Image worms_sprite_sheet_image;
     assert(worms_sprite_sheet_image.load_from_file("./worms_game/images/worms_sprite_sheet.png"));
     extract_part_of_image_(worms_sprite_sheet_image, {23, 27, {7, 7}}, "standing.png");
+    extract_part_of_image_(worms_sprite_sheet_image, {25, 30, {123, 378}}, "rocket.png");
 
     Image debris_base_image;
     assert(debris_base_image.load_from_file("./worms_game/images/dirt2.png"));
     extract_part_of_image_(debris_base_image, {8, 8, {0, 0}}, "debris.png");
 
-    extract_part_of_image_(worms_sprite_sheet_image, {25, 30, {123, 378}}, "rocket.png");
 }
 
 void extract_part_of_image_(const Image &sprite_sheet, const Rect<int> &area, const std::string &image_file_name)
@@ -83,11 +83,20 @@ void extract_part_of_image_(const Image &sprite_sheet, const Rect<int> &area, co
     image->create(area.get_width(), area.get_height());
     image->copy(proxy_texture.copy_to_image(), 0, 0); // after copying all pixels that were not explicitly changed by copying are changed to ff000000!
     const uint32_t *pixels = reinterpret_cast<const uint32_t *> (image->get_pixels_ptr());
+    uint32_t background_color = pixels[0];
+    uint8_t *ptr = reinterpret_cast<uint8_t *> (&background_color);
+    uint8_t temp = *ptr;
+    *ptr = *(ptr + 3);
+    *(ptr + 3) = temp;
+    temp = *(ptr + 1);
+    *(ptr + 1) = *(ptr + 2);
+    *(ptr + 2) = temp;
     for (uint32_t y = 0; y < image->get_height(); ++y)
     {
         for (uint32_t x = 0; x < image->get_width(); ++x)
         {
-            if (pixels[y * image->get_width() + x] == 0xff000000)
+            uint32_t cur_pixel = pixels[y * image->get_width() + x];
+            if ((cur_pixel == 0xff000000) || (cur_pixel == background_color))
             {
                 image->set_pixel(x, y, 0x00000000);
             }

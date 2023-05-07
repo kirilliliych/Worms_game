@@ -65,6 +65,11 @@ public:
         return result;
     }
 
+    void render_self(Surface *surface, const Point2d<int> &camera_offset) override
+    {
+        assert(surface != nullptr);
+    }
+
     bool handle_event(const Event &event) override
     {
         bool result = false;

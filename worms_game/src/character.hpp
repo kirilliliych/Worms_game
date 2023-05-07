@@ -220,7 +220,7 @@ public:
 private:
 public:
 
-    static constexpr float DEFAULT_FRICTION = 0.01;
+    static constexpr float DEFAULT_FRICTION = 0.0008;
 
     float texture_scale_;
 
