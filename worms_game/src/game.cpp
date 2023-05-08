@@ -124,6 +124,11 @@ bool Game::launch_event(const Event &event)
     return emanager_->handle_event(event);
 }
 
+bool Game::is_under_control(const AbstractNode *object) const
+{
+    return under_control_ == object;
+}
+
 const Character *Game::get_character_under_control() const
 {
     return under_control_;

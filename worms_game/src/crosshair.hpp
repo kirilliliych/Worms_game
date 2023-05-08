@@ -29,16 +29,9 @@ public:
     {
         assert(surface != nullptr);
 
-        if (parent_ == reinterpret_cast<const AbstractNode *> (Game::game->get_character_under_control()))
+        if (Game::game->is_under_control(parent_))
         {
-            // Sprite self_sprite(*texture_, area_.left_top() - camera_offset);
-            // surface->draw_sprite(self_sprite);
-
-            Point2d<int> crosshair_offset{static_cast<int> (cosf(OX_angle_) * spin_radius_),
-                                          static_cast<int> (sinf(OX_angle_) * spin_radius_)
-                                         };
-            Sprite self_sprite(*texture_, area_.left_top() + crosshair_offset - camera_offset);
-            surface->draw_sprite(self_sprite);
+            AbstractNode::render_self(surface, camera_offset);
         }
     }
 
@@ -54,7 +47,7 @@ public:
                 {
                     case KeyboardKey::Left:
                     {
-                        if (parent_ == reinterpret_cast<const AbstractNode *> (Game::game->get_character_under_control()))
+                        if (Game::game->is_under_control(parent_))
                         {
                             OX_angle_ -= 15.f * Game::game->time_delta.count();
                             if (OX_angle_ < -3.14159f)
@@ -68,7 +61,7 @@ public:
 
                     case KeyboardKey::Right:
                     {
-                        if (parent_ == reinterpret_cast<const AbstractNode *> (Game::game->get_character_under_control()))
+                        if (Game::game->is_under_control(parent_))
                         {
                             OX_angle_ += 15.f * Game::game->time_delta.count();
                             if (OX_angle_ > 3.14159f)
@@ -91,7 +84,9 @@ public:
 
             case EventType::TIME_PASSED:
             {
-                area_.set_left_top(parent_->get_area().center());
+                area_.set_left_top(parent_->get_area().center() +
+                                   Point2d<int>(static_cast<int> (cosf(OX_angle_) * spin_radius_),
+                                                static_cast<int> (sinf(OX_angle_) * spin_radius_)));
 
                 break;
             }

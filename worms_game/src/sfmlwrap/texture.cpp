@@ -6,6 +6,13 @@ Texture::Texture()
   : texture_(new Texture_())
 {}
 
+Texture &Texture::operator =(const Texture &other)
+{
+    texture_->operator =(*other.texture_);
+
+    return *this;
+}
+
 Texture::~Texture()
 {
     delete texture_;

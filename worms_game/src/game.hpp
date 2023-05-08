@@ -61,6 +61,8 @@ public:
 
     bool launch_event(const Event &event);
 
+    bool is_under_control(const AbstractNode *object) const;
+
     const Character *get_character_under_control() const;
 
     const PhysicsObject *get_camera_tracking_object() const;
@@ -90,7 +92,7 @@ public:
     static time_delta_t time_delta;
 
 private:
-public:
+// public:
     GameState state_;
 
     Desktop *main_window_;

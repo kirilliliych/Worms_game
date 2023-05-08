@@ -7,7 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include "game.hpp"
 
-// TODO: include guard через pragma; friend не класс, а отдельные функции; erase лишнего в отдельный ивент; управление crosshair через мышь
+// TODO: include guard через pragma; friend не класс, а отдельные функции; erase лишнего в отдельный ивент; управление crosshair через мышь; scale в abstract node
 // BUG: асимметричные прыжки
 
 int main()

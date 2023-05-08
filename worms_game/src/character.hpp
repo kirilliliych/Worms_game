@@ -9,19 +9,19 @@
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/texture.hpp"
 #include "weapon.hpp"
+#include <math.h>
 
 
 class Character : public PhysicsObject
 {
 public:
 
-    Character(AbstractNode *parent, const Rect<int> &area)    // do we need this?
+    Character(AbstractNode *parent, const Rect<int> &area)
       : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION, -1),
         texture_scale_(1),
-        hp_(100),
         crosshair_(new Crosshair(this, {10, 10, area_.center()},
                                  std::max(area.get_width(), area_.get_height()) + 30)),
-        is_alive_(true)
+        weapon_(new Weapon(this, area_, nullptr))
     {
         PhysicsObject::type_ = PhysicsEntity::CHARACTER;
     }
@@ -31,10 +31,9 @@ public:
       : PhysicsObject(parent, area, {0, 0}, {0, 0},
                       DEFAULT_FRICTION, -1, texture_file_name, texture_area),
         texture_scale_(1),
-        hp_(100),
         crosshair_(new Crosshair(this, {10, 10, area_.center()},
                                  std::max(area.get_width(), area_.get_height()) + 30)),
-        is_alive_(true)
+        weapon_(new Weapon(this, area_, nullptr))
     {
         PhysicsObject::type_ = PhysicsEntity::CHARACTER;
 
@@ -59,7 +58,10 @@ public:
     ~Character()
     {
         delete crosshair_;
+        delete weapon_;
     }
+
+
 
     void on_bounce_death(const Point2d<int> &death_position) override
     {}
@@ -82,27 +84,30 @@ public:
             case EventType::KEY_PRESSED:
             {
                 // printf("CHARACTER CATCHES KEY AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
-                if ((this == Game::game->get_character_under_control()) && 
+                if (Game::game->is_under_control(this) && 
                     (is_stable_))
                 {
                     switch (event.kedata_.key_code)
                     {
-                        case KeyboardKey::Z:
-                        {
-                            printf("CHARACTER CAUGHT KEY Z\n");
-                            velocity_.set_x(-200.0f);
-                            velocity_.set_y(-400.0f);
-                            is_stable_ = false;
+                        // case KeyboardKey::Z:
+                        // {
+                        //     printf("CHARACTER CAUGHT KEY Z\n");
+                        //     velocity_.set_x(-200.0f * cosf(crosshair_->get_angle()));
+                        //     velocity_.set_y(-400.0f * -sinf(crosshair_->get_angle()));
+                        //     is_stable_ = false;
 
-                            break;
-                        }
+                        //     break;
+                        // }
                         
                         case KeyboardKey::X:
                         {
                             printf("CHARACTER CAUGHT KEY X\n");
-                            velocity_.set_x(+200.0f);
-                            velocity_.set_y(-400.0f);
+                            velocity_.set_x(+400.0f * cosf(crosshair_->get_angle()));
+                            velocity_.set_y(+800.0f * sinf(crosshair_->get_angle()));
+                            printf("new velocity is %g %g\n", velocity_.x(), velocity_.y());
                             is_stable_ = false;
+
+                            // bebra = true;
 
                             break;
                         }
@@ -180,13 +185,6 @@ public:
                     is_stable_ = false;
                 }
 
-                // for (uint32_t i = 0; i < 20; ++i)
-                // {
-                //     // due to add_to_map_children call map becomes parent of debris
-                //     Game::game->add_to_map_children(new Debris(nullptr, {8, 8, event.eedata_.position},
-                //                                     "debris.png"));
-                // }
-
                 if (PhysicsObject::handle_event(event))
                 {
                     result = true;
@@ -206,10 +204,14 @@ public:
 
             case EventType::TIME_PASSED:
             {
-                if (PhysicsObject::handle_event(event))     // 
+                if (PhysicsObject::handle_event(event))
                 {
                     result = true;
                 }
+
+                // weapon: update projectile spawn position and OX angle
+                weapon_->set_projectile_spawn_position(crosshair_->get_area().left_top());
+                weapon_->set_OX_angle(crosshair_->get_angle());
 
                 for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
                 {
@@ -246,10 +248,7 @@ public:
 
     float texture_scale_;
 
-    // Weapon cur_weapon_;
     Crosshair *crosshair_;    
+    Weapon *weapon_;
 
-    int hp_;
-
-    bool is_alive_; // shows whether worm or grave will be drawn 
 };

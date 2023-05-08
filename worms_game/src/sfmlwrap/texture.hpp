@@ -24,11 +24,20 @@ class Texture
         Texture_(const Texture_ &other)
           : sf::Texture(other)
         {}
+
+        Texture_ &operator =(const Texture_ &other)
+        {
+            sf::Texture::operator =(other);
+
+            return *this;
+        }
     };
 
 public:
 
     Texture();
+
+    Texture &operator =(const Texture &other);
 
     ~Texture();
 

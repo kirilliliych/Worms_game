@@ -3,6 +3,7 @@
 
 
 #include "abstract_node.hpp"
+#include "ammo_traits.hpp"
 #include "physics_object.hpp"
 #include "sfmlwrap/texture.hpp"
 #include <math.h>
@@ -46,6 +47,19 @@ public:
         }
     }
 
+    Projectile(AbstractNode *parent, const Point2d<int> &spawn_position, float OX_angle, const AmmoTraits &a_traits)
+      : PhysicsObject(parent, {a_traits.get_width(),
+                               a_traits.get_height(),
+                               spawn_position
+                              },
+                      {a_traits.get_abs_init_speed() * cosf(OX_angle),
+                                 a_traits.get_abs_init_speed() * sinf(OX_angle)},
+                      {0, 0},
+                      a_traits.get_friction(),
+                      a_traits.get_bounces_before_death()),
+                      damage_(a_traits.get_damage())
+    {}
+
     void on_bounce_death(const Point2d<int> &death_position) override
     {
         Game::game->process_explosion(80, death_position);
@@ -57,8 +71,8 @@ public:
 
         Sprite self_sprite(*texture_, area_.left_top() - camera_offset);
         self_sprite.set_scale(texture_scale_, texture_scale_);
-        float rad_angle = atan2f(velocity_.y(), velocity_.x());
-        self_sprite.set_rotation(rad_angle * 180 / 3.14159);
+        // float rad_angle = atan2f(velocity_.y(), velocity_.x());
+        // self_sprite.set_rotation(rad_angle * 180 / 3.14159);
         surface->draw_sprite(self_sprite);
     }
 

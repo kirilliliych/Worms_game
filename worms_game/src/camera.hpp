@@ -89,15 +89,23 @@ public:
                     area_.set_left_top_y(static_cast<float> (area_.left_top().y()) + move_speed_ * Game::time_delta.count());
                 }
 
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
+                }
+
                 break;
             }
             case EventType::TIME_PASSED:
             {
-                // const PhysicsObject *camera_tracking = Game::game->get_camera_tracking_object();
-                // if (camera_tracking != nullptr)
-                // {
-                //     set_position(camera_tracking->get_area().left_top() - area_.half_size());
-                // }
+                const PhysicsObject *camera_tracking = Game::game->get_camera_tracking_object();
+                if ((camera_tracking != nullptr) && !camera_tracking->is_stable())
+                {
+                    set_position(camera_tracking->get_area().left_top() - area_.half_size());
+                }
                 
                 if (area_.left_top().x() < 0)
                 {
@@ -116,12 +124,28 @@ public:
                     area_.set_left_top_y(static_cast<int> (max_y_));
                 }
 
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
+                }
+
                 break;
             }
 
             default:
             {
-                result = children_handle_event(event);
+                // result = children_handle_event(event);
+
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
+                }
             }
         }
 
