@@ -14,7 +14,7 @@ public:
 
     Crosshair(AbstractNode *parent, const Rect<int> &area, int spin_radius)
       : AbstractNode(parent, area),
-        OX_angle_(0),
+        OX_angle_(-3.14159 / 2),
         spin_radius_(spin_radius)
     {
         form_crosshair_texture_(0xff0000ff);

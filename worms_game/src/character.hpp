@@ -79,15 +79,6 @@ public:
 
         switch (event.get_type())
         {
-            case EventType::MOUSE_BUTTON_PRESSED:
-            {
-            //     printf("mbedata: %d %d\n", event.mbedata_.position.x(), event.mbedata_.position.y());
-            //     if (area_.contains(event.mbedata_.position))
-            //     printf("mouse is pointing at character with this %p; character under control is %p\n", this, Game::game->get_character_under_control());
-
-            //     break;
-            }
-
             case EventType::KEY_PRESSED:
             {
                 // printf("CHARACTER CATCHES KEY AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
@@ -122,6 +113,14 @@ public:
                         }
                     }
                 }
+
+                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                {
+                    if (children_[child_index]->handle_event(event))
+                    {
+                        result = true;
+                    }
+                }
             }
 
             case EventType::COLLISION_EVENT:
@@ -146,32 +145,47 @@ public:
 
             case EventType::EXPLOSION_EVENT:
             {
-                float center_x = area_.left_top().x() + static_cast<float> (area_.get_width())  / 2;
-                float center_y = area_.left_top().y() + static_cast<float> (area_.get_height()) / 2;
+                float center_x = area_.center_x();
+                float center_y = area_.center_y();
                 float dx = center_x - event.eedata_.position.x();
                 float dy = center_y - event.eedata_.position.y();
+                int dx_sign = dx >= 0 ? dx > 0 ? 1 : 0 : -1;
                 float distance = sqrtf(dx * dx + dy * dy);
                 // printf("dx: %g dy: %g distance: %g\n", dx, dy, distance);
-                if (distance < 0.001f)
-                {
-                    // printf("distance too small\n");
-                    distance = 0.001f;
-                }
+                // if (distance < 1)        // first version
+                // {
+                //     // printf("distance too small\n");
+                //     distance = 1;
+                //     dx = 1;
+                //     dy = 1;
+                // }
                 if (distance < event.eedata_.radius)
-                {
-                    velocity_.set_x(15.f * dx / (distance /*- std::min(area_.get_width() / 2, area_.get_height() / 2)*/) * event.eedata_.radius);
-                    velocity_.set_y(15.f * dy / (distance /*- std::min(area_.get_width() / 2, area_.get_height() / 2)*/) * event.eedata_.radius);
-                    // printf("velocity: x %g y %g\n", velocity_.x(), velocity_.y());
+                {   
+                    // printf("bomb reached\n");
+                    // float new_x_velocity = 10.f * dx / distance * event.eedata_.radius;      // first version
+                    // float new_y_velocity = 20.f * dy / distance * event.eedata_.radius;
+                    // new_x_velocity = new_x_velocity < 0 ? std::max(new_x_velocity, -1000.f) : std::min(new_x_velocity, 1000.f);
+                    // new_y_velocity = new_y_velocity < 0 ? std::max(new_y_velocity, -1000.f) : std::min(new_y_velocity, 1000.f);
+
+                    // velocity_.set_x(new_x_velocity);
+                    // velocity_.set_y(new_y_velocity);
+                    // // for (int i = 0; i < 1000; ++i)
+
+                    float new_x_abs_velocity = (1000.f * (1 - distance / event.eedata_.radius));    // second version
+                    float new_y_abs_velocity = (1000.f * (1 - distance / event.eedata_.radius));
+                    velocity_.set_x(new_x_abs_velocity * dx_sign);
+                    velocity_.set_y(-new_y_abs_velocity);
+                    // printf("VELOCITY AAAA: x %g y %g\n", velocity_.x(), velocity_.y());
 
                     is_stable_ = false;
                 }
 
-                for (uint32_t i = 0; i < 20; ++i)
-                {
-                    // due to add_to_map_children call map becomes parent of debris
-                    Game::game->add_to_map_children(new Debris(nullptr, {8, 8, event.eedata_.position},
-                                                    "debris.png"));
-                }
+                // for (uint32_t i = 0; i < 20; ++i)
+                // {
+                //     // due to add_to_map_children call map becomes parent of debris
+                //     Game::game->add_to_map_children(new Debris(nullptr, {8, 8, event.eedata_.position},
+                //                                     "debris.png"));
+                // }
 
                 if (PhysicsObject::handle_event(event))
                 {

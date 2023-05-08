@@ -51,6 +51,16 @@ public:
                };
     }
 
+    Point2d<Type> half_size() const
+    {
+        return {width_ / 2, height_ / 2};
+    }
+
+    Point2d<Type> size() const
+    {
+        return {width_, height_};
+    }
+
     Type center_x() const
     {
         return center().x();

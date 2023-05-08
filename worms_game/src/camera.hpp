@@ -3,6 +3,7 @@
 
 #include "abstract_node.hpp"
 #include "game.hpp"
+#include "physics_object.hpp"
 #include "sfmlwrap/events/mouse_events.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "point2d.hpp"
@@ -87,6 +88,16 @@ public:
                 {
                     area_.set_left_top_y(static_cast<float> (area_.left_top().y()) + move_speed_ * Game::time_delta.count());
                 }
+
+                break;
+            }
+            case EventType::TIME_PASSED:
+            {
+                // const PhysicsObject *camera_tracking = Game::game->get_camera_tracking_object();
+                // if (camera_tracking != nullptr)
+                // {
+                //     set_position(camera_tracking->get_area().left_top() - area_.half_size());
+                // }
                 
                 if (area_.left_top().x() < 0)
                 {

@@ -36,7 +36,7 @@ Game::Game(uint32_t window_width, uint32_t window_height,
                        map_height - window_height)),
     emanager_(new EventManager(main_window_)),
     under_control_(nullptr),
-    pr_(new Projectile(map_, {50, 50, {600, 0}}, "rocket.png"))
+    camera_tracking_(nullptr)
 {
     assert(game == nullptr);    // singleton
     game = this;
@@ -63,6 +63,7 @@ void Game::run()
     // state_ = GameState::GENERATING_UNITS;
     team_ = new Team(map_, 3, 700, 300, 40, 40);
     under_control_ = team_->get_next_character();
+    camera_tracking_ = under_control_;
     // state_ = GameState::READY;
     
     clock clock{};
@@ -126,6 +127,11 @@ bool Game::launch_event(const Event &event)
 const Character *Game::get_character_under_control() const
 {
     return under_control_;
+}
+
+const PhysicsObject *Game::get_camera_tracking_object() const
+{
+    return camera_tracking_;
 }
 
 uint32_t Game::get_window_width() const

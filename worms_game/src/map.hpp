@@ -143,6 +143,13 @@ public:
                 make_crater_(event.eedata_.position, event.eedata_.radius);
                 update_map_texture_();
 
+                for (uint32_t i = 0; i < event.eedata_.radius / 2; ++i)
+                {
+                    // due to add_to_map_children call map becomes parent of debris
+                    Game::game->add_to_map_children(new Debris(nullptr, {8, 8, event.eedata_.position},
+                                                    "debris.png"));
+                }
+
                 for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
                 {
                     if (children_[child_index]->handle_event(event))

@@ -71,6 +71,8 @@ public:
 
                 float new_x = area_.left_top().x() + velocity_.x() * Game::time_delta.count();
                 float new_y = area_.left_top().y() + velocity_.y() * Game::time_delta.count();
+                float new_x_center = new_x + area_.get_width()  / 2.f;
+                float new_y_center = new_y + area_.get_height() / 2.f;
 
                 // if (a)
                 // {
@@ -87,14 +89,21 @@ public:
 
                 if (std::abs(velocity_.y()) < 0.01)
                 {
-                    velocity_.set_y(velocity_.y() > 0 ? 0.001 : -0.01);
+                    velocity_.set_y(velocity_.y() > 0 ? 0.01 : -0.01);
                 }
                 float semicircle_flat_part_k_coef = -velocity_.x() / velocity_.y(); // k1 * k2 = -1
                 bool above_semicircle_flat_part = true; //
-                if (velocity_.y() > 0)
+                float velocity_magnitude = sqrtf(velocity_.x() * velocity_.x() +
+                                                    velocity_.y() * velocity_.y());
+                Vector2d<float> velocity_normalized{velocity_.x() / velocity_magnitude,
+                                                    velocity_.y() / velocity_magnitude
+                                                   };
+                if (velocity_normalized.y() > semicircle_flat_part_k_coef * velocity_normalized.x())
+                // if (velocity_.y() > 0)          // rly?
                 {
                     above_semicircle_flat_part = false;
                 }
+                
 
                 std::vector<bool> is_corner_in_correct_halfplane(4, false);
                 if (( above_semicircle_flat_part && (-area_.get_height() <= semicircle_flat_part_k_coef * -area_.get_width())) ||
@@ -123,8 +132,6 @@ public:
                 float response_x = 0;
                 float response_y = 0;
 
-                float new_x_center = new_x + area_.get_width()  / 2.f;
-                float new_y_center = new_y + area_.get_height() / 2.f; 
                 if (is_corner_in_correct_halfplane[0])
                 {
                     for (float i = 0; i < area_.get_height(); i += 0.95f)
@@ -343,33 +350,33 @@ public:
                 
                 // for (float r = angle - 3.14159f / 2.0f; r < angle + 3.14159f / 2.0f; r += 3.14159f / 16.0f)  // definitely need better collision checking
                 // {
-                //     float test_pos_x = radius_ * cosf(r) + new_x + area_.get_width()  / 2.f;
-                //     float test_pos_y = radius_ * sinf(r) + new_y + area_.get_height() / 2.f;
+                //     float test_pos_x = radius_ * cosf(r) + new_x_center;
+                //     float test_pos_y = radius_ * sinf(r) + new_y_center;
 
-                //     // assert(test_pos_x - new_x > 0.01f);
-                //     // float collision_dx = std::max(test_pos_x - new_x, 0.01f);
-                //     // float collision_dy = std::max(test_pos_y - new_y, 0.01f);
-                //     // float k_coef = collision_dy / collision_dx;
-                //     // float b_coef = test_pos_y - k_coef * test_pos_x;
-                //     // if (test_pos_x >= new_x)
-                //     // {
-                //     //     float potential_test_pos_x = new_x + area_.get_width() - 1;
-                //     //     float potential_test_pos_y = k_coef * potential_test_pos_x + b_coef;
-                //     //     if (potential_test_pos_y > area_.get_bottom_y())
-                //     //     {
-                //     //         potential_test_pos_x = (area_.get_bottom_y() - b_coef) / k_coef;
-                //     //         potential_test_pos_y = area_.get_bottom_y();
-                //     //     }
-                //     //     else if (potential_test_pos_y < )
-                //     //     {
+                    // assert(test_pos_x - new_x > 0.01f);
+                    // float collision_dx = std::max(test_pos_x - new_x, 0.01f);
+                    // float collision_dy = std::max(test_pos_y - new_y, 0.01f);
+                    // float k_coef = collision_dy / collision_dx;
+                    // float b_coef = test_pos_y - k_coef * test_pos_x;
+                    // if (test_pos_x >= new_x)
+                    // {
+                    //     float potential_test_pos_x = new_x + area_.get_width() - 1;
+                    //     float potential_test_pos_y = k_coef * potential_test_pos_x + b_coef;
+                    //     if (potential_test_pos_y > area_.get_bottom_y())
+                    //     {
+                    //         potential_test_pos_x = (area_.get_bottom_y() - b_coef) / k_coef;
+                    //         potential_test_pos_y = area_.get_bottom_y();
+                    //     }
+                    //     else if (potential_test_pos_y < )
+                    //     {
 
-                //     //     }
-                //     // }
-                //     // else
-                //     // {
+                    //     }
+                    // }
+                    // else
+                    // {
                         
-                //     // }
-
+                    // }
+                
                 //     if (test_pos_x >= Game::game->get_map_width())
                 //     {
                 //         test_pos_x = Game::game->get_map_width() - 1;
@@ -407,9 +414,8 @@ public:
                 //     }
                 // }
 
-                float velocity_magnitude = sqrtf(velocity_.x() * velocity_.x() +
-                                                    velocity_.y() * velocity_.y());
-                if ((collision_happened) && !is_stable_)
+                // here was velocity magnitude
+                if (collision_happened && !is_stable_)
                 {
                     is_stable_ = true;
                     
@@ -421,8 +427,8 @@ public:
                     float response_y_norm = response_y / response_magnitude;
                     // printf("response_x_norm: %g\n", response_x_norm);
                     // printf("response_y_norm: %g\n", response_y_norm);
-                    float dot = velocity_.x() * (response_x_norm) +
-                                velocity_.y() * (response_y_norm);
+                    float dot = velocity_.x() * response_x_norm +
+                                velocity_.y() * response_y_norm;
 
                     // printf("before collision velocity is %g %g\n", velocity_.x(), velocity_.y());
                     velocity_.set_x((-2.0f * dot * response_x_norm + velocity_.x()) * friction_);
@@ -436,7 +442,7 @@ public:
 
                         if (!exists_)
                         {
-                            on_bounce_death(area_.left_top() + Point2d<int>(area_.get_width() / 2, area_.get_height() / 2));
+                            on_bounce_death(area_.center());
                         }
                     }
                 }

@@ -24,6 +24,7 @@ class Character;
 class Desktop;
 class EventManager;
 class Map;
+class PhysicsObject;
 class Projectile;
 class Team;
 
@@ -62,6 +63,8 @@ public:
 
     const Character *get_character_under_control() const;
 
+    const PhysicsObject *get_camera_tracking_object() const;
+
     uint32_t get_window_width() const;
     
     uint32_t get_window_height() const;
@@ -97,7 +100,6 @@ public:
     EventManager *emanager_;
 
     const Character *under_control_;
+    const PhysicsObject * camera_tracking_; 
     Team *team_;   // list of teams?
-
-    Projectile *pr_;
 };
