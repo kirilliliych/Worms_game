@@ -208,9 +208,7 @@ public:
         uint32_t width  = static_cast<uint32_t> (area_.get_width());
         uint32_t height = static_cast<uint32_t> (area_.get_height()); 
 
-        uint64_t pixels_size = width * height * sizeof(uint32_t) / sizeof(uint8_t);
-        std::vector<uint8_t> pixels(pixels_size);
-        uint32_t *pixels_data = reinterpret_cast<uint32_t *> (pixels.data());
+        std::vector<uint32_t> pixels(width * height);
 
         for (uint32_t y = 0; y < height; ++y)
         {
@@ -222,7 +220,7 @@ public:
                     {
                         uint32_t image_width  = landscape_images_[MapPixelCondition::SKY]->get_width();
                         uint32_t image_height = landscape_images_[MapPixelCondition::SKY]->get_height();
-                        pixels_data[y * width + x] = landscape_images_[MapPixelCondition::SKY]->get_pixel(x % image_width,
+                        pixels[y * width + x] = landscape_images_[MapPixelCondition::SKY]->get_pixel(x % image_width,
                                                                                                           y % image_height);
                         break;
                     }
@@ -231,15 +229,8 @@ public:
                     {
                         uint32_t image_width  = landscape_images_[MapPixelCondition::TERRAIN]->get_width();
                         uint32_t image_height = landscape_images_[MapPixelCondition::TERRAIN]->get_height();
-                        pixels_data[y * width + x] = landscape_images_[MapPixelCondition::TERRAIN]->get_pixel(x % image_width,
+                        pixels[y * width + x] = landscape_images_[MapPixelCondition::TERRAIN]->get_pixel(x % image_width,
                                                                                                               y % image_height);
-                        break;
-                    }
-
-                    case MapPixelCondition::COLLISION:
-                    {
-                        pixels_data[y * width + x] = 0xff0000ff;
-                        
                         break;
                     }
 
@@ -253,7 +244,7 @@ public:
             }
         }
         
-        texture_->update(pixels.data(), width, height, 0, 0);
+        texture_->update(reinterpret_cast<const uint8_t *> (pixels.data()), width, height, 0, 0);
     }
 
     std::vector<float> PerlinNoise1D_(const std::vector<float> &noise_seed, int octaves_quantity, float bias)

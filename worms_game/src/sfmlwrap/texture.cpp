@@ -83,7 +83,6 @@ void Texture::fill_with_color(uint32_t color)
     uint32_t width  = get_width();
     uint32_t height = get_height();
     std::vector<uint32_t> pixels(width * height, 0);
-    uint32_t *pixels_data = pixels.data();
 
     for (uint32_t cur_height = 0; cur_height < height; ++cur_height)
     {
@@ -93,5 +92,5 @@ void Texture::fill_with_color(uint32_t color)
         }
     }
 
-    texture_->update(reinterpret_cast<const uint8_t *> (pixels_data), width, height, 0, 0);
+    texture_->update(reinterpret_cast<const uint8_t *> (pixels.data()), width, height, 0, 0);
 }

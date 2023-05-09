@@ -117,7 +117,6 @@ private:
         uint32_t texture_horizontal_line_top_edge_y = height / 2 - thickness / 2;
         uint32_t texture_vertical_line_left_edge_x  = width  / 2 - thickness / 2;
         std::vector<uint32_t> pixels(width * height, 0);
-        uint32_t *pixels_data = pixels.data();
         for (uint32_t cur_width = 0; cur_width < width; ++cur_width)
         {
             for (uint32_t cur_thickness = 0; cur_thickness < thickness; ++cur_thickness)
@@ -133,7 +132,7 @@ private:
             }
         }
 
-        texture_->update(reinterpret_cast<const uint8_t *> (pixels_data), width, height, 0, 0);
+        texture_->update(reinterpret_cast<const uint8_t *> (pixels.data()), width, height, 0, 0);
     }
 
 private:

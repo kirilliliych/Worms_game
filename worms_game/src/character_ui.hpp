@@ -83,7 +83,6 @@ private:
         int max = width * std::max(new_hp, prev_hp_) / max_hp_;
         uint32_t color = delta > 0 ? 0xff0000ff : 0x00000000;
         std::vector<uint32_t> pixels(width * height, 0);
-        uint32_t *pixels_data = pixels.data();
         for (int cur_width = min; cur_width < max; ++cur_width)
         {
             for (int cur_height = 0; cur_height < height; ++cur_height)
@@ -91,6 +90,8 @@ private:
                 pixels[cur_height * width + cur_width] = color;
             }
         }
+
+        texture_->update(reinterpret_cast<const uint8_t *> (pixels.data()), width, height, 0, 0);
     }
 
 private:
