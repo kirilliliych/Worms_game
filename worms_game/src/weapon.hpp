@@ -88,12 +88,9 @@ public:
                         }
                     }
 
-                    for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                    if (children_handle_event(event))
                     {
-                        if (children_[child_index]->handle_event(event))
-                        {
-                            result = true;
-                        }
+                        result = true;
                     }
 
                     break;
@@ -111,12 +108,9 @@ public:
                         is_charging_ = false;
                     }
 
-                    for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                    if (children_handle_event(event))
                     {
-                        if (children_[child_index]->handle_event(event))
-                        {
-                            result = true;
-                        }
+                        result = true;
                     }
 
                     break;
@@ -151,13 +145,9 @@ public:
                         }
                     }
 
-
-                    for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                    if (children_handle_event(event))
                     {
-                        if (children_[child_index]->handle_event(event))
-                        {
-                            result = true;
-                        }
+                        result = true;
                     }
 
                     break;
@@ -166,12 +156,9 @@ public:
 
                 default:
                 {
-                    for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                    if (children_handle_event(event))
                     {
-                        if (children_[child_index]->handle_event(event))
-                        {
-                            result = true;
-                        }
+                        result = true;
                     }
                 }
             }

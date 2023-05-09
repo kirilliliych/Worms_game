@@ -131,14 +131,10 @@ public:
                     }
                 }
 
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
-                // result = children_handle_event(event);
 
                 break;
             }
@@ -155,15 +151,10 @@ public:
                                                     "debris.png"));     // just new here
                 }
 
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
-
-                // result = children_handle_event(event);
 
                 break;
             }
@@ -175,14 +166,10 @@ public:
                     result = true;
                 }
 
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
-                // result = children_handle_event(event);
 
                 break;
             }
@@ -194,28 +181,20 @@ public:
                                                      [](const std::unique_ptr<AbstractNode> &object) {return !object->does_exist();}),
                                 children_.cend());
 
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
-                // result = children_handle_event(event);
 
                 break;
             }
 
             default:
             {
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
-                // result = children_handle_event(event);
             }
         }
 

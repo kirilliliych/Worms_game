@@ -1,4 +1,5 @@
 #include "character.hpp"
+#include "character_ui.hpp"
 
 
     Character::Character(AbstractNode *parent, const Rect<int> &area)
@@ -23,23 +24,6 @@
         ui_(new CharacterUI(this, {area.get_width(), 5, {area.get_left_x(), area.get_top_y() - 10}}, hp_))
     {
         PhysicsObject::type_ = PhysicsEntity::CHARACTER;
-
-        // uint32_t texture_width  = texture_->get_width();
-        // uint32_t texture_height = texture_->get_height();
-        // float asked_width  = static_cast<float> (area.get_width());
-        // float asked_height = static_cast<float> (area.get_height());
-        // float x_scale = asked_width  / static_cast<float> (texture_width);
-        // float y_scale = asked_height / static_cast<float> (texture_height);
-        // if (y_scale < x_scale)
-        // {
-        //     area_.set_width(y_scale * static_cast<int> (texture_width));
-        //     texture_scale_ = y_scale;
-        // }
-        // else
-        // {
-        //     area_.set_height(x_scale * static_cast<int> (texture_height));
-        //     texture_scale_ = x_scale;
-        // }
 
         calculate_scale();
     }
@@ -129,12 +113,9 @@
                     }
                 }
 
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
 
                 break;
@@ -148,14 +129,10 @@
                     result = true;
                 }
 
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
-                // result = children_handle_event(event);
 
                 break;
             }
@@ -192,12 +169,9 @@
                     result = true;
                 }
 
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
 
                 break;
@@ -215,12 +189,9 @@
 
                 set_texture_by_angle_(crosshair_->get_angle());
 
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
 
                 break;
@@ -228,14 +199,10 @@
 
             default:
             {
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
-                // result = children_handle_event(event);
             }
         }
 

@@ -45,7 +45,7 @@ protected:
     bool load_texture_from_image_manager(const std::string &image_file_name);
 
     AbstractNode *parent_;
-    std::vector<std::unique_ptr<AbstractNode>> children_;       // on_delete event instead
+    std::vector<std::unique_ptr<AbstractNode>> children_;
 
     Rect<int> area_;
 

@@ -38,13 +38,14 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area, const st
         parent->children_.push_back(std::unique_ptr<AbstractNode> (this));
     }
 
-    const Image *texture_image = Game::imanager.get_image(image_file_name);
-    if (texture_image == nullptr)
-    {
-        printf("%s\n", image_file_name.c_str());
-        assert(0);
-    }
-    texture_->load_from_image(*texture_image, texture_area);
+    load_texture_from_image_manager(image_file_name);   // changes here
+    // const Image *texture_image = Game::imanager.get_image(image_file_name);
+    // if (texture_image == nullptr)
+    // {
+    //     printf("%s\n", image_file_name.c_str());
+    //     assert(0);
+    // }
+    // texture_->load_from_image(*texture_image, texture_area);
 }
 
 AbstractNode::~AbstractNode()
@@ -128,14 +129,10 @@ bool AbstractNode::handle_event(const Event &event)
     {
         default:
         {
-            for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+            if (children_handle_event(event))
             {
-                if (children_[child_index]->handle_event(event))
-                {
-                    result = true;
-                }
+                result = true;
             }
-            // result = children_handle_event(event);
         }
     };
 

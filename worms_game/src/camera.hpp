@@ -106,12 +106,9 @@ public:
                     area_.set_left_top_y(static_cast<float> (area_.left_top().y()) + move_speed_ * Game::time_delta.count());
                 }
 
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
 
                 break;
@@ -141,12 +138,9 @@ public:
                     area_.set_left_top_y(static_cast<int> (max_y_));
                 }
 
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
 
                 break;
@@ -154,14 +148,9 @@ public:
 
             default:
             {
-                // result = children_handle_event(event);
-
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
             }
         }

@@ -15,16 +15,16 @@ class PhysicsObject : public AbstractNode
 protected:
 
     PhysicsObject(AbstractNode *parent, const Rect<int> &area, const Vector2d<float> &velocity,
-                  const Vector2d<float> &acceleration, float friction, int bounces_before_death);
-    //   : AbstractNode(parent, area),
-    //     type_(PhysicsEntity::UNKNOWN),
-    //     velocity_(velocity),
-    //     acceleration_(acceleration),
-    //     friction_(friction),
-    //     bounces_before_death_(bounces_before_death),
-    //     is_stable_(true),
-    //     radius_(std::max(area.get_width(), area.get_height()))
-    // {}
+                  const Vector2d<float> &acceleration, float friction, int bounces_before_death)
+      : AbstractNode(parent, area),
+        type_(PhysicsEntity::UNKNOWN),
+        velocity_(velocity),
+        acceleration_(acceleration),
+        friction_(friction),
+        bounces_before_death_(bounces_before_death),
+        is_stable_(true),
+        radius_(std::max(area.get_width(), area.get_height()))
+    {}
 
     PhysicsObject(AbstractNode *parent, const Rect<int> &area, const Vector2d<float> &velocity,
                   const Vector2d<float> &acceleration, float friction, int bounces_before_death,
@@ -492,13 +492,9 @@ public:
             {
                 handle_physics();
 
-                // result = children_handle_event(event);
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
 
                 break;
@@ -506,14 +502,10 @@ public:
 
             default:
             {
-                for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
+                if (children_handle_event(event))
                 {
-                    if (children_[child_index]->handle_event(event))
-                    {
-                        result = true;
-                    }
+                    result = true;
                 }
-                // result = children_handle_event(event);
             }
         }
 
