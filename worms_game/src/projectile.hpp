@@ -84,7 +84,12 @@ public:
 
     void on_bounce_death(const Point2d<int> &death_position) override
     {
-        Game::game->process_explosion(a_traits_->get_explosion_radius(), death_position);
+        // Game::game->process_explosion(a_traits_->get_explosion_radius(), death_position);
+        Event event;
+        event.set_type(EventType::EXPLOSION_EVENT);
+        event.eedata_.radius = a_traits_->get_explosion_radius();
+        event.eedata_.position = death_position;
+        Game::game->launch_event(event);
     }
 
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override

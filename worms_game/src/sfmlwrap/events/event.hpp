@@ -12,8 +12,8 @@ enum class EventType
     MOUSE_BUTTON_PRESSED,
     MOUSE_BUTTON_RELEASED,
     MOUSE_MOVED,
-    MOUSE_ENTERED,  // rewrite camera movement via this
-    MOUSE_LEFT,     // rewrite camera movement via this
+    MOUSE_ENTERED,
+    MOUSE_LEFT,
     KEY_PRESSED,
     KEY_RELEASED,
     TIME_PASSED,

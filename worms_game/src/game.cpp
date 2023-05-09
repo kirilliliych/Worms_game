@@ -97,27 +97,27 @@ void Game::add_to_map_children(AbstractNode *object)
     map_->add_child(object);
 }
 
-bool Game::check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const
-{
-    assert(checker_address != nullptr);
+// bool Game::check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const
+// {
+//     assert(checker_address != nullptr);
 
-    Event collision_event;
-    collision_event.set_type(EventType::COLLISION_EVENT);
-    collision_event.cedata_.checker  = checker;
-    collision_event.cedata_.position = collision_point;
+//     Event collision_event;
+//     collision_event.set_type(EventType::COLLISION_EVENT);
+//     collision_event.cedata_.checker  = checker;
+//     collision_event.cedata_.position = collision_point;
     
-    return main_window_->handle_event(collision_event);
-}
+//     return main_window_->handle_event(collision_event);
+// }
 
-void Game::process_explosion(float radius, const Point2d<int> &position)
-{
-    Event explosion_event;
-    explosion_event.set_type(EventType::EXPLOSION_EVENT);
-    explosion_event.eedata_.radius   = radius;
-    explosion_event.eedata_.position = position;
+// void Game::process_explosion(float radius, const Point2d<int> &position)
+// {
+//     Event explosion_event;
+//     explosion_event.set_type(EventType::EXPLOSION_EVENT);
+//     explosion_event.eedata_.radius   = radius;
+//     explosion_event.eedata_.position = position;
 
-    main_window_->handle_event(explosion_event); 
-}
+//     main_window_->handle_event(explosion_event); 
+// }
 
 bool Game::launch_event(const Event &event)
 {
@@ -162,4 +162,9 @@ uint32_t Game::get_map_height() const
 Point2d<int> Game::get_camera_position() const
 {
     return camera_->get_position();
+}
+
+void Game::lock_camera() const
+{
+    camera_->lock();
 }

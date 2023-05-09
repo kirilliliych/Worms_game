@@ -47,6 +47,11 @@ public:
         return w_traits_;
     }
 
+    float get_charge_level() const
+    {
+        return charge_level_;
+    }
+
     void set_projectile_spawn_position(const Point2d<int> &position)
     {
         projectile_spawn_position_ = position;
@@ -72,7 +77,6 @@ public:
     bool handle_event(const Event &event) override
     {
         bool result = false;
-        // printf("WEAPON HANDLES EVENT\n");
 
         if (w_traits_ != nullptr)
         {
@@ -144,14 +148,10 @@ public:
                         if (is_charging_)
                         {
                             charge_level_ += w_traits_->get_charging_speed() * Game::game->time_delta.count();
-                            // printf("added %g\n", w_traits_->get_charging_speed() * Game::game->time_delta.count());
-                            // printf("charge level is %g\n", charge_level_);
                             if (charge_level_ >= 1.f)
                             {
                                 charge_level_ = 1.f;
                                 fires_ = true;
-
-                                // printf("charge level down\n");
                             }
                         }
 
@@ -161,7 +161,6 @@ public:
                             Game::game->add_to_map_children(new Projectile(nullptr, projectile_spawn_position_,
                                                                            OX_angle_, charge_level_,
                                                                            w_traits_->get_ammo_traits()));
-                            // new Projectile(Game::game->map_, {40, 40, {300, 100}}, "rocket.png");
 
                             is_charging_ = false;
                             charge_level_ = 0;

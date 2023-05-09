@@ -122,10 +122,9 @@ public:
             case EventType::TIME_PASSED:
             {
                 const PhysicsObject *camera_tracking = Game::game->get_camera_tracking_object();
-                if ((camera_tracking != nullptr) && !camera_tracking->is_stable())
+                if ((camera_tracking != nullptr) && is_locked_)
                 {
                     set_position(camera_tracking->get_area().left_top() - area_.half_size());
-                    is_locked_ = true;
                 }
                 
                 if (area_.left_top().x() < 0)

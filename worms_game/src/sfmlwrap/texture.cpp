@@ -39,7 +39,8 @@ Image Texture::copy_to_image() const
     printf("texture: copied image size: %u %u\n", texture_image.getSize().x, texture_image.getSize().y);
 
     Image result;
-    result.create(150, 200);
+    // result.create(150, 200); // changes here
+    result.create(texture_->getSize().x, texture_->getSize().y);
     result.image_->copy(texture_image, 0, 0);
     printf("texture: result image size: %u %u\n", result.get_width(), result.get_height());
     
@@ -75,4 +76,22 @@ uint32_t Texture::get_height() const
 Point2d<uint32_t> Texture::get_center() const
 {
     return {get_width() / 2, get_height() / 2};
+}
+
+void Texture::fill_with_color(uint32_t color)
+{
+    uint32_t width  = get_width();
+    uint32_t height = get_height();
+    std::vector<uint32_t> pixels(width * height, 0);
+    uint32_t *pixels_data = pixels.data();
+
+    for (uint32_t cur_height = 0; cur_height < height; ++cur_height)
+    {
+        for (uint32_t cur_width = 0; cur_width < width; ++cur_width)
+        {
+            pixels[cur_height * width + cur_width] = color;
+        }
+    }
+
+    texture_->update(reinterpret_cast<const uint8_t *> (pixels_data), width, height, 0, 0);
 }

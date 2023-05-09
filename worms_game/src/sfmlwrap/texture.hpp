@@ -61,6 +61,8 @@ public:
 
     Point2d<uint32_t> get_center() const;
 
+    void fill_with_color(uint32_t color);
+
 private:
 public:
     Texture_ *texture_;

@@ -7,7 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include "game.hpp"
 
-// TODO:  erase лишнего в отдельный ивент; rotation снаряда; заменить process explosion charge indicator
+// TODO:  erase лишнего в отдельный ивент, no unique_ptr?; charge indicator
 // BUG: асимметричные прыжки, снаряд упирается в потолок?
 
 int main()

@@ -462,9 +462,14 @@ public:
 
         if (get_physics_entity_type() == PhysicsEntity::CHARACTER)
         {
-            if (velocity_magnitude < 50.f)
+            if (velocity_magnitude < 30.f)
             {
                 is_stable_ = true;
+            }
+            else
+            {
+                // if (reinterpret_cast<const AbstractNode *> (this) == reinterpret_cast<const AbstractNode *> (Game::game->get_character_under_control()))
+                // printf("velocity magnitude is too big: %g\n", velocity_magnitude);
             }
         }
         else if (velocity_magnitude < 30.f)

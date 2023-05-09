@@ -55,9 +55,9 @@ public:
 
     void add_to_map_children(AbstractNode *object);
 
-    bool check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const;
+    // bool check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const;
 
-    void process_explosion(float radius, const Point2d<int> &position);
+    // void process_explosion(float radius, const Point2d<int> &position);
 
     bool launch_event(const Event &event);
 
@@ -76,6 +76,8 @@ public:
     uint32_t get_map_height() const;
 
     Point2d<int> get_camera_position() const;
+
+    void lock_camera() const;
 
 private:
 //-----------------------------------Variables-------------------------------------

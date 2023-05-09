@@ -165,7 +165,7 @@ bool AbstractNode::load_texture_from_image_manager(const std::string &image_file
         // printf("%s\n", image_file_name.c_str());
         assert(0);
     }
-    printf("NAME IS %s\n", image_file_name.c_str());
+    // printf("NAME IS %s\n", image_file_name.c_str());
     // assert(0);
     return texture_->load_from_image(*texture_image);
     // assert(0);
