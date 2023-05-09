@@ -22,23 +22,6 @@ public:
         is_charging_(false),
         fires_(false)
     {
-        // uint32_t texture_width  = texture_->get_width();
-        // uint32_t texture_height = texture_->get_height();
-        // float asked_width  = static_cast<float> (area.get_width());
-        // float asked_height = static_cast<float> (area.get_height());
-        // float x_scale = asked_width  / static_cast<float> (texture_width);
-        // float y_scale = asked_height / static_cast<float> (texture_height);
-        // if (y_scale < x_scale)
-        // {
-        //     area_.set_width(y_scale * static_cast<int> (texture_width));
-        //     texture_scale_ = y_scale;
-        // }
-        // else
-        // {
-        //     area_.set_height(x_scale * static_cast<int> (texture_height));
-        //     texture_scale_ = x_scale;
-        // }
-
         calculate_scale();
     }
 
@@ -70,8 +53,6 @@ public:
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override
     {
         assert(surface != nullptr);
-
-        // nothing?
     }
 
     bool handle_event(const Event &event) override

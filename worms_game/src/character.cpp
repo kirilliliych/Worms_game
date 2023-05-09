@@ -64,9 +64,9 @@
     {
         assert(surface != nullptr);
 
-        Sprite self_sprite(*texture_, area_.left_top() - camera_offset);
+        Sprite self_sprite(*texture_, area_.left_top() - camera_offset + texture_->get_center());
         self_sprite.set_scale(crosshair_->is_right_semicircle() ? -texture_scale_ : texture_scale_, texture_scale_);
-        self_sprite.set_origin(texture_->get_center().x(), 0);
+        self_sprite.set_origin(texture_->get_center().x(), texture_->get_center().y());
         surface->draw_sprite(self_sprite);
     }
 
@@ -99,7 +99,7 @@
                             velocity_.set_x(400.0f * cosf(crosshair_->get_angle()));
                             velocity_.set_y(400.0f * sinf(crosshair_->get_angle()));
                             // printf("new velocity is %g %g\n", velocity_.x(), velocity_.y());
-                            printf("set is_stable to false\n");
+                            // printf("set is_stable to false\n");
                             is_stable_ = false;
 
                             Game::game->lock_camera();
@@ -177,22 +177,12 @@
                 //     dy = 1;
                 // }
                 if (distance < event.eedata_.radius)
-                {   
-                    // printf("bomb reached\n");
-                    // float new_x_velocity = 10.f * dx / distance * event.eedata_.radius;      // first version
-                    // float new_y_velocity = 20.f * dy / distance * event.eedata_.radius;
-                    // new_x_velocity = new_x_velocity < 0 ? std::max(new_x_velocity, -1000.f) : std::min(new_x_velocity, 1000.f);
-                    // new_y_velocity = new_y_velocity < 0 ? std::max(new_y_velocity, -1000.f) : std::min(new_y_velocity, 1000.f);
-
-                    // velocity_.set_x(new_x_velocity);
-                    // velocity_.set_y(new_y_velocity);
-                    // // for (int i = 0; i < 1000; ++i)
-
-                    float new_x_abs_velocity = (1000.f * (1 - distance / event.eedata_.radius));    // second version
-                    float new_y_abs_velocity = (1000.f * (1 - distance / event.eedata_.radius));
+                {
+                    float new_x_abs_velocity = (500.f * (1 - distance / event.eedata_.radius));    // second version
+                    float new_y_abs_velocity = (500.f * (1 - distance / event.eedata_.radius));
                     velocity_.set_x(new_x_abs_velocity * dx_sign);
                     velocity_.set_y(-new_y_abs_velocity);
-                    // printf("VELOCITY AAAA: x %g y %g\n", velocity_.x(), velocity_.y());
+                    // printf("velocity after explosion: %g %g\n", velocity_.x(), velocity_.y());
 
                     is_stable_ = false;
                 }
@@ -209,7 +199,6 @@
                         result = true;
                     }
                 }
-                // result = children_handle_event(event);      // double handling
 
                 break;
             }
@@ -233,7 +222,6 @@
                         result = true;
                     }
                 }
-                // result = children_handle_event(event);
 
                 break;
             }

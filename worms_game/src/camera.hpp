@@ -85,9 +85,6 @@ public:
         {
             case EventType::MOUSE_MOVED:
             {
-                // printf("mmedata: %d %d\n", event.mmedata_.position.x(), event.mmedata_.position.y());
-                // printf("area x: %d y: %d\n", area_.left_top().x(), area_.left_top().y());
-
                 if (event.mmedata_.position.x() - area_.left_top().x() < DEFAULT_CAMERA_MOVE_MARGIN)
                 {
                     is_locked_ = false;
