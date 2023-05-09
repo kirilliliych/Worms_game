@@ -71,3 +71,8 @@ uint32_t Texture::get_height() const
 {
     return texture_->getSize().y;
 }
+
+Point2d<uint32_t> Texture::get_center() const
+{
+    return {get_width() / 2, get_height() / 2};
+}

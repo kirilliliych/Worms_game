@@ -7,8 +7,8 @@
 #include <SFML/Graphics.hpp>
 #include "game.hpp"
 
-// TODO: include guard через pragma; friend не класс, а отдельные функции; erase лишнего в отдельный ивент; управление crosshair через мышь; scale в abstract node
-// BUG: асимметричные прыжки
+// TODO:  erase лишнего в отдельный ивент; rotation снаряда; заменить process explosion charge indicator
+// BUG: асимметричные прыжки, снаряд упирается в потолок?
 
 int main()
 {

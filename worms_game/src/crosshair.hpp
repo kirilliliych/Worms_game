@@ -14,7 +14,7 @@ public:
 
     Crosshair(AbstractNode *parent, const Rect<int> &area, int spin_radius)
       : AbstractNode(parent, area),
-        OX_angle_(-3.14159 / 2),
+        OX_angle_(-3.14359f),
         spin_radius_(spin_radius)
     {
         form_crosshair_texture_(0xff0000ff);
@@ -23,6 +23,11 @@ public:
     float get_angle() const
     {
         return OX_angle_;
+    }
+
+    bool is_right_semicircle() const
+    {
+        return (-3.14159f / 2 <= OX_angle_) && (OX_angle_ <= 3.14159f / 2);
     }
 
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override

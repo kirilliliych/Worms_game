@@ -18,7 +18,8 @@ public:
       : AbstractNode(parent, area),
         max_x_(max_x),
         max_y_(max_y),
-        move_speed_(DEFAULT_MOVE_SPEED)
+        move_speed_(DEFAULT_MOVE_SPEED),
+        is_locked_(false)
     {}
     
     int get_x() const
@@ -36,6 +37,11 @@ public:
         return area_.left_top();
     }
 
+    bool is_locked() const
+    {
+        return is_locked_;
+    }
+
     void set_x(int x)
     {
         area_.set_left_top_x(x);
@@ -49,6 +55,16 @@ public:
     void set_position(Point2d<int> position)
     {
         area_.set_left_top(position);
+    }
+
+    void lock()
+    {
+        is_locked_ = true;
+    }
+
+    void unlock()
+    {
+        is_locked_ = false;
     }
 
     void set_move_speed(float camera_move_speed)
@@ -74,18 +90,22 @@ public:
 
                 if (event.mmedata_.position.x() - area_.left_top().x() < DEFAULT_CAMERA_MOVE_MARGIN)
                 {
+                    is_locked_ = false;
                     area_.set_left_top_x(static_cast<float> (area_.left_top().x()) - move_speed_ * Game::time_delta.count());
                 }
                 if (event.mmedata_.position.x() - area_.left_top().x() > area_.get_width() - DEFAULT_CAMERA_MOVE_MARGIN)
                 {
+                    is_locked_ = false;
                     area_.set_left_top_x(static_cast<float> (area_.left_top().x()) + move_speed_ * Game::time_delta.count());
                 }
                 if (event.mmedata_.position.y() - area_.left_top().y() < DEFAULT_CAMERA_MOVE_MARGIN)
                 {
+                    is_locked_ = false;
                     area_.set_left_top_y(static_cast<float> (area_.left_top().y()) - move_speed_ * Game::time_delta.count());
                 }
                 if (event.mmedata_.position.y() - area_.left_top().y() > area_.get_height() - DEFAULT_CAMERA_MOVE_MARGIN)
                 {
+                    is_locked_ = false;
                     area_.set_left_top_y(static_cast<float> (area_.left_top().y()) + move_speed_ * Game::time_delta.count());
                 }
 
@@ -105,6 +125,7 @@ public:
                 if ((camera_tracking != nullptr) && !camera_tracking->is_stable())
                 {
                     set_position(camera_tracking->get_area().left_top() - area_.half_size());
+                    is_locked_ = true;
                 }
                 
                 if (area_.left_top().x() < 0)
@@ -161,4 +182,6 @@ private:
     uint32_t max_y_;
 
     float move_speed_;
+
+    bool is_locked_;
 };

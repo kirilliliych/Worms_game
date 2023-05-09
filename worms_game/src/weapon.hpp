@@ -3,6 +3,7 @@
 
 #include "abstract_node.hpp"
 #include "game.hpp"
+#include "map.hpp"
 #include "projectile.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "weapon_traits.hpp"
@@ -14,7 +15,6 @@ public:
 
     Weapon(AbstractNode *parent, const Rect<int> &area, const WeaponTraits *w_traits) // w_traits == nullptr means character does not hold a weapon
       : AbstractNode(parent, area),
-        texture_scale_(1),
         OX_angle_(-3.14159f / 2),
         projectile_spawn_position_(area_.center()),
         w_traits_(w_traits),
@@ -22,22 +22,29 @@ public:
         is_charging_(false),
         fires_(false)
     {
-        uint32_t texture_width  = texture_->get_width();
-        uint32_t texture_height = texture_->get_height();
-        float asked_width  = static_cast<float> (area.get_width());
-        float asked_height = static_cast<float> (area.get_height());
-        float x_scale = asked_width  / static_cast<float> (texture_width);
-        float y_scale = asked_height / static_cast<float> (texture_height);
-        if (y_scale < x_scale)
-        {
-            area_.set_width(y_scale * static_cast<int> (texture_width));
-            texture_scale_ = y_scale;
-        }
-        else
-        {
-            area_.set_height(x_scale * static_cast<int> (texture_height));
-            texture_scale_ = x_scale;
-        }
+        // uint32_t texture_width  = texture_->get_width();
+        // uint32_t texture_height = texture_->get_height();
+        // float asked_width  = static_cast<float> (area.get_width());
+        // float asked_height = static_cast<float> (area.get_height());
+        // float x_scale = asked_width  / static_cast<float> (texture_width);
+        // float y_scale = asked_height / static_cast<float> (texture_height);
+        // if (y_scale < x_scale)
+        // {
+        //     area_.set_width(y_scale * static_cast<int> (texture_width));
+        //     texture_scale_ = y_scale;
+        // }
+        // else
+        // {
+        //     area_.set_height(x_scale * static_cast<int> (texture_height));
+        //     texture_scale_ = x_scale;
+        // }
+
+        calculate_scale();
+    }
+
+    const WeaponTraits *get_weapon_traits() const
+    {
+        return w_traits_;
     }
 
     void set_projectile_spawn_position(const Point2d<int> &position)
@@ -65,6 +72,7 @@ public:
     bool handle_event(const Event &event) override
     {
         bool result = false;
+        // printf("WEAPON HANDLES EVENT\n");
 
         if (w_traits_ != nullptr)
         {
@@ -78,8 +86,14 @@ public:
                         {
                             case KeyboardKey::Space:
                             {
+                                if (!is_charging_)  // not necessary?
+                                {
+                                    charge_level_ = 0;
+                                }
+
                                 is_charging_ = true;
-                                charge_level_ = 0;
+
+                                break;
                             }
 
                             default:
@@ -130,21 +144,30 @@ public:
                         if (is_charging_)
                         {
                             charge_level_ += w_traits_->get_charging_speed() * Game::game->time_delta.count();
-                            if (charge_level_ > 1.f)
+                            // printf("added %g\n", w_traits_->get_charging_speed() * Game::game->time_delta.count());
+                            // printf("charge level is %g\n", charge_level_);
+                            if (charge_level_ >= 1.f)
                             {
                                 charge_level_ = 1.f;
                                 fires_ = true;
+
+                                // printf("charge level down\n");
                             }
                         }
 
                         if (fires_)
                         {
+                            // printf("projectile added\n");
                             Game::game->add_to_map_children(new Projectile(nullptr, projectile_spawn_position_,
-                                                                           OX_angle_, w_traits_->get_ammo_traits()));
+                                                                           OX_angle_, charge_level_,
+                                                                           w_traits_->get_ammo_traits()));
+                            // new Projectile(Game::game->map_, {40, 40, {300, 100}}, "rocket.png");
 
                             is_charging_ = false;
-                            charge_level_ = 0.f;
+                            charge_level_ = 0;
                             fires_ = false;
+
+                            w_traits_ = nullptr;
                         }
                     }
 
@@ -179,8 +202,6 @@ public:
 
 
 private:
-
-    float texture_scale_;
 
     float OX_angle_;
     Point2d<int> projectile_spawn_position_;

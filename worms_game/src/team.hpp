@@ -38,7 +38,7 @@ public:
                                                            character_consts::SPAWN_Y_COORD
                                                           }
                                                          },
-                                                   "standing.png");
+                                                        "standing.png");
         }
 
         form_priority_();

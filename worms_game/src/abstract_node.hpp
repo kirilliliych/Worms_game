@@ -24,13 +24,13 @@ public:
 
     const Rect<int> &get_area() const;
 
+    void calculate_scale();
+
     void render(Surface *surface, const Point2d<int> &camera_offset);
 
     virtual void render_self(Surface *surface, const Point2d<int> &camera_offset);
 
     void render_children(Surface *surface, const Point2d<int> &camera_offset);
-
-public:
 
     void add_child(AbstractNode *child);
 
@@ -42,12 +42,15 @@ public:
 
 protected:
 
+    bool load_texture_from_image_manager(const std::string &image_file_name);
+
     AbstractNode *parent_;
     std::vector<std::unique_ptr<AbstractNode>> children_;       // on_delete event instead
 
     Rect<int> area_;
 
     Texture *texture_;
+    float texture_scale_;
 
     bool exists_;
 };

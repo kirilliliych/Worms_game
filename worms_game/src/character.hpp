@@ -9,7 +9,6 @@
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/texture.hpp"
 #include "weapon.hpp"
-#include <math.h>
 
 
 class Character : public PhysicsObject
@@ -18,7 +17,6 @@ public:
 
     Character(AbstractNode *parent, const Rect<int> &area)
       : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION, -1),
-        texture_scale_(1),
         crosshair_(new Crosshair(this, {10, 10, area_.center()},
                                  std::max(area.get_width(), area_.get_height()) + 30)),
         weapon_(new Weapon(this, area_, nullptr))
@@ -30,29 +28,30 @@ public:
               const Rect<int> &texture_area = Rect<int>())
       : PhysicsObject(parent, area, {0, 0}, {0, 0},
                       DEFAULT_FRICTION, -1, texture_file_name, texture_area),
-        texture_scale_(1),
         crosshair_(new Crosshair(this, {10, 10, area_.center()},
                                  std::max(area.get_width(), area_.get_height()) + 30)),
         weapon_(new Weapon(this, area_, nullptr))
     {
         PhysicsObject::type_ = PhysicsEntity::CHARACTER;
 
-        uint32_t texture_width  = texture_->get_width();
-        uint32_t texture_height = texture_->get_height();
-        float asked_width  = static_cast<float> (area.get_width());
-        float asked_height = static_cast<float> (area.get_height());
-        float x_scale = asked_width  / static_cast<float> (texture_width);
-        float y_scale = asked_height / static_cast<float> (texture_height);
-        if (y_scale < x_scale)
-        {
-            area_.set_width(y_scale * static_cast<int> (texture_width));
-            texture_scale_ = y_scale;
-        }
-        else
-        {
-            area_.set_height(x_scale * static_cast<int> (texture_height));
-            texture_scale_ = x_scale;
-        }
+        // uint32_t texture_width  = texture_->get_width();
+        // uint32_t texture_height = texture_->get_height();
+        // float asked_width  = static_cast<float> (area.get_width());
+        // float asked_height = static_cast<float> (area.get_height());
+        // float x_scale = asked_width  / static_cast<float> (texture_width);
+        // float y_scale = asked_height / static_cast<float> (texture_height);
+        // if (y_scale < x_scale)
+        // {
+        //     area_.set_width(y_scale * static_cast<int> (texture_width));
+        //     texture_scale_ = y_scale;
+        // }
+        // else
+        // {
+        //     area_.set_height(x_scale * static_cast<int> (texture_height));
+        //     texture_scale_ = x_scale;
+        // }
+
+        calculate_scale();
     }
 
     ~Character()
@@ -60,8 +59,6 @@ public:
         delete crosshair_;
         delete weapon_;
     }
-
-
 
     void on_bounce_death(const Point2d<int> &death_position) override
     {}
@@ -71,7 +68,8 @@ public:
         assert(surface != nullptr);
 
         Sprite self_sprite(*texture_, area_.left_top() - camera_offset);
-        self_sprite.set_scale(texture_scale_, texture_scale_);
+        self_sprite.set_scale(crosshair_->is_right_semicircle() ? -texture_scale_ : texture_scale_, texture_scale_);
+        self_sprite.set_origin(texture_->get_center().x(), 0);
         surface->draw_sprite(self_sprite);
     }
 
@@ -83,7 +81,6 @@ public:
         {
             case EventType::KEY_PRESSED:
             {
-                // printf("CHARACTER CATCHES KEY AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
                 if (Game::game->is_under_control(this) && 
                     (is_stable_))
                 {
@@ -99,15 +96,28 @@ public:
                         //     break;
                         // }
                         
-                        case KeyboardKey::X:
+                        case KeyboardKey::Enter:
                         {
-                            printf("CHARACTER CAUGHT KEY X\n");
-                            velocity_.set_x(+400.0f * cosf(crosshair_->get_angle()));
-                            velocity_.set_y(+800.0f * sinf(crosshair_->get_angle()));
-                            printf("new velocity is %g %g\n", velocity_.x(), velocity_.y());
+                            // printf("CHARACTER CAUGHT KEY X\n");
+                            velocity_.set_x(400.0f * cosf(crosshair_->get_angle()));
+                            velocity_.set_y(400.0f * sinf(crosshair_->get_angle()));
+                            // printf("new velocity is %g %g\n", velocity_.x(), velocity_.y());
                             is_stable_ = false;
 
-                            // bebra = true;
+                            break;
+                        }
+
+                        case KeyboardKey::Num0:
+                        {
+                            weapon_->set_weapon_traits(nullptr);
+
+                            break;
+                        }
+
+                        case KeyboardKey::Num1:
+                        {
+                            printf("changing weapon to rocket launcher\n");
+                            weapon_->set_weapon_traits(&traits::weapon_traits_pool[Weapons::ROCKET_LAUNCHER]);
 
                             break;
                         }
@@ -126,6 +136,8 @@ public:
                         result = true;
                     }
                 }
+
+                break;
             }
 
             case EventType::COLLISION_EVENT:
@@ -209,9 +221,10 @@ public:
                     result = true;
                 }
 
-                // weapon: update projectile spawn position and OX angle
                 weapon_->set_projectile_spawn_position(crosshair_->get_area().left_top());
                 weapon_->set_OX_angle(crosshair_->get_angle());
+
+                set_texture_by_angle_(crosshair_->get_angle());;
 
                 for (uint32_t child_index = 0; child_index < children_.size(); ++child_index)
                 {
@@ -242,11 +255,53 @@ public:
     }
 
 private:
+
+    void set_texture_by_angle_(float OX_angle)
+    {
+        if (weapon_->get_weapon_traits() == nullptr)
+        {
+            load_texture_from_image_manager("standing.png");
+            calculate_scale();
+
+            return;
+        }
+
+        float OX_angle_right_semicircle = OX_angle;
+        if (OX_angle < -3.14159f / 2)
+        {
+            OX_angle_right_semicircle = -3.14159f - OX_angle;
+        }
+        else if (OX_angle > 3.14159f / 2)
+        {
+            OX_angle_right_semicircle = 3.14159f - OX_angle;
+        }
+        printf("OX_angle_right_semicircle: %g\n", OX_angle_right_semicircle);
+
+        // assert(0);
+        float step = 3.14159f / 8;
+        float border_angle = 3.14159f / 2 - step;
+        for (uint32_t i = 0; i < 4; ++i)
+        {
+            if (OX_angle_right_semicircle >= border_angle)
+            {
+                // assert(0);
+                assert(load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(i)));
+                // assert(0);
+
+                return;
+            }
+
+            border_angle -= 2 * step;
+        }
+
+        load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(4));
+        calculate_scale();
+    }
+
+private:
 public:
 
     static constexpr float DEFAULT_FRICTION = 0.0008;
-
-    float texture_scale_;
 
     Crosshair *crosshair_;    
     Weapon *weapon_;

@@ -104,11 +104,9 @@ public:
                                             velocity_.y() / velocity_magnitude
                                            };
         if (velocity_normalized.y() > semicircle_flat_part_k_coef * velocity_normalized.x())
-        // if (velocity_.y() > 0)          // rly?
         {
             above_semicircle_flat_part = false;
         }
-
 
         std::vector<bool> is_corner_in_correct_halfplane(4, false);
         if (( above_semicircle_flat_part && (-area_.get_height() <= semicircle_flat_part_k_coef * -area_.get_width())) ||
@@ -454,6 +452,12 @@ public:
         {
             area_.set_left_top_x(new_x);
             area_.set_left_top_y(new_y);
+
+            if ((get_physics_entity_type() == PhysicsEntity::CHARACTER) &&
+                (area_.get_top_y() > static_cast<int> (Game::game->get_map_height())))
+            {
+                // set character is_alive to false, reduce hp
+            }
         }
 
         if (get_physics_entity_type() == PhysicsEntity::CHARACTER)
@@ -510,10 +514,6 @@ public:
 
         return result;
     }
-
-public:
-
-    // bool bebra = false;
 
 protected:
 

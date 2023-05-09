@@ -61,7 +61,7 @@ void Game::run()
     map_->create_map();
 
     // state_ = GameState::GENERATING_UNITS;
-    team_ = new Team(map_, 3, 700, 300, 40, 40);
+    team_ = new Team(map_, 3, 700, 300, 30, 40);
     under_control_ = team_->get_next_character();
     camera_tracking_ = under_control_;
     // state_ = GameState::READY;

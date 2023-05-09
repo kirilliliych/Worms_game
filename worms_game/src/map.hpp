@@ -14,6 +14,7 @@
 #include "sfmlwrap/image.hpp"
 #include "sfmlwrap/rect.hpp"
 #include "sfmlwrap/texture.hpp"
+#include "weapon_traits.hpp"
 
 
 namespace string_consts
@@ -114,7 +115,7 @@ public:
                     case MouseButton::RIGHT:
                     {
                         // Game::game->add_to_map_children(new Projectile(this, {40, 40, event.mbedata_.position}, "rocket.png"));
-                        new Projectile(this, {40, 40, event.mbedata_.position}, "rocket.png");
+                        new Projectile(this, event.mbedata_.position, -3.14159f, 0.5, traits::weapon_traits_pool[0].get_ammo_traits());
 
                         break;
                     }

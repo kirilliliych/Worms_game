@@ -1,10 +1,10 @@
-#ifndef IMAGE_HPP
-#define IMAGE_HPP
+#pragma once
 
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include "rect.hpp"
+#include "utilities.hpp"
 
 
 class Image
@@ -50,19 +50,7 @@ public:
 
     uint32_t get_pixel(uint32_t x, uint32_t y) const
     {
-        uint32_t result = image_->getPixel(x, y).toInteger();
-        uint8_t *result_ptr = reinterpret_cast<uint8_t *>(&result);     // reversing result bytes
-        uint8_t temp = 0;
-
-        temp = *result_ptr;
-        *result_ptr = *(result_ptr + 3);
-        *(result_ptr + 3) = temp;
-
-        temp = *(result_ptr + 1);
-        *(result_ptr + 1) = *(result_ptr + 2);
-        *(result_ptr + 2) = temp;
-
-        return result;
+        return reverse_bytes(image_->getPixel(x, y).toInteger());
     }
 
     void set_pixel(uint32_t x, uint32_t y, uint32_t color)
@@ -87,8 +75,7 @@ public:
     }
 
 private:
-public:
+
     Image_ *image_;
 };
 
-#endif

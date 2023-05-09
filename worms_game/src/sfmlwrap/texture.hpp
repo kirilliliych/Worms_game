@@ -59,6 +59,8 @@ public:
 
     uint32_t get_height() const;
 
+    Point2d<uint32_t> get_center() const;
+
 private:
 public:
     Texture_ *texture_;

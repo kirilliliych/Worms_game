@@ -7,6 +7,7 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area)
     children_(),
     area_(area),
     texture_(new Texture()),
+    texture_scale_(1),
     exists_(true)
 {
     if (parent != nullptr)
@@ -29,6 +30,7 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area, const st
     children_(),
     area_(area),
     texture_(new Texture()),
+    texture_scale_(1),
     exists_(true)
 {
     if (parent != nullptr)
@@ -37,7 +39,11 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area, const st
     }
 
     const Image *texture_image = Game::imanager.get_image(image_file_name);
-    assert(texture_image != nullptr);
+    if (texture_image == nullptr)
+    {
+        printf("%s\n", image_file_name.c_str());
+        assert(0);
+    }
     texture_->load_from_image(*texture_image, texture_area);
 }
 
@@ -49,6 +55,26 @@ AbstractNode::~AbstractNode()
 const Rect<int> &AbstractNode::get_area() const
 {
     return area_;
+}
+
+void AbstractNode::calculate_scale()
+{
+    uint32_t texture_width  = texture_->get_width();
+    uint32_t texture_height = texture_->get_height();
+    float asked_width  = static_cast<float> (area_.get_width());
+    float asked_height = static_cast<float> (area_.get_height());
+    float x_scale = asked_width  / static_cast<float> (texture_width);
+    float y_scale = asked_height / static_cast<float> (texture_height);
+    if (y_scale < x_scale)
+    {
+        area_.set_width(y_scale * static_cast<int> (texture_width));
+        texture_scale_ = y_scale;
+    }
+    else
+    {
+        area_.set_height(x_scale * static_cast<int> (texture_height));
+        texture_scale_ = x_scale;
+    }
 }
 
 void AbstractNode::render(Surface *surface, const Point2d<int> &camera_offset)
@@ -86,7 +112,7 @@ void AbstractNode::add_child(AbstractNode *child)
     assert(child != nullptr);
 
     children_.push_back(std::unique_ptr<AbstractNode> (child));
-    // child->parent_ = this;
+    child->parent_ = this;
 }
 
 bool AbstractNode::does_exist() const
@@ -129,4 +155,18 @@ bool AbstractNode::children_handle_event(const Event &event)
     }
 
     return result;
+}
+
+bool AbstractNode::load_texture_from_image_manager(const std::string &image_file_name)
+{
+    const Image *texture_image = Game::imanager.get_image(image_file_name);
+    if (texture_image == nullptr)
+    {
+        // printf("%s\n", image_file_name.c_str());
+        assert(0);
+    }
+    printf("NAME IS %s\n", image_file_name.c_str());
+    // assert(0);
+    return texture_->load_from_image(*texture_image);
+    // assert(0);
 }

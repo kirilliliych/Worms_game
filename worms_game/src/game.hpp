@@ -92,7 +92,7 @@ public:
     static time_delta_t time_delta;
 
 private:
-// public:
+public:
     GameState state_;
 
     Desktop *main_window_;
@@ -101,6 +101,7 @@ private:
 
     EventManager *emanager_;
 
+public:
     const Character *under_control_;
     const PhysicsObject * camera_tracking_; 
     Team *team_;   // list of teams?
