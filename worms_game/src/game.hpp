@@ -30,17 +30,6 @@ class Team;
 
 class Game
 {
-    enum class GameState
-    {
-        UNINITIALIZED,
-        CHOOSING_MODE,
-        GENERATING_TERRAIN,
-        GENERATING_UNITS,
-        READY,
-        PLAYER_CONTROL,
-        CAMERA_CONTROL,
-        EXITED
-    };
 
 public:
 
@@ -55,13 +44,15 @@ public:
 
     void add_to_map_children(AbstractNode *object);
 
-    // bool check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const;
-
-    // void process_explosion(float radius, const Point2d<int> &position);
-
     bool launch_event(const Event &event);
 
     bool is_under_control(const AbstractNode *object) const;
+
+    bool player_action_finished() const;
+
+    void finish_player_action();
+
+    void enable_player_action();
 
     const Character *get_character_under_control() const;
 
@@ -98,8 +89,6 @@ public:
     static time_delta_t time_delta;
 
 private:
-public:
-    GameState state_;
 
     Desktop *main_window_;
     Map *map_;
@@ -107,8 +96,11 @@ public:
 
     EventManager *emanager_;
 
-public:
+
     const Character *under_control_;
-    const PhysicsObject * camera_tracking_; 
+    const PhysicsObject * camera_tracking_;
+
+    bool player_action_finished_;
+
     Team *team_;   // list of teams?
 };

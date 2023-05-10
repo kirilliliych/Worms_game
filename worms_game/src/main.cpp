@@ -1,13 +1,6 @@
-#include <chrono>
-#include <cstdlib>
-#include <ctime>
-#include <ratio>
-
-
 #include <SFML/Graphics.hpp>
 #include "game.hpp"
 
-// TODO: erase лишнего в отдельный ивент, no unique_ptr?;
 
 int main()
 {

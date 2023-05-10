@@ -43,39 +43,16 @@
     {
         acceleration_.set_y(2000);
 
-        // if (Game::game->is_under_control(this) && bebra)
-        // {
-        //     printf("velocity before acceleration buff: %g %g\n", velocity_.x(), velocity_.y());
-        // }
         velocity_ += acceleration_ * Game::time_delta.count();
-        // if (Game::game->is_under_control(this) && bebra)
-        // {
-        //     printf("velocity after acceleration buff: %g %g\n", velocity_.x(), velocity_.y());;
-        // }
-
-        // bebra = false;
-        // if (Game::game->is_under_control(this))
-        // {
-        //     printf("under control velocity: %g %g\n", velocity_.x(), velocity_.y());
-        // }
 
         float new_x = area_.left_top().x() + velocity_.x() * Game::time_delta.count();
         float new_y = area_.left_top().y() + velocity_.y() * Game::time_delta.count();
         float new_x_center = new_x + area_.get_width()  / 2.f;
         float new_y_center = new_y + area_.get_height() / 2.f;
 
-        // if (a)
-        // {
-            // printf("new_x: %g = left topx: %d + velocityx: %g * time_delta: %g\n", new_x, area_.left_top().x(), velocity_.x(), Game::time_delta.count());
-            // printf("new_y: %g = left topy: %d + velocityy: %g * time_delta: %g\n", new_y, area_.left_top().y(), velocity_.y(), Game::time_delta.count());
-        // }
-        // a = false;
-
         acceleration_.set_x(0);
         acceleration_.set_y(0);
         is_stable_ = false;
-
-        // float angle = atan2f(velocity_.y(), velocity_.x()); // here y and x were accidentally swapped, this bug was since Wednesday, May 3 omg
 
         if (std::abs(velocity_.y()) < 0.01)
         {
@@ -333,75 +310,8 @@
                     }
                 }
             }
-        }                
-                
-        // for (float r = angle - 3.14159f / 2.0f; r < angle + 3.14159f / 2.0f; r += 3.14159f / 16.0f)  // definitely need better collision checking
-        // {
-        //     float test_pos_x = radius_ * cosf(r) + new_x_center;
-        //     float test_pos_y = radius_ * sinf(r) + new_y_center;
+        }
 
-        // assert(test_pos_x - new_x > 0.01f);
-        // float collision_dx = std::max(test_pos_x - new_x, 0.01f);
-        // float collision_dy = std::max(test_pos_y - new_y, 0.01f);
-        // float k_coef = collision_dy / collision_dx;
-        // float b_coef = test_pos_y - k_coef * test_pos_x;
-        // if (test_pos_x >= new_x)
-        // {
-        //     float potential_test_pos_x = new_x + area_.get_width() - 1;
-        //     float potential_test_pos_y = k_coef * potential_test_pos_x + b_coef;
-        //     if (potential_test_pos_y > area_.get_bottom_y())
-        //     {
-        //         potential_test_pos_x = (area_.get_bottom_y() - b_coef) / k_coef;
-        //         potential_test_pos_y = area_.get_bottom_y();
-        //     }
-        //     else if (potential_test_pos_y < )
-        //     {
-
-        //     }
-        // }
-        // else
-        // {
-                        
-        // }
-                
-        //     if (test_pos_x >= Game::game->get_map_width())
-        //     {
-        //         test_pos_x = Game::game->get_map_width() - 1;
-        //     }
-        //     if (test_pos_y >= Game::game->get_map_height())
-        //     {
-        //         test_pos_y = Game::game->get_map_height() - 1;
-        //     }
-        //     if (test_pos_x < 0)
-        //     {
-        //         test_pos_x = 0;
-        //     }
-        //     if (test_pos_y < 0)
-        //     {
-        //         test_pos_y = 0;
-        //     }
-                    
-        //     Event check_collision_event;
-        //     check_collision_event.set_type(EventType::COLLISION_EVENT);
-        //     check_collision_event.cedata_.checker = get_physics_entity_type();
-        //     check_collision_event.cedata_.checker_address = this;
-        //     check_collision_event.cedata_.position = {static_cast<int> (test_pos_x),
-        //                                               static_cast<int> (test_pos_y)
-        //                                              }; 
-        //     if (Game::game->launch_event(check_collision_event))
-        //     // if (Game::game->check_collision(this, get_physics_entity_type(),
-        //     //                                  {static_cast<int> (test_pos_x),
-        //     //                                  static_cast<int> (test_pos_y)}))
-        //     {
-        //         response_x += new_x - test_pos_x;
-        //         response_y += new_y - test_pos_y;
-
-        //         collision_happened = true;
-        //         // Game::game->map
-        //     }
-        // }
-
-        // here was velocity magnitude
         if (collision_happened && !is_stable_)
         {
             is_stable_ = true;
@@ -444,19 +354,7 @@
             area_.set_left_top_y(new_y);
         }
 
-        if (get_physics_entity_type() == PhysicsEntity::CHARACTER)
-        {
-            if (velocity_magnitude < 30.f)
-            {
-                is_stable_ = true;
-            }
-            else
-            {
-                // if (reinterpret_cast<const AbstractNode *> (this) == reinterpret_cast<const AbstractNode *> (Game::game->get_character_under_control()))
-                // printf("velocity magnitude is too big: %g\n", velocity_magnitude);
-            }
-        }
-        else if (velocity_magnitude < 30.f)
+        if (velocity_magnitude < 30.f)
         {
             // printf("set to true\n");
             is_stable_ = true;

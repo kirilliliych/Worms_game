@@ -18,6 +18,8 @@ public:
       : AbstractNode(parent, area),
         max_x_(max_x),
         max_y_(max_y),
+        target_x_(0),
+        target_y_(0),
         move_speed_(DEFAULT_MOVE_SPEED),
         is_locked_(false)
     {}
@@ -45,16 +47,20 @@ public:
     void set_x(int x)
     {
         area_.set_left_top_x(x);
+        // target_x_ = x;
     }
 
     void set_y(int y)
     {
         area_.set_left_top_y(y);
+        // target_y_ = y;
     }
 
     void set_position(Point2d<int> position)
     {
         area_.set_left_top(position);
+        // target_x_ = position.x();
+        // target_y_ = position.y();
     }
 
     void lock()
@@ -121,6 +127,23 @@ public:
                     set_position(camera_tracking->get_area().left_top() - area_.half_size());
                 }
                 
+                // if (target_x_ < 0)
+                // {
+                    // target_x_ = 0;
+                // }
+                // if (target_x_ > static_cast<int> (max_x_))
+                // {
+                    // target_x_ = max_x_;
+                // }
+                // if (target_y_ < 0)
+                // {
+                    // target_y_ = 0;
+                // }
+                // if (target_y_ > static_cast<int> (max_y_))
+                // {
+                    // target_y_ = max_y_;
+                // }
+
                 if (area_.left_top().x() < 0)
                 {
                     area_.set_left_top_x(0);
@@ -142,6 +165,9 @@ public:
                 {
                     result = true;
                 }
+
+                // area_.set_left_top({area_.get_left_x() + static_cast<int>((target_x_ - area_.get_left_x()) * 5.f * Game::game->time_delta.count()),  // now bugged
+                                  //  area_.get_top_y()  + static_cast<int>((target_y_ - area_.get_top_y())  * 5.f * Game::game->time_delta.count())});
 
                 break;
             }
@@ -165,6 +191,9 @@ private:
     
     uint32_t max_x_;
     uint32_t max_y_;
+
+    int target_x_;
+    int target_y_;
 
     float move_speed_;
 

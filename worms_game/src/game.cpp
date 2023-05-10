@@ -25,8 +25,7 @@ Game::time_delta_t Game::time_delta{};
 Game::Game(uint32_t window_width, uint32_t window_height,
            uint32_t map_width,    uint32_t map_height,
            const std::string &title)
-  : state_(GameState::UNINITIALIZED),
-    main_window_(new Desktop(window_width, window_height, title)),
+  : main_window_(new Desktop(window_width, window_height, title)),
     map_(new Map(main_window_, {static_cast<int> (map_width),
                                             static_cast<int> (map_height),
                                                     {0, 0}})),
@@ -95,27 +94,6 @@ void Game::add_to_map_children(AbstractNode *object)
     map_->add_child(object);
 }
 
-// bool Game::check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const
-// {
-//     assert(checker_address != nullptr);
-
-//     Event collision_event;
-//     collision_event.set_type(EventType::COLLISION_EVENT);
-//     collision_event.cedata_.checker  = checker;
-//     collision_event.cedata_.position = collision_point;
-    
-//     return main_window_->handle_event(collision_event);
-// }
-
-// void Game::process_explosion(float radius, const Point2d<int> &position)
-// {
-//     Event explosion_event;
-//     explosion_event.set_type(EventType::EXPLOSION_EVENT);
-//     explosion_event.eedata_.radius   = radius;
-//     explosion_event.eedata_.position = position;
-
-//     main_window_->handle_event(explosion_event); 
-// }
 
 bool Game::launch_event(const Event &event)
 {
@@ -125,6 +103,21 @@ bool Game::launch_event(const Event &event)
 bool Game::is_under_control(const AbstractNode *object) const
 {
     return under_control_ == object;
+}
+
+bool Game::player_action_finished() const
+{
+    return player_action_finished_;
+}
+
+void Game::enable_player_action()
+{
+    player_action_finished_ = false;
+}
+
+void Game::finish_player_action()
+{
+    player_action_finished_ = true;
 }
 
 const Character *Game::get_character_under_control() const
