@@ -8,10 +8,11 @@
 #include "physics_object.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/texture.hpp"
-#include "weapon.hpp"
+// #include "weapon.hpp"
 
 
 class CharacterUI;
+class Weapon;
 
 class Character : public PhysicsObject
 {
@@ -45,6 +46,6 @@ public:
     Weapon *weapon_;
 
     int hp_;
-    CharacterUI *ui_; 
+    CharacterUI *character_ui_; 
 };
 

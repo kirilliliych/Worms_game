@@ -1,5 +1,6 @@
 #include "character.hpp"
 #include "character_ui.hpp"
+#include "weapon.hpp"
 
 
     Character::Character(AbstractNode *parent, const Rect<int> &area)
@@ -8,7 +9,7 @@
                                  std::max(area.get_width(), area_.get_height()) + 30)),
         weapon_(new Weapon(this, area_, nullptr)),
         hp_(100),
-        ui_(new CharacterUI(this, {area.get_width(), 5, {area.get_left_x(), area.get_top_y() - 10}}, hp_))
+        character_ui_(new CharacterUI(this, {area.get_width(), 5, {area.get_left_x(), area.get_top_y() - 10}}, hp_))
     {
         PhysicsObject::type_ = PhysicsEntity::CHARACTER;
     }
@@ -21,7 +22,7 @@
                                  std::max(area.get_width(), area_.get_height()) + 30)),
         weapon_(new Weapon(this, area_, nullptr)),
         hp_(100),
-        ui_(new CharacterUI(this, {area.get_width(), 5, {area.get_left_x(), area.get_top_y() - 10}}, hp_))
+        character_ui_(new CharacterUI(this, {area.get_width(), 5, {area.get_left_x(), area.get_top_y() - 10}}, hp_))
     {
         PhysicsObject::type_ = PhysicsEntity::CHARACTER;
 
@@ -33,7 +34,7 @@
         delete crosshair_;
         delete weapon_;
 
-        // delete ui_;
+        delete character_ui_;
     }
 
     int Character::get_hp() const

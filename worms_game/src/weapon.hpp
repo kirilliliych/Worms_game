@@ -7,6 +7,31 @@
 #include "projectile.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "weapon_traits.hpp"
+#include "weapon_ui.hpp"
+
+
+class Weapon;
+
+
+class WeaponUI : public AbstractNode
+{
+public:
+
+    WeaponUI(AbstractNode *parent, const Rect<int> &area);
+
+    void render_self(Surface *surface, const Point2d<int> &camera_offset) override;
+
+    bool handle_event(const Event &event) override;
+
+private:
+
+    void update_charging_line_texture_(float new_charge_level);
+
+private:
+
+    const Weapon *weapon_parent_;
+};
+
 
 
 class Weapon : public AbstractNode
@@ -20,9 +45,15 @@ public:
         w_traits_(w_traits),
         charge_level_(0),
         is_charging_(false),
-        fires_(false)
+        fires_(false),
+        weapon_ui_(new WeaponUI(this, {area.get_width(), 5, {area.get_left_x(), area.get_bottom_y() + 10}}))
     {
         calculate_scale();
+    }
+
+    ~Weapon()
+    {
+        delete weapon_ui_;
     }
 
     const WeaponTraits *get_weapon_traits() const
@@ -71,7 +102,7 @@ public:
                         {
                             case KeyboardKey::Space:
                             {
-                                if (!is_charging_)  // not necessary?
+                                if (!is_charging_)
                                 {
                                     charge_level_ = 0;
                                 }
@@ -132,7 +163,6 @@ public:
 
                         if (fires_)
                         {
-                            // printf("projectile added\n");
                             Game::game->add_to_map_children(new Projectile(nullptr, projectile_spawn_position_,
                                                                            OX_angle_, charge_level_,
                                                                            w_traits_->get_ammo_traits()));
@@ -144,6 +174,8 @@ public:
                             w_traits_ = nullptr;
                         }
                     }
+
+                    area_.set_left_top(parent_->get_area().left_top());
 
                     if (children_handle_event(event))
                     {
@@ -178,5 +210,77 @@ private:
     float charge_level_;
     bool is_charging_;
     bool fires_;
+
+    WeaponUI *weapon_ui_;
 };
 
+
+
+inline WeaponUI::WeaponUI(AbstractNode *parent, const Rect<int> &area)
+  : AbstractNode(parent, area),
+    weapon_parent_(dynamic_cast<const Weapon *> (parent))
+{
+    assert(weapon_parent_ != nullptr);
+}
+
+inline void WeaponUI::render_self(Surface *surface, const Point2d<int> &camera_offset)
+{
+    assert(surface != nullptr);
+
+    float charge_level = weapon_parent_->get_charge_level();
+    if (charge_level > 0)
+    {
+        update_charging_line_texture_(charge_level);
+        
+        AbstractNode::render_self(surface, camera_offset);
+    }
+}
+
+inline bool WeaponUI::handle_event(const Event &event)
+{
+    bool result = false;
+
+    switch (event.get_type())
+    {
+        case EventType::TIME_PASSED:
+        {
+            area_.set_left_top({weapon_parent_->get_area().left_top().x(),
+                                weapon_parent_->get_area().left_bottom().y() + 10});
+
+            if (children_handle_event(event))
+            {
+                result = true;
+            }
+
+            break;
+        }
+
+        default:
+        {
+            if (children_handle_event(event))
+            {
+                result = true;
+            }
+
+            break;
+        }
+    }
+
+    return result;
+}
+
+inline void WeaponUI::update_charging_line_texture_(float new_charge_level)
+{
+    int width  = area_.get_width();
+    int height = area_.get_height();
+    std::vector<uint32_t> pixels(width * height, 0);
+    for (int cur_width = 0; cur_width < width * new_charge_level; ++cur_width)
+    {
+        for (int cur_height = 0; cur_height < height; ++cur_height)
+        {
+            pixels[cur_height * width + cur_width] = 0xffffffff;
+        }
+    }
+
+    texture_->update(reinterpret_cast<const uint8_t *> (pixels.data()), width, height, 0, 0);
+}

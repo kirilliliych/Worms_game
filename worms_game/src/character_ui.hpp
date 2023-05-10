@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "abstract_node.hpp"
 #include "character.hpp"
 
 
@@ -22,15 +23,15 @@ public:
     {
         assert(surface != nullptr);
 
-        // printf("character UI: render_self called\n");
         int hp = character_parent_->get_hp();
         if (hp > 0)
         {
             update_hp_texture_(hp);
             prev_hp_ = hp;
  
-            Sprite self_sprite(*texture_, area_.left_top() - camera_offset);
-            surface->draw_sprite(self_sprite);
+            // Sprite self_sprite(*texture_, area_.left_top() - camera_offset);
+            // surface->draw_sprite(self_sprite);
+            AbstractNode::render_self(surface, camera_offset);
         }
     }
  

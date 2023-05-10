@@ -62,29 +62,11 @@ public:
                       a_traits->get_image_file_name()),
                       a_traits_(a_traits)
     {
-        // uint32_t texture_width  = texture_->get_width();
-        // uint32_t texture_height = texture_->get_height();
-        // float asked_width  = static_cast<float> (a_traits.get_width());
-        // float asked_height = static_cast<float> (a_traits.get_height());
-        // float x_scale = asked_width  / static_cast<float> (texture_width);
-        // float y_scale = asked_height / static_cast<float> (texture_height);
-        // if (y_scale < x_scale)
-        // {
-        //     area_.set_width(y_scale * static_cast<int> (texture_width));
-        //     texture_scale_ = y_scale;
-        // }
-        // else
-        // {
-        //     area_.set_height(x_scale * static_cast<int> (texture_height));
-        //     texture_scale_ = x_scale;
-        // }
-
         calculate_scale();
     }
 
     void on_bounce_death(const Point2d<int> &death_position) override
     {
-        // Game::game->process_explosion(a_traits_->get_explosion_radius(), death_position);
         Event event;
         event.set_type(EventType::EXPLOSION_EVENT);
         event.eedata_.radius = a_traits_->get_explosion_radius();
@@ -96,11 +78,9 @@ public:
     {
         assert(surface != nullptr);
 
-        // assert(texture_->load_from_file("rocket.png"));
-        // printf("RENDERING PROJECTILE\n");
-        Sprite self_sprite(*texture_, area_.left_top() - camera_offset);
+        Sprite self_sprite(*texture_, area_.left_top() - camera_offset + texture_->get_center());
         self_sprite.set_scale(texture_scale_, texture_scale_);
-        self_sprite.set_origin(texture_->get_center().x(), 0);
+        self_sprite.set_origin(texture_->get_center().x(), texture_->get_center().y());
         self_sprite.set_rotation(radians_to_degrees(a_traits_->get_texture_original_rotation() + atan2f(velocity_.y(), velocity_.x())));
         surface->draw_sprite(self_sprite);
     }
