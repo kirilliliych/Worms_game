@@ -79,6 +79,10 @@ public:
 
     void lock_camera() const;
 
+    void set_character_under_control(const Character *now_under_control);
+
+    void set_camera_tracking_object(const PhysicsObject *now_tracked_object);
+
 private:
 //-----------------------------------Variables-------------------------------------
     using clock = std::chrono::system_clock;

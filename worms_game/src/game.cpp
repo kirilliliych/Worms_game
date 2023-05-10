@@ -76,14 +76,12 @@ void Game::run()
         Game::time_delta = cur_time_point - prev_time_point;
         prev_time_point = cur_time_point;
 
-        // main_window_->process_events();
         for (int i = 0; i < 2000; ++i)
         emanager_->process_external_events(main_window_);
 
         Event time_event;
         time_event.set_type(EventType::TIME_PASSED);
         time_event.dt_ = Game::time_delta;
-        // main_window_->handle_event(time_event);
         emanager_->handle_event(time_event);
 
         main_window_->redraw(camera_->get_position());
@@ -166,5 +164,16 @@ Point2d<int> Game::get_camera_position() const
 
 void Game::lock_camera() const
 {
+    camera_->lock();
+}
+
+void Game::set_character_under_control(const Character *now_under_control)
+{
+    under_control_ = now_under_control;
+}
+
+void Game::set_camera_tracking_object(const PhysicsObject *now_tracked_object)
+{
+    camera_tracking_ = now_tracked_object;
     camera_->lock();
 }

@@ -141,14 +141,12 @@ public:
 
             case EventType::EXPLOSION_EVENT:
             {
-                // printf("map explosion position: %d %d camera: %d %d\n", event.eedata_.position.x(), event.eedata_.position.y(), Game::game->get_camera_position().x(), Game::game->get_camera_position().y());
                 make_crater_(event.eedata_.position, event.eedata_.radius);
                 update_map_texture_();
 
                 for (uint32_t i = 0; i < event.eedata_.radius / 2; ++i)
                 {
-                    Game::game->add_to_map_children(new Debris(nullptr, {8, 8, event.eedata_.position},
-                                                    "debris.png"));     // just new here
+                    new Debris(this, {8, 8, event.eedata_.position}, "debris.png");
                 }
 
                 if (children_handle_event(event))

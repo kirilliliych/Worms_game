@@ -4,11 +4,9 @@
 #include "abstract_node.hpp"
 #include "crosshair.hpp"
 #include "debris.hpp"
-#include "physics_entity.hpp"
 #include "physics_object.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/texture.hpp"
-// #include "weapon.hpp"
 
 
 class CharacterUI;

@@ -163,9 +163,12 @@ public:
 
                         if (fires_)
                         {
-                            Game::game->add_to_map_children(new Projectile(nullptr, projectile_spawn_position_,
+                            Projectile *spawned_projectile = new Projectile(nullptr, projectile_spawn_position_,
                                                                            OX_angle_, charge_level_,
-                                                                           w_traits_->get_ammo_traits()));
+                                                                           w_traits_->get_ammo_traits());
+                            Game::game->add_to_map_children(spawned_projectile);
+                            Game::game->set_camera_tracking_object(spawned_projectile);
+                            printf("projectile set as center of camera\n");
 
                             is_charging_ = false;
                             charge_level_ = 0;

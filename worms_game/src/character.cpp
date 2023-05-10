@@ -183,7 +183,7 @@
                 int radius = sqrtf(area_.half_size().x() * area_.half_size().x() +
                                    area_.half_size().y() * area_.half_size().y());
                 weapon_->set_projectile_spawn_position(area_.center() + Point2d<int>(radius * cosf(crosshair_angle),
-                                                                                     radius * sinf(crosshair_angle)));
+                                                                                              radius * sinf(crosshair_angle)));
                 weapon_->set_OX_angle(crosshair_->get_angle());
 
                 set_texture_by_angle_(crosshair_->get_angle());
