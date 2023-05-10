@@ -7,8 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include "game.hpp"
 
-// TODO: erase лишнего в отдельный ивент, no unique_ptr?; charge indicator fix rocket speed; fix rocket spawn
-// BUG: асимметричные прыжки, снаряд упирается в потолок?
+// TODO: erase лишнего в отдельный ивент, no unique_ptr?;
 
 int main()
 {

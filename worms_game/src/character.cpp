@@ -1,6 +1,7 @@
 #include "character.hpp"
 #include "character_ui.hpp"
 #include "weapon.hpp"
+#include <math.h>
 
 
     Character::Character(AbstractNode *parent, const Rect<int> &area)
@@ -146,21 +147,13 @@
                 float dy = center_y - event.eedata_.position.y();
                 int dx_sign = dx >= 0 ? dx > 0 ? 1 : 0 : -1;
                 float distance = sqrtf(dx * dx + dy * dy);
-                // printf("dx: %g dy: %g distance: %g\n", dx, dy, distance);
-                // if (distance < 1)        // first version
-                // {
-                //     // printf("distance too small\n");
-                //     distance = 1;
-                //     dx = 1;
-                //     dy = 1;
-                // }
+
                 if (distance < event.eedata_.radius)
                 {
-                    float new_x_abs_velocity = (500.f * (1 - distance / event.eedata_.radius));    // second version
+                    float new_x_abs_velocity = (500.f * (1 - distance / event.eedata_.radius));
                     float new_y_abs_velocity = (500.f * (1 - distance / event.eedata_.radius));
                     velocity_.set_x(new_x_abs_velocity * dx_sign);
                     velocity_.set_y(-new_y_abs_velocity);
-                    // printf("velocity after explosion: %g %g\n", velocity_.x(), velocity_.y());
 
                     is_stable_ = false;
                 }
@@ -185,7 +178,12 @@
                     result = true;
                 }
 
-                weapon_->set_projectile_spawn_position(crosshair_->get_area().left_top());
+                // weapon_->set_projectile_spawn_position(crosshair_->get_area().left_top());
+                float crosshair_angle = crosshair_->get_angle();
+                int radius = sqrtf(area_.half_size().x() * area_.half_size().x() +
+                                   area_.half_size().y() * area_.half_size().y());
+                weapon_->set_projectile_spawn_position(area_.center() + Point2d<int>(radius * cosf(crosshair_angle),
+                                                                                     radius * sinf(crosshair_angle)));
                 weapon_->set_OX_angle(crosshair_->get_angle());
 
                 set_texture_by_angle_(crosshair_->get_angle());
@@ -231,16 +229,14 @@
         }
         // printf("OX_angle_right_semicircle: %g\n", OX_angle_right_semicircle);
 
-        // assert(0);
         float step = 3.14159f / 8;
         float border_angle = 3.14159f / 2 - step;
         for (uint32_t i = 0; i < 4; ++i)
         {
             if (OX_angle_right_semicircle >= border_angle)
             {
-                // assert(0);
-                assert(load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(i)));
-                // assert(0);
+                bool loading_result = load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(i));
+                assert(loading_result);
 
                 return;
             }
