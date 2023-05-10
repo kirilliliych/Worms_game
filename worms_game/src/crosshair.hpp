@@ -91,7 +91,7 @@ public:
             {
                 area_.set_left_top(parent_->get_area().center() +
                                    Point2d<int>(static_cast<int> (cosf(OX_angle_) * spin_radius_),
-                                                static_cast<int> (sinf(OX_angle_) * spin_radius_)));
+                                                static_cast<int> (sinf(OX_angle_) * spin_radius_)) + Point2d<int>(5, 5));
 
                 break;
             }

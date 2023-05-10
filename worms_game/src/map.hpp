@@ -200,8 +200,8 @@ public:
     }
 
 private:
-public:
-    void update_map_texture_()      // ВНИМАНИЕ: ЦВЕТ, ВЫТАСКИВАЕМЫЙ ЧЕРЕЗ to_Integer ИЗ sf::Color, НЕКОРРЕКТЕН! ТРЕБУЕТСЯ ПОБАЙТОВОЕ РАЗВОРАЧИВАНИЕ
+
+    void update_map_texture_()
     {
         uint32_t width  = static_cast<uint32_t> (area_.get_width());
         uint32_t height = static_cast<uint32_t> (area_.get_height()); 

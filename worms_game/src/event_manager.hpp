@@ -69,7 +69,9 @@ private:
             }
 
             default:
-            {}
+            {
+                break;
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 #include "character.hpp"
 #include "character_ui.hpp"
+#include "game.hpp"
 #include "weapon.hpp"
-#include <math.h>
 
 
     Character::Character(AbstractNode *parent, const Rect<int> &area)
@@ -64,60 +64,52 @@
         {
             case EventType::KEY_PRESSED:
             {
-                if (Game::game->is_under_control(this) && 
-                    (is_stable_))
+                if (Game::game->does_player_have_control())
                 {
-                    switch (event.kedata_.key_code)
+                    if (Game::game->is_under_control(this) && is_stable_)
                     {
-                        // case KeyboardKey::Z:
-                        // {
-                        //     printf("CHARACTER CAUGHT KEY Z\n");
-                        //     velocity_.set_x(-200.0f * cosf(crosshair_->get_angle()));
-                        //     velocity_.set_y(-400.0f * -sinf(crosshair_->get_angle()));
-                        //     is_stable_ = false;
-
-                        //     break;
-                        // }
-                        
-                        case KeyboardKey::Enter:
+                        switch (event.kedata_.key_code)
                         {
-                            // printf("CHARACTER CAUGHT KEY X\n");
-                            velocity_.set_x(400.0f * cosf(crosshair_->get_angle()));
-                            velocity_.set_y(400.0f * sinf(crosshair_->get_angle()));
-                            // printf("new velocity is %g %g\n", velocity_.x(), velocity_.y());
-                            // printf("set is_stable to false\n");
-                            is_stable_ = false;
+                            case KeyboardKey::Enter:
+                            {
+                                // printf("CHARACTER CAUGHT KEY ENTER\n");
+                                velocity_.set_x(400.0f * cosf(crosshair_->get_angle()));
+                                velocity_.set_y(400.0f * sinf(crosshair_->get_angle()));
+                                // printf("new velocity is %g %g\n", velocity_.x(), velocity_.y());
+                                // printf("set is_stable to false\n");
+                                is_stable_ = false;
 
-                            Game::game->lock_camera();
+                                Game::game->lock_camera();
 
-                            break;
-                        }
+                                break;
+                            }
 
-                        case KeyboardKey::Num0:
-                        {
-                            weapon_->set_weapon_traits(nullptr);
+                            case KeyboardKey::Num0:
+                            {
+                                weapon_->set_weapon_traits(nullptr);
 
-                            break;
-                        }
+                                break;
+                            }
 
-                        case KeyboardKey::Num1:
-                        {
-                            printf("changing weapon to rocket launcher\n");
-                            weapon_->set_weapon_traits(&traits::weapon_traits_pool[Weapons::ROCKET_LAUNCHER]);
+                            case KeyboardKey::Num1:
+                            {
+                                printf("changing weapon to rocket launcher\n");
+                                weapon_->set_weapon_traits(&traits::weapon_traits_pool[Weapons::ROCKET_LAUNCHER]);
 
-                            break;
-                        }
+                                break;
+                            }
 
-                        default:
-                        {
-                            break;
+                            default:
+                            {
+                                break;
+                            }
                         }
                     }
-                }
 
-                if (children_handle_event(event))
-                {
-                    result = true;
+                    if (children_handle_event(event))
+                    {
+                        result = true;
+                    }
                 }
 
                 break;
@@ -187,6 +179,21 @@
                 weapon_->set_OX_angle(crosshair_->get_angle());
 
                 set_texture_by_angle_(crosshair_->get_angle());
+
+                if (children_handle_event(event))
+                {
+                    result = true;
+                }
+
+                break;
+            }
+
+            case EventType::STABILITY_EVENT:
+            {
+                if (!is_stable_)
+                {
+                    result = true;
+                }
 
                 if (children_handle_event(event))
                 {

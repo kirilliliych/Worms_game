@@ -4,6 +4,7 @@
 #include "abstract_node.hpp"
 #include "game.hpp"
 #include "map.hpp"
+#include "maths.hpp"
 #include "projectile.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "weapon_traits.hpp"
@@ -40,7 +41,7 @@ public:
 
     Weapon(AbstractNode *parent, const Rect<int> &area, const WeaponTraits *w_traits) // w_traits == nullptr means character does not hold a weapon
       : AbstractNode(parent, area),
-        OX_angle_(-3.14159f / 2),
+        OX_angle_(-math_consts::HALF_PI),
         projectile_spawn_position_(area_.center()),
         w_traits_(w_traits),
         charge_level_(0),
@@ -168,13 +169,16 @@ public:
                                                                            w_traits_->get_ammo_traits());
                             Game::game->add_to_map_children(spawned_projectile);
                             Game::game->set_camera_tracking_object(spawned_projectile);
-                            printf("projectile set as center of camera\n");
+                            // printf("projectile set as center of camera\n");
 
                             is_charging_ = false;
                             charge_level_ = 0;
                             fires_ = false;
 
                             w_traits_ = nullptr;
+
+                            Game::game->finish_player_action();
+                            Game::game->set_player_has_control(false);
                         }
                     }
 

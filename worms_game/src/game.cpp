@@ -35,7 +35,10 @@ Game::Game(uint32_t window_width, uint32_t window_height,
                        map_height - window_height)),
     emanager_(new EventManager(main_window_)),
     under_control_(nullptr),
-    camera_tracking_(nullptr)
+    camera_tracking_(nullptr),
+    player_has_control_(true),
+    player_action_finished_(false),
+    is_stable_(false)
 {
     assert(game == nullptr);    // singleton
     game = this;
@@ -54,16 +57,11 @@ Game::~Game()
 
 void Game::run()
 {
-    // state_ = GameState::CHOOSING_MODE;
-
-    // state_ = GameState::GENERATING_TERRAIN;
     map_->create_map();
 
-    // state_ = GameState::GENERATING_UNITS;
     team_ = new Team(map_, 3, 700, 300, 30, 40);
     under_control_ = team_->get_next_character();
     camera_tracking_ = under_control_;
-    // state_ = GameState::READY;
     
     clock clock{};
     prev_time_point = clock.now();
@@ -75,8 +73,20 @@ void Game::run()
         Game::time_delta = cur_time_point - prev_time_point;
         prev_time_point = cur_time_point;
 
-        for (int i = 0; i < 2000; ++i)
-        emanager_->process_external_events(main_window_);
+        Event check_stability_event;
+        check_stability_event.set_type(EventType::STABILITY_EVENT);
+        is_stable_ = !emanager_->handle_event(check_stability_event);
+        if (is_stable_)
+        {
+            Game::game->enable_player_action();
+            Game::game->set_player_has_control(true);
+        }
+
+        int events_per_frame = 2000;
+        for (int events_launched = 0; events_launched < events_per_frame; ++events_launched)
+        {   
+            emanager_->process_external_events(main_window_);
+        }
 
         Event time_event;
         time_event.set_type(EventType::TIME_PASSED);
@@ -110,14 +120,24 @@ bool Game::player_action_finished() const
     return player_action_finished_;
 }
 
+void Game::finish_player_action()
+{
+    player_action_finished_ = true;
+}
+
 void Game::enable_player_action()
 {
     player_action_finished_ = false;
 }
 
-void Game::finish_player_action()
+bool Game::does_player_have_control() const
 {
-    player_action_finished_ = true;
+    return player_has_control_;
+}
+
+void Game::set_player_has_control(bool whether_has_control)
+{
+    player_has_control_ = whether_has_control;
 }
 
 const Character *Game::get_character_under_control() const
@@ -153,6 +173,11 @@ uint32_t Game::get_map_height() const
 Point2d<int> Game::get_camera_position() const
 {
     return camera_->get_position();
+}
+
+bool Game::get_stability() const
+{
+    return is_stable_;
 }
 
 void Game::lock_camera() const

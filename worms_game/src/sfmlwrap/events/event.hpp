@@ -20,6 +20,7 @@ enum class EventType
     QUIT_EVENT,
     EXPLOSION_EVENT,
     COLLISION_EVENT,
+    STABILITY_EVENT,
     OTHER_EVENT,
     EVENT_TYPE_CNT
 };

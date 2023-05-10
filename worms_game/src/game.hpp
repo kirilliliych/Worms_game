@@ -54,6 +54,10 @@ public:
 
     void enable_player_action();
 
+    bool does_player_have_control() const;
+
+    void set_player_has_control(bool whether_has_control);
+
     const Character *get_character_under_control() const;
 
     const PhysicsObject *get_camera_tracking_object() const;
@@ -67,6 +71,8 @@ public:
     uint32_t get_map_height() const;
 
     Point2d<int> get_camera_position() const;
+
+    bool get_stability() const;
 
     void lock_camera() const;
 
@@ -96,11 +102,13 @@ private:
 
     EventManager *emanager_;
 
-
     const Character *under_control_;
     const PhysicsObject * camera_tracking_;
 
+    bool player_has_control_;
     bool player_action_finished_;
+
+    bool is_stable_;
 
     Team *team_;   // list of teams?
 };

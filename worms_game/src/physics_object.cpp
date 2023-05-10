@@ -1,5 +1,6 @@
 #include "character.hpp"
 #include "game.hpp"
+#include "physics_entity.hpp"
 #include "physics_object.hpp"
 
 
@@ -341,9 +342,10 @@
                 {
                     if (this == Game::game->get_camera_tracking_object())
                     {
-                        Game::game->set_camera_tracking_object(Game::game->get_character_under_control());
+                        Game::game->set_camera_tracking_object(nullptr);
+                        // Game::game->set_camera_tracking_object(Game::game->get_character_under_control());
                     }
-                    printf("character set as center of camera\n");
+                    // printf("character set as center of camera\n");
                     on_bounce_death(area_.center());
                 }
             }
@@ -354,7 +356,7 @@
             area_.set_left_top_y(new_y);
         }
 
-        if (velocity_magnitude < 30.f)
+        if (velocity_magnitude < 1.f)
         {
             // printf("set to true\n");
             is_stable_ = true;
@@ -367,6 +369,7 @@
     bool PhysicsObject::handle_event(const Event &event)
     {
         bool result = false;
+        // printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
 
         switch (event.get_type())
         {
@@ -388,6 +391,8 @@
                 {
                     result = true;
                 }
+
+                break;
             }
         }
 

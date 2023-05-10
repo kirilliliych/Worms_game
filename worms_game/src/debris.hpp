@@ -54,6 +54,21 @@ public:
                 break;
             }
 
+            case EventType::STABILITY_EVENT:
+            {
+                if (!is_stable_)
+                {
+                    result = true;
+                }
+
+                if (children_handle_event(event))
+                {
+                    result = true;
+                }
+
+                break;
+            }
+
             default:
             {
                 if (children_handle_event(event))

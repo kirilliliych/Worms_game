@@ -62,6 +62,8 @@ public:
                 {
                     result = true;
                 }
+
+                break;
             }
         }
 

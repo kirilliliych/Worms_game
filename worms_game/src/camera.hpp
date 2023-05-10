@@ -2,6 +2,7 @@
 
 
 #include "abstract_node.hpp"
+#include "character.hpp"
 #include "game.hpp"
 #include "physics_object.hpp"
 #include "sfmlwrap/events/mouse_events.hpp"
@@ -119,9 +120,15 @@ public:
 
                 break;
             }
+
             case EventType::TIME_PASSED:
             {
                 const PhysicsObject *camera_tracking = Game::game->get_camera_tracking_object();
+                if ((camera_tracking == nullptr) && Game::game->get_stability())
+                {
+                    Game::game->set_camera_tracking_object(Game::game->get_character_under_control());
+                }
+
                 if ((camera_tracking != nullptr) && is_locked_)
                 {
                     set_position(camera_tracking->get_area().left_top() - area_.half_size());
