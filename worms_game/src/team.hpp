@@ -6,6 +6,7 @@
 #include "abstract_node.hpp"
 #include "character.hpp"
 #include "point2d.hpp"
+#include "sfmlwrap/events/event.hpp"
 
 
 namespace character_consts
@@ -23,7 +24,8 @@ public:
       : AbstractNode(parent, {0, 0, {0, 0}}),
         members_quantity_(members_quantity),
         members_(members_quantity),
-        priority_(members_quantity, 0)
+        priority_(members_quantity),
+        cur_character_priority_index_(0)
     {
         std::vector<int> spawn_positions_x = randomize_positions_(spawn_position_center_x,
                                                                   variance);
@@ -31,23 +33,59 @@ public:
         for (uint32_t member_index = 0; member_index < members_quantity; ++member_index)
         {
             members_[member_index] = new Character(this, {static_cast<int> (character_pixel_width),
-                                                                static_cast<int> (character_pixel_height),
-                                                        {spawn_positions_x[member_index], 
-                                                            character_consts::SPAWN_Y_COORD}},
-                                                   "standing.png");
+                                                          static_cast<int> (character_pixel_height),
+                                                          {spawn_positions_x[member_index], 
+                                                           character_consts::SPAWN_Y_COORD
+                                                          }
+                                                         },
+                                                        "standing.png");
         }
+
+        form_priority_();
     }
 
     ~Team()
     {
-        auto members_iterator = members_.cbegin();
-        auto members_end = members_.cend();
-        while (members_iterator != members_end)
-        {
-            delete *members_iterator;
+        // auto members_iterator = members_.cbegin();
+        // auto members_end = members_.cend();
+        // while (members_iterator != members_end)
+        // {
+        //     delete *members_iterator;
 
-            ++members_iterator;
+        //     ++members_iterator;
+        // }
+    }
+
+    const Character *get_next_character()
+    {
+        const Character *result = members_[cur_character_priority_index_]; 
+        ++cur_character_priority_index_;
+        cur_character_priority_index_ %= members_quantity_;
+
+        return result;
+    }
+
+    void render_self(Surface *surface, const Point2d<int> &camera_offset) override
+    {
+        assert(surface != nullptr);
+    }
+
+    bool handle_event(const Event &event) override
+    {
+        bool result = false;
+
+        switch (event.get_type())
+        {
+            default:
+            {
+                if (children_handle_event(event))
+                {
+                    result = true;
+                }
+            }
         }
+
+        return result;
     }
 
 private:
@@ -66,18 +104,23 @@ private:
     void form_priority_()
     {
         uint32_t left_to_generate = members_quantity_;
+        std::vector<uint32_t> marks(members_quantity_);
+        for (uint32_t i = 0; i < members_quantity_; ++i)
+        {
+            marks[i] = i;
+        }
         while (left_to_generate > 0)
         {
             uint32_t index = std::rand() % left_to_generate;
-            if (priority_[index] == 0)
-            {
-                priority_[index] = members_quantity_ + 1 - left_to_generate;
-                --left_to_generate;
-            }
+            priority_[members_quantity_ - left_to_generate] = marks[index];
+
+            marks.erase(marks.cbegin() + index);
+            --left_to_generate;
         }
     }
 
     uint32_t members_quantity_;
     std::vector<Character *> members_;
     std::vector<uint32_t> priority_;
+    uint32_t cur_character_priority_index_;
 };

@@ -2,13 +2,19 @@
 #define MAP_HPP
 
 
+#include <algorithm>
 #include <cstdlib>
 #include <vector>
 #include "abstract_node.hpp"
+#include "debris.hpp"
 #include "game.hpp"
+#include "physics_object.hpp"
+#include "projectile.hpp"
+#include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/image.hpp"
 #include "sfmlwrap/rect.hpp"
 #include "sfmlwrap/texture.hpp"
+#include "weapon_traits.hpp"
 
 
 namespace string_consts
@@ -20,32 +26,29 @@ namespace string_consts
 
 class Map : public AbstractNode
 {
+public:
     enum MapPixelCondition
     {
         SKY = 0,
-        TERRAIN
+        TERRAIN,
+        COLLISION
     };
 
 public:
 //---------------------------------------------------------------------------------
-    Map(AbstractNode *parent, uint32_t width, uint32_t height)
-      : AbstractNode(parent, Rect<int>(static_cast<int> (width),
-                                       static_cast<int> (height),
-                                       {0, 0})),
-        width_(width),
-        height_(height),
-        map_(width * height, 0),
+    Map(AbstractNode *parent, const Rect<int> &area)
+      : AbstractNode(parent, area),
+        map_(static_cast<uint32_t> (area_.get_width() * area.get_height()), 0),
         landscape_images_(string_consts::landscape_images_names_pool.size())
     {
-        id = 1;
-
         uint64_t landscape_types_quantity = string_consts::landscape_images_names_pool.size();
         for (uint64_t i = 0; i < landscape_types_quantity; ++i)
         {
             landscape_images_[i] = Game::imanager.get_image(string_consts::landscape_images_names_pool[i]);
         }
 
-        texture_->create(width, height);
+        texture_->create(static_cast<uint32_t> (area.get_width()),
+                         static_cast<uint32_t> (area_.get_height()));
     }
 
     Map(const Map &other) = delete;
@@ -59,46 +62,166 @@ public:
 //---------------------------------------------------------------------------------
     void create_map()
     {
-        std::vector<float> noise_seed(width_, 0);
-        for (uint32_t i = 1; i < width_; ++i)
+        uint32_t width  = static_cast<uint32_t> (area_.get_width());
+        uint32_t height = static_cast<uint32_t> (area_.get_height()); 
+
+        std::vector<float> noise_seed(width, 0);
+        for (uint32_t i = 1; i < width; ++i)
         {
             noise_seed[i] = static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX);
         }
         noise_seed[0] = 0.5f;   // means terrain starts and ends halfway up due to algorithm implementation
 
         std::vector<float> surface = PerlinNoise1D_(noise_seed, 8, 2.0f);
-        for (uint32_t y = 0; y < height_; ++y)
+        for (uint32_t y = 0; y < height; ++y)
         {
-            for (uint32_t x = 0; x < width_; ++x)
+            for (uint32_t x = 0; x < width; ++x)
             {
-                map_[(height_ - 1 - y) * width_ + x] = y >= surface[x] * height_ ? MapPixelCondition::SKY :
-                                                                                   MapPixelCondition::TERRAIN;  // currently there are two types of landscape...
+                map_[(height - 1 - y) * width + x] = y >= surface[x] * height ? MapPixelCondition::SKY :
+                                                                                MapPixelCondition::TERRAIN;  // currently there are two types of landscape...
             }
         }
 
         update_map_texture_();
     }
 
-private:
+    uint32_t get_width() const
+    {
+        return area_.get_width();
+    }
 
+    uint32_t get_height() const
+    {
+        return area_.get_height();
+    }
+
+    bool handle_event(const Event &event)
+    {
+        bool result = false;
+
+        switch (event.get_type())
+        {
+            case EventType::MOUSE_BUTTON_PRESSED:
+            {
+                switch (event.mbedata_.button)
+                {
+                    case MouseButton::LEFT:
+                    {
+                        // Game::game->process_explosion(40, event.mbedata_.position);
+                        Event eevent;
+                        eevent.set_type(EventType::EXPLOSION_EVENT);
+                        eevent.eedata_.radius = 40;
+                        eevent.eedata_.position = event.mbedata_.position;
+                        Game::game->launch_event(eevent);
+
+                        break;
+                    }
+
+                    case MouseButton::RIGHT:
+                    {
+                        // Game::game->add_to_map_children(new Projectile(this, {40, 40, event.mbedata_.position}, "rocket.png"));
+                        new Projectile(this, event.mbedata_.position, -3.14159f, 0.5, traits::weapon_traits_pool[0].get_ammo_traits());
+
+                        break;
+                    }
+
+                    default:
+                    {
+                        break;
+                    }
+                }
+
+                if (children_handle_event(event))
+                {
+                    result = true;
+                }
+
+                break;
+            }
+
+            case EventType::EXPLOSION_EVENT:
+            {
+                // printf("map explosion position: %d %d camera: %d %d\n", event.eedata_.position.x(), event.eedata_.position.y(), Game::game->get_camera_position().x(), Game::game->get_camera_position().y());
+                make_crater_(event.eedata_.position, event.eedata_.radius);
+                update_map_texture_();
+
+                for (uint32_t i = 0; i < event.eedata_.radius / 2; ++i)
+                {
+                    Game::game->add_to_map_children(new Debris(nullptr, {8, 8, event.eedata_.position},
+                                                    "debris.png"));     // just new here
+                }
+
+                if (children_handle_event(event))
+                {
+                    result = true;
+                }
+
+                break;
+            }
+
+            case EventType::COLLISION_EVENT:
+            {
+                if (map_[event.cedata_.position.y() * area_.get_width() + event.cedata_.position.x()] != MapPixelCondition::SKY)
+                {
+                    result = true;
+                }
+
+                if (children_handle_event(event))
+                {
+                    result = true;
+                }
+
+                break;
+            }
+
+            case EventType::TIME_PASSED:
+            {
+                children_.erase(std::remove_if(children_.begin(),
+                                                     children_.end(),
+                                                     [](const std::unique_ptr<AbstractNode> &object) {return !object->does_exist();}),
+                                children_.cend());
+
+                if (children_handle_event(event))
+                {
+                    result = true;
+                }
+
+                break;
+            }
+
+            default:
+            {
+                if (children_handle_event(event))
+                {
+                    result = true;
+                }
+            }
+        }
+
+        return result;
+    }
+
+private:
+public:
     void update_map_texture_()      // ВНИМАНИЕ: ЦВЕТ, ВЫТАСКИВАЕМЫЙ ЧЕРЕЗ to_Integer ИЗ sf::Color, НЕКОРРЕКТЕН! ТРЕБУЕТСЯ ПОБАЙТОВОЕ РАЗВОРАЧИВАНИЕ
     {
-        uint64_t pixels_size = width_ * height_ * sizeof(uint32_t) / sizeof(uint8_t);
-        std::vector<uint8_t> pixels(pixels_size);
-        uint32_t *pixels_data = reinterpret_cast<uint32_t *> (pixels.data());
+        uint32_t width  = static_cast<uint32_t> (area_.get_width());
+        uint32_t height = static_cast<uint32_t> (area_.get_height()); 
 
-        for (uint32_t y = 0; y < height_; ++y)
+        std::vector<uint32_t> pixels(width * height);
+
+        for (uint32_t y = 0; y < height; ++y)
         {
-            for (uint32_t x = 0; x < width_; ++x)
+            for (uint32_t x = 0; x < width; ++x)
             {
-                switch (map_[y * width_ + x])
+                switch (map_[y * width + x])
                 {
-                    case MapPixelCondition::SKY:                                                                                // copypaste?
+                    case MapPixelCondition::SKY:
                     {
                         uint32_t image_width  = landscape_images_[MapPixelCondition::SKY]->get_width();
                         uint32_t image_height = landscape_images_[MapPixelCondition::SKY]->get_height();
-                        pixels_data[y * width_ + x] = landscape_images_[MapPixelCondition::SKY]->get_pixel(x % image_width,
-                                                                                                           y % image_height);
+                        pixels[y * width + x] = landscape_images_[MapPixelCondition::SKY]->get_pixel(x % image_width,
+                                                                                                          y % image_height);
                         break;
                     }
 
@@ -106,8 +229,8 @@ private:
                     {
                         uint32_t image_width  = landscape_images_[MapPixelCondition::TERRAIN]->get_width();
                         uint32_t image_height = landscape_images_[MapPixelCondition::TERRAIN]->get_height();
-                        pixels_data[y * width_ + x] = landscape_images_[MapPixelCondition::TERRAIN]->get_pixel(x % image_width,
-                                                                                                               y % image_height);
+                        pixels[y * width + x] = landscape_images_[MapPixelCondition::TERRAIN]->get_pixel(x % image_width,
+                                                                                                              y % image_height);
                         break;
                     }
 
@@ -121,7 +244,7 @@ private:
             }
         }
         
-        texture_->update(pixels.data(), width_, height_, 0, 0);
+        texture_->update(reinterpret_cast<const uint8_t *> (pixels.data()), width, height, 0, 0);
     }
 
     std::vector<float> PerlinNoise1D_(const std::vector<float> &noise_seed, int octaves_quantity, float bias)
@@ -153,10 +276,39 @@ private:
         return result;
 	}
 
+    void make_crater_(const Point2d<int> &position, float radius)
+    {
+        auto CircleBresenham = [&](Point2d<int> position, int radius)
+		{
+			int x = 0;
+			int y = radius;
+			int p = 3 - 2 * radius;
+			if (!radius) return;
+
+			auto drawline = [&](int sx, int ex, int ny)
+			{
+				for (int i = sx; i < ex; i++)
+					if (ny >= 0 && ny < area_.get_height() && i >= 0 && i < area_.get_width())
+						map_[ny * area_.get_width() + i] = MapPixelCondition::SKY;
+			};
+
+			while (y >= x) 
+			{
+				drawline(position.x() - x, position.x() + x, position.y() - y);
+				drawline(position.x() - y, position.x() + y, position.y() - x);
+				drawline(position.x() - x, position.x() + x, position.y() + y);
+				drawline(position.x() - y, position.x() + y, position.y() + x);
+				if (p < 0) p += 4 * x++ + 6;
+				else p += 4 * (x++ - y--) + 10;
+			}
+		};
+
+		CircleBresenham(position, radius);
+    }
+
 private:
+public:
 //-----------------------------------Variables-------------------------------------
-    uint32_t width_;
-    uint32_t height_;
     std::vector<uint8_t> map_;
 
     std::vector<const Image *> landscape_images_;

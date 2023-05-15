@@ -31,17 +31,64 @@ public:
 
     Point2d<Type> right_top() const
     {
-        return {left_top_.x() + width_, left_top_.y()};
+        return {left_top_.x() + width_ - 1, left_top_.y()};
     }
 
     Point2d<Type> left_bottom() const
     {
-        return {left_top_.x(), left_top_.y() + height_};
+        return {left_top_.x(), left_top_.y() + height_ - 1};
     }
 
     Point2d<Type> right_bottom() const
     {
-        return {left_top_.x() + width_, left_top_.y() + height_};
+        return {left_top_.x() + width_ - 1, left_top_.y() + height_ - 1};
+    }
+
+    Point2d<Type> center() const
+    {
+        return {left_top_.x() + (width_  - 1) / 2,
+                left_top_.y() + (height_ - 1) / 2
+               };
+    }
+
+    Point2d<Type> half_size() const
+    {
+        return {width_ / 2, height_ / 2};
+    }
+
+    Point2d<Type> size() const
+    {
+        return {width_, height_};
+    }
+
+    Type center_x() const
+    {
+        return center().x();
+    }
+
+    Type center_y() const
+    {
+        return center().y();
+    }
+
+    Type get_left_x() const
+    {
+        return left_top_.x();
+    }
+
+    Type get_right_x() const
+    {
+        return right_bottom().x();
+    }
+
+    Type get_top_y() const
+    {
+        return right_top().y();
+    }
+
+    Type get_bottom_y() const
+    {
+        return right_bottom().y();
     }
 
     Type get_width() const
@@ -64,7 +111,22 @@ public:
         height_ = height;
     }
 
-    bool contains(Point2d<Type> position) const
+    void set_left_top(Point2d<Type> position)
+    {
+        left_top_ = position;
+    }
+
+    void set_left_top_x(int x)
+    {
+        left_top_.set_x(x);
+    }
+
+    void set_left_top_y(int y)
+    {
+        left_top_.set_y(y);
+    }
+
+    bool contains(const Point2d<Type> &position) const
     {
         return (left_top_.x() <= position.x()) && (position.x() < left_top_.x() + width_) &&
                (left_top_.y() <= position.y()) && (position.y() < left_top_.y() + height_);

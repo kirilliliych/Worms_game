@@ -2,7 +2,9 @@
 
 
 #include <cassert>
+#include <memory>
 #include "point2d.hpp"
+#include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/surface.hpp"
 #include "sfmlwrap/texture.hpp"
 #include "sfmlwrap/rect.hpp"
@@ -10,7 +12,7 @@
 
 class AbstractNode
 {
-protected:
+public:
 
     AbstractNode(AbstractNode *parent, const Rect<int> &area);
     
@@ -20,22 +22,35 @@ protected:
     virtual ~AbstractNode();
 
 
-    void render(Surface *surface);
+    const Rect<int> &get_area() const;
 
-    virtual void render_self(Surface *surface);
+    void calculate_scale();
 
-    void render_children(Surface *surface);
+    void render(Surface *surface, const Point2d<int> &camera_offset);
+
+    virtual void render_self(Surface *surface, const Point2d<int> &camera_offset);
+
+    void render_children(Surface *surface, const Point2d<int> &camera_offset);
+
+    void add_child(AbstractNode *child);
+
+    bool does_exist() const;
+
+    virtual bool handle_event(const Event &event);
+
+    bool children_handle_event(const Event &event);
 
 protected:
 
+    bool load_texture_from_image_manager(const std::string &image_file_name);
+
     AbstractNode *parent_;
-    std::vector<AbstractNode *> children_;
+    std::vector<std::unique_ptr<AbstractNode>> children_;
 
     Rect<int> area_;
 
     Texture *texture_;
+    float texture_scale_;
 
-public:
-
-    int id;     // for debug
+    bool exists_;
 };

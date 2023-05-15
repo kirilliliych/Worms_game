@@ -1,20 +1,47 @@
+#include <chrono>
 #include <cstdlib>
 #include <ctime>
+#include <ratio>
+
+
 #include <SFML/Graphics.hpp>
-
 #include "game.hpp"
-#include "sfmlwrap/texture.hpp"
 
-
-// TODO: include guard через pragma; friend не класс, а отдельные функции
+// TODO: erase лишнего в отдельный ивент, no unique_ptr?;
 
 int main()
 {
     std::srand(std::time(nullptr));
 
-    Game game(1920, 1080,
-                   1920, 1080);
+    Game game(1200, 800,
+                        1920, 1080);
     game.run();
+
+    // std::vector<int> v(7);
+    // for (int i = 0; i < 7; ++i)
+    // {
+    //     v[i] = i + 1;
+    // }
+    // for (int i = 0; i < v.size(); ++i)
+    // {
+    //     std::cout << v[i] << " ";
+    // }
+    // std::cout << std::endl;
+    // v.erase(std::remove_if(v.begin(), v.end(), [](int val) {return val % 2 == 0;}), v.end());
+    // for (int i = 0; i < v.size(); ++i)
+    // {
+    //     std::cout << v[i] << " ";
+    // }
+    // std::cout << std::endl <<  "size: " << v.size() << std::endl;
+
+
+    // std::chrono::system_clock clock{};                                          // example
+    // std::chrono::time_point<std::chrono::system_clock> p1 = clock.now();
+    // for (int i = 0; i < 200; ++i)
+    // {}
+    // std::chrono::time_point<std::chrono::system_clock> p2 = clock.now();
+    // std::chrono::duration<float, std::micro> a = p2 - p1;
+    // std::cout << a.count() << std::endl;
 
 
     // sf::Texture texture;

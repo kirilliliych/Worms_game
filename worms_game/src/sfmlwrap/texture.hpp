@@ -24,13 +24,20 @@ class Texture
         Texture_(const Texture_ &other)
           : sf::Texture(other)
         {}
+
+        Texture_ &operator =(const Texture_ &other)
+        {
+            sf::Texture::operator =(other);
+
+            return *this;
+        }
     };
 
 public:
 
     Texture();
 
-    // Texture(const std::string &file_name, const Rect<int> &area = Rect<int>());
+    Texture &operator =(const Texture &other);
 
     ~Texture();
 
@@ -51,6 +58,10 @@ public:
     uint32_t get_width() const;
 
     uint32_t get_height() const;
+
+    Point2d<uint32_t> get_center() const;
+
+    void fill_with_color(uint32_t color);
 
 private:
 public:

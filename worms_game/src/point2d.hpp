@@ -12,6 +12,9 @@
 template<typename Type>
 class Point2d
 {
+    template<typename OtherType>
+    friend class Point2d;
+
 public:
 //---------------------------------------------------------------------------------
     Point2d()
@@ -33,28 +36,42 @@ public:
         return y_;
     }
 
-    void operator +=(const Point2d &another_point)
+    void set_x(Type x)
     {
-        x_ += another_point.x;
-        y_ += another_point.y;
+        x_ = x;
     }
 
-    void operator -=(const Point2d &another_point)
+    void set_y(Type y) 
     {
-        x_ -= another_point.x;
-        y_ -= another_point.y;
+        y_ = y;
     }
 
-    Point2d operator +(const Point2d &another_point) const
+    template<typename OtherType>
+    void operator +=(const Point2d<OtherType> &another_point)
+    {
+        x_ += static_cast<Type> (another_point.x_);
+        y_ += static_cast<Type> (another_point.y_);
+    }
+
+    template<typename OtherType>
+    void operator -=(const Point2d<OtherType> &another_point)
+    {
+        x_ -= static_cast<Type> (another_point.x_);
+        y_ -= static_cast<Type> (another_point.y_);
+    }
+
+    template<typename OtherType>
+    Point2d operator +(const Point2d<OtherType> &another_point) const
     {      
-        return {this->x_ + another_point.x_,
-                this->y_ + another_point.y};
+        return {this->x_ + static_cast<Type> (another_point.x_),
+                this->y_ + static_cast<Type> (another_point.y_)};
     }
     
-    Point2d operator -(const Point2d &another_point) const
+        template<typename OtherType>
+    Point2d operator -(const Point2d<OtherType> &another_point) const
     {
-        return {this->x_ - another_point.x_,
-                this->y_ - another_point.y};
+        return {this->x_ - static_cast<Type> (another_point.x_),
+                this->y_ - static_cast<Type> (another_point.y_)};
     }
 
     Point2d operator -() const
@@ -63,34 +80,40 @@ public:
                 -this->y_};
     }
 
-    bool operator ==(const Point2d &another_point) const
+    template<typename OtherType>
+    bool operator ==(const Point2d<OtherType> &another_point) const
     {
-        return ((x_ == another_point.x) && (y_ == another_point.y));
+        return ((x_ == static_cast<Type> (another_point.x_)) && (y_ == static_cast<Type> (another_point.y_)));
     }
 
-    bool operator !=(const Point2d &another_point) const
+    template<typename OtherType>
+    bool operator !=(const Point2d<OtherType> &another_point) const
     {
         return !(*this == another_point);
     }
 
-    bool operator <=(const Point2d &another_point) const
+    template<typename OtherType>
+    bool operator <=(const Point2d<OtherType> &another_point) const
     {
-        return x_ == another_point.x ? y_ <= another_point.y : x_ <= another_point.x;
+        return x_ == static_cast<Type> (another_point.x_) ? y_ <= static_cast<Type> (another_point.y_) : x_ <= static_cast<Type> (another_point.x_);
     }
 
-    bool operator <(const Point2d &another_point) const
+    template<typename OtherType>
+    bool operator <(const Point2d<OtherType> &another_point) const
     {
-        return x_ == another_point.x ? y_ <  another_point.y : x_  < another_point.x;
+        return x_ == static_cast<Type> (another_point.x_) ? y_ <  static_cast<Type> (another_point.y_) : x_  < static_cast<Type> (another_point.x_);
     }
 
-    bool operator >=(const Point2d &another_point) const
+    template<typename OtherType>
+    bool operator >=(const Point2d<OtherType> &another_point) const
     {
-        return x_ == another_point.x ? y_ >= another_point.y : x_ >= another_point.x;
+        return x_ == static_cast<Type> (another_point.x_) ? y_ >= static_cast<Type> (another_point.y_) : x_ >= static_cast<Type> (another_point.x_);
     }
 
-    bool operator >(const Point2d &another_point) const
+    template<typename OtherType>
+    bool operator >(const Point2d<OtherType> &another_point) const
     {
-        return x_ == another_point.x ? y_ >  another_point.y : x_ >  another_point.x; 
+        return x_ == static_cast<Type> (another_point.x_) ? y_ >  static_cast<Type> (another_point.y_) : x_ >  static_cast<Type> (another_point.x_); 
     }
 
 

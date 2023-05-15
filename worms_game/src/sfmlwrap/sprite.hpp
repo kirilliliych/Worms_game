@@ -57,6 +57,21 @@ public:
         sprite_->setScale(factor_x, factor_y);
     }
 
+    void set_origin(float x, float y)
+    {
+        sprite_->setOrigin(x, y);
+    }
+
+    void set_rotation(float angle)
+    {
+        sprite_->setRotation(angle);
+    }
+
+    void rotate(float angle)
+    {
+        sprite_->rotate(angle);
+    }
+
 private:
 public:
     Sprite_ *sprite_;
