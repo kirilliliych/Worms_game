@@ -71,32 +71,32 @@ public:
         return center().y();
     }
 
-    Type get_left_x() const
+    Type left_x() const
     {
         return left_top_.x();
     }
 
-    Type get_right_x() const
+    Type right_x() const
     {
         return right_bottom().x();
     }
 
-    Type get_top_y() const
+    Type top_y() const
     {
         return right_top().y();
     }
 
-    Type get_bottom_y() const
+    Type bottom_y() const
     {
         return right_bottom().y();
     }
 
-    Type get_width() const
+    Type width() const
     {
         return width_;
     }
 
-    Type get_height() const
+    Type height() const
     {
         return height_;
     }

@@ -15,8 +15,8 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area)
         parent->children_.push_back(std::unique_ptr<AbstractNode> (this));
     }
 
-    uint32_t width  = static_cast<uint32_t> (area.get_width());
-    uint32_t height = static_cast<uint32_t> (area.get_height()); 
+    uint32_t width  = static_cast<uint32_t> (area.width());
+    uint32_t height = static_cast<uint32_t> (area.height()); 
     if ((width  != 0) &&
         (height != 0))
     {
@@ -61,8 +61,8 @@ void AbstractNode::calculate_scale()
 {
     uint32_t texture_width  = texture_->get_width();
     uint32_t texture_height = texture_->get_height();
-    float asked_width  = static_cast<float> (area_.get_width());
-    float asked_height = static_cast<float> (area_.get_height());
+    float asked_width  = static_cast<float> (area_.width());
+    float asked_height = static_cast<float> (area_.height());
     float x_scale = asked_width  / static_cast<float> (texture_width);
     float y_scale = asked_height / static_cast<float> (texture_height);
     if (y_scale < x_scale)

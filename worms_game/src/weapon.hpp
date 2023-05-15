@@ -47,7 +47,7 @@ public:
         charge_level_(0),
         is_charging_(false),
         fires_(false),
-        weapon_ui_(new WeaponUI(this, {area.get_width(), 5, {area.get_left_x(), area.get_bottom_y() + 10}}))
+        weapon_ui_(new WeaponUI(this, {area.width(), 5, {area.left_x(), area.bottom_y() + 10}}))
     {
         calculate_scale();
     }
@@ -278,8 +278,8 @@ inline bool WeaponUI::handle_event(const Event &event)
 
 inline void WeaponUI::update_charging_line_texture_(float new_charge_level)
 {
-    int width  = area_.get_width();
-    int height = area_.get_height();
+    int width  = area_.width();
+    int height = area_.height();
     std::vector<uint32_t> pixels(width * height, 0);
     for (int cur_width = 0; cur_width < width * new_charge_level; ++cur_width)
     {

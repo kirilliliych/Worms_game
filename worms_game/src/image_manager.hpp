@@ -75,7 +75,7 @@ void extract_part_of_image_(const Image &sprite_sheet, const Rect<int> &area, co
     Texture proxy_texture;
     proxy_texture.load_from_image(sprite_sheet, area);
     Image *image = new Image();
-    image->create(area.get_width(), area.get_height());
+    image->create(area.width(), area.height());
     image->copy(proxy_texture.copy_to_image(), 0, 0); // after copying all pixels that were not explicitly changed by copying are changed to ff000000!
     const uint32_t *pixels = reinterpret_cast<const uint32_t *> (image->get_pixels_ptr());
     uint32_t background_color = pixels[0];

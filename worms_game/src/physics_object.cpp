@@ -13,7 +13,7 @@
         friction_(friction),
         bounces_before_death_(bounces_before_death),
         is_stable_(true),
-        radius_(std::max(area.get_width(), area.get_height()))
+        radius_(std::max(area.width(), area.height()))
     {}
 
     PhysicsObject::PhysicsObject(AbstractNode *parent, const Rect<int> &area, const Vector2d<float> &velocity,
@@ -26,8 +26,8 @@
         friction_(friction),
         bounces_before_death_(bounces_before_death),
         is_stable_(true),
-        radius_(sqrtf(area_.get_width()  * area.get_width() +
-                      area_.get_height() * area_.get_height()))
+        radius_(sqrtf(area_.width()  * area.width() +
+                      area_.height() * area_.height()))
     {}
 
     PhysicsEntity PhysicsObject::get_physics_entity_type() const
@@ -48,8 +48,8 @@
 
         float new_x = area_.left_top().x() + velocity_.x() * Game::time_delta.count();
         float new_y = area_.left_top().y() + velocity_.y() * Game::time_delta.count();
-        float new_x_center = new_x + area_.get_width()  / 2.f;
-        float new_y_center = new_y + area_.get_height() / 2.f;
+        float new_x_center = new_x + area_.width()  / 2.f;
+        float new_y_center = new_y + area_.height() / 2.f;
 
         acceleration_.set_x(0);
         acceleration_.set_y(0);
@@ -72,23 +72,23 @@
         }
 
         std::vector<bool> is_corner_in_correct_halfplane(4, false);
-        if (( above_semicircle_flat_part && (-area_.get_height() <= semicircle_flat_part_k_coef * -area_.get_width())) ||
-            (!above_semicircle_flat_part && (-area_.get_height() >  semicircle_flat_part_k_coef * -area_.get_width())))
+        if (( above_semicircle_flat_part && (-area_.height() <= semicircle_flat_part_k_coef * -area_.width())) ||
+            (!above_semicircle_flat_part && (-area_.height() >  semicircle_flat_part_k_coef * -area_.width())))
         {
             is_corner_in_correct_halfplane[0] = true;
         }
-        if (( above_semicircle_flat_part && (-area_.get_height() <= semicircle_flat_part_k_coef * area_.get_width()))  ||
-            (!above_semicircle_flat_part && (-area_.get_height() >  semicircle_flat_part_k_coef * area_.get_width())))
+        if (( above_semicircle_flat_part && (-area_.height() <= semicircle_flat_part_k_coef * area_.width()))  ||
+            (!above_semicircle_flat_part && (-area_.height() >  semicircle_flat_part_k_coef * area_.width())))
         {
             is_corner_in_correct_halfplane[1] = true;
         }
-        if (( above_semicircle_flat_part && (area_.get_height() <= semicircle_flat_part_k_coef * area_.get_width()))   ||
-            (!above_semicircle_flat_part && (area_.get_height() >  semicircle_flat_part_k_coef * area_.get_width())))
+        if (( above_semicircle_flat_part && (area_.height() <= semicircle_flat_part_k_coef * area_.width()))   ||
+            (!above_semicircle_flat_part && (area_.height() >  semicircle_flat_part_k_coef * area_.width())))
         {
             is_corner_in_correct_halfplane[2] = true;
         }
-        if (( above_semicircle_flat_part && (area_.get_height() <= semicircle_flat_part_k_coef * -area_.get_width()))  ||
-            (!above_semicircle_flat_part && (area_.get_height() >  semicircle_flat_part_k_coef * -area_.get_width())))
+        if (( above_semicircle_flat_part && (area_.height() <= semicircle_flat_part_k_coef * -area_.width()))  ||
+            (!above_semicircle_flat_part && (area_.height() >  semicircle_flat_part_k_coef * -area_.width())))
         {
             is_corner_in_correct_halfplane[3] = true;
         }
@@ -100,7 +100,7 @@
 
         if (is_corner_in_correct_halfplane[0])
         {
-            for (float i = 0; i < area_.get_height(); i += 0.95f)
+            for (float i = 0; i < area_.height(); i += 0.95f)
             {
                 float test_pos_x = new_x;
                 float test_pos_y = new_y + i;
@@ -124,7 +124,7 @@
                 }
             }
 
-            for (float i = 0; i < area_.get_width(); i += 0.95f)
+            for (float i = 0; i < area_.width(); i += 0.95f)
             {
                 float test_pos_x = new_x + i;
                 float test_pos_y = new_y;
@@ -151,9 +151,9 @@
 
         if (is_corner_in_correct_halfplane[2])
         {
-            for (float i = 0; i < area_.get_height(); i += 0.95f)
+            for (float i = 0; i < area_.height(); i += 0.95f)
             {
-                float test_pos_x = new_x + area_.get_width() - 1;
+                float test_pos_x = new_x + area_.width() - 1;
                 float test_pos_y = new_y + i;
                 if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
                     (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
@@ -175,10 +175,10 @@
                 }
             }
 
-            for (float i = 0; i < area_.get_width(); i += 0.95f)
+            for (float i = 0; i < area_.width(); i += 0.95f)
             {
                 float test_pos_x = new_x + i;
-                float test_pos_y = new_y + area_.get_height() - 1;
+                float test_pos_y = new_y + area_.height() - 1;
                 if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
                     (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
                 {
@@ -204,9 +204,9 @@
         {
             if (!is_corner_in_correct_halfplane[2])
             {
-                for (float i = 0; i < area_.get_height(); i += 0.95f)
+                for (float i = 0; i < area_.height(); i += 0.95f)
                 {
-                    float test_pos_x = new_x + area_.get_width() - 1;
+                    float test_pos_x = new_x + area_.width() - 1;
                     float test_pos_y = new_y + i;
                     if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
                         (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
@@ -231,7 +231,7 @@
 
             if (!is_corner_in_correct_halfplane[1])
             {
-                for (float i = 0; i < area_.get_width(); i += 0.95f)
+                for (float i = 0; i < area_.width(); i += 0.95f)
                 {
                     float test_pos_x = new_x + i;
                     float test_pos_y = new_y;
@@ -260,7 +260,7 @@
         {
             if (!is_corner_in_correct_halfplane[0])
             {
-                for (float i = 0; i < area_.get_height(); i += 0.95f)
+                for (float i = 0; i < area_.height(); i += 0.95f)
                 {
                     float test_pos_x = new_x;
                     float test_pos_y = new_y + i;
@@ -287,10 +287,10 @@
 
             if (!is_corner_in_correct_halfplane[2])
             {
-                for (float i = 0; i < area_.get_width(); i += 0.95f)
+                for (float i = 0; i < area_.width(); i += 0.95f)
                 {
                     float test_pos_x = new_x + i;
-                    float test_pos_y = new_y + area_.get_height() - 1;
+                    float test_pos_y = new_y + area_.height() - 1;
                     if (( above_semicircle_flat_part && (test_pos_y - new_y_center <= semicircle_flat_part_k_coef * (test_pos_x - new_x_center))) ||
                         (!above_semicircle_flat_part && (test_pos_y - new_y_center >  semicircle_flat_part_k_coef * (test_pos_x - new_x_center))))
                     {

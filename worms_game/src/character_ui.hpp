@@ -9,14 +9,15 @@ class CharacterUI : public AbstractNode
 {
 public:
 
-    CharacterUI(AbstractNode *parent, const Rect<int> &area, int max_hp)
+    CharacterUI(AbstractNode *parent, const Rect<int> &area, int max_hp, uint32_t color)
       : AbstractNode(parent, area),
         character_parent_(dynamic_cast<const Character *> (parent)),
-        max_hp_(max_hp)
+        max_hp_(max_hp),
+        color_(color)
     {
         assert(character_parent_ != nullptr);
  
-        texture_->fill_with_color(0xff0000ff);
+        texture_->fill_with_color(color);
     }
  
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override
@@ -78,17 +79,16 @@ private:
             return;
         }
 
-        int width  = area_.get_width();
-        int height = area_.get_height();
-        int min = width * std::min(new_hp, prev_hp_) / max_hp_;
-        int max = width * std::max(new_hp, prev_hp_) / max_hp_;
-        uint32_t color = delta > 0 ? 0xff0000ff : 0x00000000;
+        int width  = area_.width();
+        int height = area_.height();
+
+        int new_width = static_cast<float> (new_hp) / max_hp_  * width; 
         std::vector<uint32_t> pixels(width * height, 0);
-        for (int cur_width = min; cur_width < max; ++cur_width)
+        for (int cur_width = 0; cur_width < new_width; ++cur_width)
         {
             for (int cur_height = 0; cur_height < height; ++cur_height)
             {
-                pixels[cur_height * width + cur_width] = color;
+                pixels[cur_height * width + cur_width] = color_;
             }
         }
 
@@ -101,4 +101,6 @@ private:
 
     int max_hp_;
     int prev_hp_;
+
+    uint32_t color_;
 };

@@ -38,7 +38,7 @@ public:
 //---------------------------------------------------------------------------------
     Map(AbstractNode *parent, const Rect<int> &area)
       : AbstractNode(parent, area),
-        map_(static_cast<uint32_t> (area_.get_width() * area.get_height()), 0),
+        map_(static_cast<uint32_t> (area_.width() * area.height()), 0),
         landscape_images_(string_consts::landscape_images_names_pool.size())
     {
         uint64_t landscape_types_quantity = string_consts::landscape_images_names_pool.size();
@@ -47,8 +47,8 @@ public:
             landscape_images_[i] = Game::imanager.get_image(string_consts::landscape_images_names_pool[i]);
         }
 
-        texture_->create(static_cast<uint32_t> (area.get_width()),
-                         static_cast<uint32_t> (area_.get_height()));
+        texture_->create(static_cast<uint32_t> (area.width()),
+                         static_cast<uint32_t> (area_.height()));
     }
 
     Map(const Map &other) = delete;
@@ -62,8 +62,8 @@ public:
 //---------------------------------------------------------------------------------
     void create_map()
     {
-        uint32_t width  = static_cast<uint32_t> (area_.get_width());
-        uint32_t height = static_cast<uint32_t> (area_.get_height()); 
+        uint32_t width  = static_cast<uint32_t> (area_.width());
+        uint32_t height = static_cast<uint32_t> (area_.height()); 
 
         std::vector<float> noise_seed(width, 0);
         for (uint32_t i = 1; i < width; ++i)
@@ -87,12 +87,12 @@ public:
 
     uint32_t get_width() const
     {
-        return area_.get_width();
+        return area_.width();
     }
 
     uint32_t get_height() const
     {
-        return area_.get_height();
+        return area_.height();
     }
 
     bool handle_event(const Event &event)
@@ -159,7 +159,7 @@ public:
 
             case EventType::COLLISION_EVENT:
             {
-                if (map_[event.cedata_.position.y() * area_.get_width() + event.cedata_.position.x()] != MapPixelCondition::SKY)
+                if (map_[event.cedata_.position.y() * area_.width() + event.cedata_.position.x()] != MapPixelCondition::SKY)
                 {
                     result = true;
                 }
@@ -203,8 +203,8 @@ private:
 
     void update_map_texture_()
     {
-        uint32_t width  = static_cast<uint32_t> (area_.get_width());
-        uint32_t height = static_cast<uint32_t> (area_.get_height()); 
+        uint32_t width  = static_cast<uint32_t> (area_.width());
+        uint32_t height = static_cast<uint32_t> (area_.height()); 
 
         std::vector<uint32_t> pixels(width * height);
 
@@ -286,8 +286,8 @@ private:
 			auto drawline = [&](int sx, int ex, int ny)
 			{
 				for (int i = sx; i < ex; i++)
-					if (ny >= 0 && ny < area_.get_height() && i >= 0 && i < area_.get_width())
-						map_[ny * area_.get_width() + i] = MapPixelCondition::SKY;
+					if (ny >= 0 && ny < area_.height() && i >= 0 && i < area_.width())
+						map_[ny * area_.width() + i] = MapPixelCondition::SKY;
 			};
 
 			while (y >= x) 

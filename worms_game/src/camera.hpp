@@ -97,7 +97,7 @@ public:
                     is_locked_ = false;
                     area_.set_left_top_x(static_cast<float> (area_.left_top().x()) - move_speed_ * Game::time_delta.count());
                 }
-                if (event.mmedata_.position.x() - area_.left_top().x() > area_.get_width() - DEFAULT_CAMERA_MOVE_MARGIN)
+                if (event.mmedata_.position.x() - area_.left_top().x() > area_.width() - DEFAULT_CAMERA_MOVE_MARGIN)
                 {
                     is_locked_ = false;
                     area_.set_left_top_x(static_cast<float> (area_.left_top().x()) + move_speed_ * Game::time_delta.count());
@@ -107,7 +107,7 @@ public:
                     is_locked_ = false;
                     area_.set_left_top_y(static_cast<float> (area_.left_top().y()) - move_speed_ * Game::time_delta.count());
                 }
-                if (event.mmedata_.position.y() - area_.left_top().y() > area_.get_height() - DEFAULT_CAMERA_MOVE_MARGIN)
+                if (event.mmedata_.position.y() - area_.left_top().y() > area_.height() - DEFAULT_CAMERA_MOVE_MARGIN)
                 {
                     is_locked_ = false;
                     area_.set_left_top_y(static_cast<float> (area_.left_top().y()) + move_speed_ * Game::time_delta.count());
