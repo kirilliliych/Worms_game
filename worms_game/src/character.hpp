@@ -16,10 +16,9 @@ class Character : public PhysicsObject
 {
 public:
 
-    Character(AbstractNode *parent, const Rect<int> &area);
+    Character(AbstractNode *parent, const Rect<int> &area, uint32_t color);
 
-    Character(AbstractNode *parent, const Rect<int> &area, const std::string &texture_file_name,
-              const Rect<int> &texture_area = Rect<int>());
+    Character(AbstractNode *parent, const Rect<int> &area, const std::string &texture_file_name, uint32_t color);
 
     ~Character();
 

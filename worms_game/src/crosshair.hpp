@@ -12,12 +12,12 @@ class Crosshair : public AbstractNode
 {
 public:
 
-    Crosshair(AbstractNode *parent, const Rect<int> &area, int spin_radius)
+    Crosshair(AbstractNode *parent, const Rect<int> &area, int spin_radius, uint32_t color)
       : AbstractNode(parent, area),
         OX_angle_(-3.14359f),
         spin_radius_(spin_radius)
     {
-        form_crosshair_texture_(0xff0000ff);
+        form_crosshair_texture_(color);
     }
 
     float get_angle() const

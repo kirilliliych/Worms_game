@@ -20,9 +20,9 @@ public:
     }
 
     Debris(AbstractNode *parent, const Rect<int> &area,
-           const std::string &texture_file_name, const Rect<int> &texture_area = Rect<int>())
+           const std::string &texture_file_name)
       : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION, 8,
-                      texture_file_name, texture_area)
+                      texture_file_name)
     {
         type_ = PhysicsEntity::DEBRIS;
 

@@ -20,7 +20,7 @@ class Team : public AbstractNode
 public:
 
     Team(AbstractNode *parent, uint32_t members_quantity, int spawn_position_center_x, int variance,
-         uint32_t character_pixel_width, uint32_t character_pixel_height)
+         uint32_t character_pixel_width, uint32_t character_pixel_height, uint32_t color)
       : AbstractNode(parent, {0, 0, {0, 0}}),
         members_quantity_(members_quantity),
         members_(members_quantity),
@@ -38,7 +38,8 @@ public:
                                                            character_consts::SPAWN_Y_COORD
                                                           }
                                                          },
-                                                        "standing.png");
+                                                        "standing.png",
+                                                        color);
         }
 
         form_priority_();

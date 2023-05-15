@@ -59,7 +59,7 @@ void Game::run()
 {
     map_->create_map();
 
-    team_ = new Team(map_, 3, 700, 300, 30, 40);
+    team_ = new Team(map_, 3, 700, 300, 30, 40, 0xffff00ff);
     under_control_ = team_->get_next_character();
     camera_tracking_ = under_control_;
     

@@ -4,10 +4,10 @@
 #include "weapon.hpp"
 
 
-    Character::Character(AbstractNode *parent, const Rect<int> &area)
+    Character::Character(AbstractNode *parent, const Rect<int> &area, uint32_t color)
       : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION, -1),
         crosshair_(new Crosshair(this, {10, 10, area_.center()},
-                                 std::max(area.get_width(), area_.get_height()) + 30)),
+                                 std::max(area.get_width(), area_.get_height()) + 30, color)),
         weapon_(new Weapon(this, area_, nullptr)),
         hp_(100),
         character_ui_(new CharacterUI(this, {area.get_width(), 5, {area.get_left_x(), area.get_top_y() - 10}}, hp_))
@@ -15,12 +15,11 @@
         PhysicsObject::type_ = PhysicsEntity::CHARACTER;
     }
 
-    Character::Character(AbstractNode *parent, const Rect<int> &area, const std::string &texture_file_name,
-              const Rect<int> &texture_area)
+    Character::Character(AbstractNode *parent, const Rect<int> &area, const std::string &texture_file_name, uint32_t color)
       : PhysicsObject(parent, area, {0, 0}, {0, 0},
-                      DEFAULT_FRICTION, -1, texture_file_name, texture_area),
+                      DEFAULT_FRICTION, -1, texture_file_name),
         crosshair_(new Crosshair(this, {10, 10, area_.center()},
-                                 std::max(area.get_width(), area_.get_height()) + 30)),
+                                 std::max(area.get_width(), area_.get_height()) + 30, color)),
         weapon_(new Weapon(this, area_, nullptr)),
         hp_(100),
         character_ui_(new CharacterUI(this, {area.get_width(), 5, {area.get_left_x(), area.get_top_y() - 10}}, hp_))

@@ -18,8 +18,8 @@
 
     PhysicsObject::PhysicsObject(AbstractNode *parent, const Rect<int> &area, const Vector2d<float> &velocity,
                                  const Vector2d<float> &acceleration, float friction, int bounces_before_death,
-                                 const std::string &texture_file_name, const Rect<int> &texture_area)
-      : AbstractNode(parent, area, texture_file_name, texture_area),
+                                 const std::string &texture_file_name)
+      : AbstractNode(parent, area, texture_file_name),
         type_(PhysicsEntity::UNKNOWN),
         velocity_(velocity),
         acceleration_(acceleration),

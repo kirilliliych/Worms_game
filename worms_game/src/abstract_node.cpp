@@ -24,8 +24,7 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area)
     }
 }  
     
-AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area, const std::string &image_file_name,
-                           const Rect<int> &texture_area)
+AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area, const std::string &image_file_name)
   : parent_(parent),
     children_(),
     area_(area),

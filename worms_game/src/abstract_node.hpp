@@ -16,8 +16,7 @@ public:
 
     AbstractNode(AbstractNode *parent, const Rect<int> &area);
     
-    AbstractNode(AbstractNode *parent, const Rect<int> &area, const std::string &image_file_name,
-                 const Rect<int> &texture_area = Rect<int>());
+    AbstractNode(AbstractNode *parent, const Rect<int> &area, const std::string &image_file_name);
 
     virtual ~AbstractNode();
 
