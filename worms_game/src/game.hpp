@@ -96,11 +96,16 @@ public:
 
 private:
 
+    static constexpr uint32_t TEAMS_QUANTITY   = 3;
+    static constexpr uint32_t MEMBERS_QUANTITY = 3; 
+
     Desktop *main_window_;
     Map *map_;
     Camera *camera_;
 
     EventManager *emanager_;
+
+    std::vector<Team *> teams_;
 
     const Character *under_control_;
     const PhysicsObject * camera_tracking_;
@@ -110,5 +115,5 @@ private:
 
     bool is_stable_;
 
-    Team *team_;   // list of teams?
+    // Team *team_;
 };

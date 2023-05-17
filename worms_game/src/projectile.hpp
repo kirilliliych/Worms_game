@@ -71,6 +71,8 @@ public:
         event.set_type(EventType::EXPLOSION_EVENT);
         event.eedata_.radius = a_traits_->get_explosion_radius();
         event.eedata_.position = death_position;
+        event.eedata_.damage = a_traits_->get_damage();
+        event.eedata_.full_damage_radius = a_traits_->get_full_damage_radius();
         Game::game->launch_event(event);
     }
 
@@ -93,10 +95,12 @@ public:
         {
             case EventType::TIME_PASSED:
             {
-                if (PhysicsObject::handle_event(event))
-                {
-                    result = true;
-                }
+                // if (PhysicsObject::handle_event(event))
+                // {
+                //     result = true;
+                // }
+
+                handle_physics();
 
                 if (children_handle_event(event))
                 {

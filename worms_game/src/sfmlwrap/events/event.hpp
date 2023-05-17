@@ -175,6 +175,8 @@ struct CollisionEventData
 struct ExplosionEventData
 {
     float radius;
+    float full_damage_radius;
+    int damage;
     Point2d<int> position;
 };
 

@@ -24,6 +24,8 @@ public:
 
     int get_hp() const;
 
+    void set_hp(int new_hp);
+
     void on_bounce_death(const Point2d<int> &death_position) override;
 
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override;

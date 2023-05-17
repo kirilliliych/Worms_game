@@ -3,12 +3,12 @@
 
 #include "sfmlwrap/texture.hpp"
 #include "utilities.hpp"
-#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics.hpp>
+#include "sfmlwrap/image.hpp"
 #include <cassert>
 #include <filesystem>
 #include <ostream>
 #include <unordered_map>
-#include <sfmlwrap/image.hpp>
 
 
 class ImageManager

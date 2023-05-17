@@ -41,10 +41,12 @@ public:
         {
             case EventType::TIME_PASSED:
             {
-                if (PhysicsObject::handle_event(event))
-                {
-                    result = true;
-                }
+                // if (PhysicsObject::handle_event(event))
+                // {
+                //     result = true;
+                // }
+
+                handle_physics();
 
                 if (children_handle_event(event))
                 {

@@ -101,6 +101,11 @@ public:
         return height_;
     }
 
+    Type get_radius() const
+    {
+        return static_cast<Type> (sqrtf(width_ * width_ + height_ * height_));
+    }
+
     void set_width(Type width)
     {
         width_ = width;

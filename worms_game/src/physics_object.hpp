@@ -32,6 +32,15 @@ public:
 
     bool handle_event(const Event &event) override;
 
+private:
+
+    template<typename Type>
+    bool point_is_in_correct_semicircle_zone_(float angle_coef, bool is_above_semicircle_flat_part, const Point2d<Type> &point) const
+    {
+        return (( is_above_semicircle_flat_part && (point.y() <= angle_coef * point.x())) ||
+                (!is_above_semicircle_flat_part && (point.y() >  angle_coef * point.x())));
+    }
+
 protected:
 
     PhysicsEntity type_;

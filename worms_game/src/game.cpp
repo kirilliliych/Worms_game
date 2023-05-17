@@ -34,6 +34,7 @@ Game::Game(uint32_t window_width, uint32_t window_height,
                        map_width  - window_width,
                        map_height - window_height)),
     emanager_(new EventManager(main_window_)),
+    teams_(TEAMS_QUANTITY),
     under_control_(nullptr),
     camera_tracking_(nullptr),
     player_has_control_(true),
@@ -51,7 +52,11 @@ Game::~Game()
     delete camera_;
     delete emanager_;
 
-    delete team_;
+    // delete team_;
+    for (uint32_t i = 0; i < TEAMS_QUANTITY; ++i)
+    {
+        delete teams_[i];
+    }
 }
 
 
@@ -59,8 +64,14 @@ void Game::run()
 {
     map_->create_map();
 
-    team_ = new Team(map_, 3, 700, 300, 30, 40, 0xffff00ff);
-    under_control_ = team_->get_next_character();
+    
+    // team_ = new Team(map_, 3, 700, 300, 30, 40, 0xff00ffff);
+    teams_[0] = new Team(map_, 3, 300, 200, 30, 40, 0xff0000ff);
+    teams_[1] = new Team(map_, 3, 700, 200, 30, 40, 0xff00ffff);
+    teams_[2] = new Team(map_, 3, 1300, 200, 30, 40, 0xffff0000);
+
+    under_control_ = teams_[0]->get_next_character();
+    // under_control_ = team_->get_next_character();
     camera_tracking_ = under_control_;
     
     clock clock{};

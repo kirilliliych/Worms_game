@@ -42,6 +42,11 @@
         return hp_;
     }
 
+    void Character::set_hp(int new_hp)
+    {
+        hp_ = new_hp;
+    }
+
     void Character::on_bounce_death(const Point2d<int> &death_position)
     {}
 
@@ -141,18 +146,26 @@
 
                 if (distance < event.eedata_.radius)
                 {
-                    float new_x_abs_velocity = (500.f * (1 - distance / event.eedata_.radius));
-                    float new_y_abs_velocity = (500.f * (1 - distance / event.eedata_.radius));
+                    float throwing_scale = 1 - distance / event.eedata_.radius;
+                    float new_x_abs_velocity = (600.f * (1 - distance / event.eedata_.radius));
+                    float new_y_abs_velocity = (600.f * (1 - distance / event.eedata_.radius));
                     velocity_.set_x(new_x_abs_velocity * dx_sign);
                     velocity_.set_y(-new_y_abs_velocity);
+
+                    assert(event.eedata_.radius - event.eedata_.full_damage_radius > 0);
+                    float damage_scale = 1 - distance / (event.eedata_.radius - event.eedata_.full_damage_radius);
+                    printf("damage_scale: %d\n", damage_scale);
+                    int new_hp = get_hp() - event.eedata_.damage * damage_scale;
+                    printf("new_hp: %d\n", new_hp);
+                    set_hp(new_hp);
 
                     is_stable_ = false;
                 }
 
-                if (PhysicsObject::handle_event(event))
-                {
-                    result = true;
-                }
+                // if (PhysicsObject::handle_event(event))
+                // {
+                //     result = true;
+                // }
 
                 if (children_handle_event(event))
                 {
@@ -164,15 +177,17 @@
 
             case EventType::TIME_PASSED:
             {
-                if (PhysicsObject::handle_event(event))
-                {
-                    result = true;
-                }
+                // if (PhysicsObject::handle_event(event))
+                // {
+                //     result = true;
+                // }
+
+                handle_physics();
 
                 // weapon_->set_projectile_spawn_position(crosshair_->get_area().left_top());
                 float crosshair_angle = crosshair_->get_angle();
                 int radius = sqrtf(area_.half_size().x() * area_.half_size().x() +
-                                   area_.half_size().y() * area_.half_size().y());
+                                      area_.half_size().y() * area_.half_size().y());
                 weapon_->set_projectile_spawn_position(area_.center() + Point2d<int>(radius * cosf(crosshair_angle),
                                                                                               radius * sinf(crosshair_angle)));
                 weapon_->set_OX_angle(crosshair_->get_angle());

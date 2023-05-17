@@ -22,11 +22,6 @@ public:
         a_traits_(a_traits)
     {}
 
-    // const std::vector<std::string> &get_image_file_names() const
-    // {
-    //     return image_file_names_;
-    // }
-
     const std::string &get_image_file_name(uint32_t index) const
     {
         return image_file_names_[index];
@@ -59,13 +54,14 @@ namespace traits
                                                                                           "rocket_launcher_left_up.png",
                                                                                           "rocket_launcher_up.png"
                                                                                           },
-                                                                        0.75f,
+                                                                        1.f,
                                                                         AmmoTraits(20,
                                                                                     30,
                                                                                     1,
                                                                                     1,
                                                                                     60,
-                                                                                    25,
+                                                                                    15,
+                                                                                    32,
                                                                                     2000.f,
                                                                                     "rocket.png",
                                                                                     math_consts::HALF_PI))
