@@ -48,6 +48,8 @@ public:
 
     bool is_under_control(const AbstractNode *object) const;
 
+    
+
     bool player_action_finished() const;
 
     void finish_player_action();
@@ -99,6 +101,8 @@ private:
     static constexpr uint32_t TEAMS_QUANTITY   = 3;
     static constexpr uint32_t MEMBERS_QUANTITY = 3; 
 
+    static constexpr uint32_t EVENTS_HANDLING_PER_FRAME = 2000;
+
     Desktop *main_window_;
     Map *map_;
     Camera *camera_;
@@ -106,6 +110,7 @@ private:
     EventManager *emanager_;
 
     std::vector<Team *> teams_;
+    Team *active_team_;
 
     const Character *under_control_;
     const PhysicsObject * camera_tracking_;
@@ -114,6 +119,4 @@ private:
     bool player_action_finished_;
 
     bool is_stable_;
-
-    // Team *team_;
 };

@@ -24,8 +24,8 @@ public:
       : AbstractNode(parent, {0, 0, {0, 0}}),
         members_quantity_(members_quantity),
         members_(members_quantity),
-        priority_(members_quantity),
-        cur_character_priority_index_(0)
+        sequence_(members_quantity),
+        sequence_cur_character_index_(0)
     {
         std::vector<int> spawn_positions_x = randomize_positions_(spawn_position_center_x,
                                                                   variance);
@@ -59,11 +59,34 @@ public:
 
     const Character *get_next_character()
     {
-        const Character *result = members_[cur_character_priority_index_]; 
-        ++cur_character_priority_index_;
-        cur_character_priority_index_ %= members_quantity_;
+        assert(is_alive());
+
+        const Character *result = members_[sequence_cur_character_index_];
+        while (result->get_hp() < 0)
+        {
+            ++sequence_cur_character_index_;
+            sequence_cur_character_index_ %= members_quantity_;
+        }
+        ++sequence_cur_character_index_;
+        sequence_cur_character_index_ %= members_quantity_;
 
         return result;
+    }
+
+    bool is_alive() const
+    {
+        bool is_team_alive = false;
+        for (uint32_t member_index = 0; member_index < members_quantity_; ++member_index)
+        {
+            if (members_[member_index]->get_hp() > 0)
+            {
+                is_team_alive = true;
+
+                break;
+            }
+        }
+
+        return is_team_alive;
     }
 
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override
@@ -113,7 +136,7 @@ private:
         while (left_to_generate > 0)
         {
             uint32_t index = std::rand() % left_to_generate;
-            priority_[members_quantity_ - left_to_generate] = marks[index];
+            sequence_[members_quantity_ - left_to_generate] = marks[index];
 
             marks.erase(marks.cbegin() + index);
             --left_to_generate;
@@ -122,6 +145,6 @@ private:
 
     uint32_t members_quantity_;
     std::vector<Character *> members_;
-    std::vector<uint32_t> priority_;
-    uint32_t cur_character_priority_index_;
+    std::vector<uint32_t> sequence_;
+    uint32_t sequence_cur_character_index_;
 };

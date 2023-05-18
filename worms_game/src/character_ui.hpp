@@ -82,7 +82,7 @@ private:
         int width  = area_.width();
         int height = area_.height();
 
-        int new_width = static_cast<float> (new_hp) / max_hp_  * width; 
+        int new_width = static_cast<float> (new_hp) / max_hp_ * width; 
         std::vector<uint32_t> pixels(width * height, 0);
         for (int cur_width = 0; cur_width < new_width; ++cur_width)
         {

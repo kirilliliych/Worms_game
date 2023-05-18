@@ -2,6 +2,8 @@
 #include "game.hpp"
 
 
+// make turn, AI, fps and vector, colors
+// out of bounds, character-projectile interaction
 int main()
 {
     std::srand(std::time(nullptr));

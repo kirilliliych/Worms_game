@@ -79,13 +79,7 @@ void extract_part_of_image_(const Image &sprite_sheet, const Rect<int> &area, co
     image->copy(proxy_texture.copy_to_image(), 0, 0); // after copying all pixels that were not explicitly changed by copying are changed to ff000000!
     const uint32_t *pixels = reinterpret_cast<const uint32_t *> (image->get_pixels_ptr());
     uint32_t background_color = pixels[0];
-    // uint8_t *ptr = reinterpret_cast<uint8_t *> (&background_color);
-    // uint8_t temp = *ptr;
-    // *ptr = *(ptr + 3);
-    // *(ptr + 3) = temp;
-    // temp = *(ptr + 1);
-    // *(ptr + 1) = *(ptr + 2);
-    // *(ptr + 2) = temp;
+    
     for (uint32_t y = 0; y < image->get_height(); ++y)
     {
         for (uint32_t x = 0; x < image->get_width(); ++x)

@@ -35,6 +35,7 @@ Game::Game(uint32_t window_width, uint32_t window_height,
                        map_height - window_height)),
     emanager_(new EventManager(main_window_)),
     teams_(TEAMS_QUANTITY),
+    active_team_(teams_[0]),
     under_control_(nullptr),
     camera_tracking_(nullptr),
     player_has_control_(true),
@@ -52,7 +53,6 @@ Game::~Game()
     delete camera_;
     delete emanager_;
 
-    // delete team_;
     for (uint32_t i = 0; i < TEAMS_QUANTITY; ++i)
     {
         delete teams_[i];
@@ -63,16 +63,15 @@ Game::~Game()
 void Game::run()
 {
     map_->create_map();
-
     
-    // team_ = new Team(map_, 3, 700, 300, 30, 40, 0xff00ffff);
+// init teams
     teams_[0] = new Team(map_, 3, 300, 200, 30, 40, 0xff0000ff);
     teams_[1] = new Team(map_, 3, 700, 200, 30, 40, 0xff00ffff);
     teams_[2] = new Team(map_, 3, 1300, 200, 30, 40, 0xffff0000);
-
     under_control_ = teams_[0]->get_next_character();
+
     // under_control_ = team_->get_next_character();
-    camera_tracking_ = under_control_;
+    // camera_tracking_ = under_control_;
     
     clock clock{};
     prev_time_point = clock.now();
@@ -93,8 +92,7 @@ void Game::run()
             Game::game->set_player_has_control(true);
         }
 
-        int events_per_frame = 2000;
-        for (int events_launched = 0; events_launched < events_per_frame; ++events_launched)
+        for (uint32_t events_launched = 0; events_launched < EVENTS_HANDLING_PER_FRAME; ++events_launched)
         {   
             emanager_->process_external_events(main_window_);
         }
@@ -114,7 +112,6 @@ void Game::add_to_map_children(AbstractNode *object)
 
     map_->add_child(object);
 }
-
 
 bool Game::launch_event(const Event &event)
 {

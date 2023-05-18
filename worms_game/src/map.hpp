@@ -107,7 +107,6 @@ public:
                 {
                     case MouseButton::LEFT:
                     {
-                        // Game::game->process_explosion(40, event.mbedata_.position);
                         Event eevent;
                         eevent.set_type(EventType::EXPLOSION_EVENT);
                         eevent.eedata_.radius = 40;

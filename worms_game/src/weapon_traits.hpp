@@ -27,6 +27,11 @@ public:
         return image_file_names_[index];
     }
 
+    uint32_t get_images_quantity() const
+    {
+        return image_file_names_.size();
+    }
+
     float get_charging_speed() const
     {
         return charging_speed_;
@@ -60,7 +65,7 @@ namespace traits
                                                                                     1,
                                                                                     1,
                                                                                     60,
-                                                                                    15,
+                                                                                    20,
                                                                                     32,
                                                                                     2000.f,
                                                                                     "rocket.png",

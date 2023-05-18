@@ -1,6 +1,7 @@
 #include "character.hpp"
 #include "character_ui.hpp"
 #include "game.hpp"
+#include "maths.hpp"
 #include "weapon.hpp"
 
 
@@ -155,17 +156,13 @@
                     assert(event.eedata_.radius - event.eedata_.full_damage_radius > 0);
                     float damage_scale = 1 - distance / (event.eedata_.radius - event.eedata_.full_damage_radius);
                     printf("damage_scale: %d\n", damage_scale);
+                    assert(damage_scale >= 0);
                     int new_hp = get_hp() - event.eedata_.damage * damage_scale;
                     printf("new_hp: %d\n", new_hp);
                     set_hp(new_hp);
 
                     is_stable_ = false;
                 }
-
-                // if (PhysicsObject::handle_event(event))
-                // {
-                //     result = true;
-                // }
 
                 if (children_handle_event(event))
                 {
@@ -177,19 +174,13 @@
 
             case EventType::TIME_PASSED:
             {
-                // if (PhysicsObject::handle_event(event))
-                // {
-                //     result = true;
-                // }
-
                 handle_physics();
 
-                // weapon_->set_projectile_spawn_position(crosshair_->get_area().left_top());
                 float crosshair_angle = crosshair_->get_angle();
                 int radius = sqrtf(area_.half_size().x() * area_.half_size().x() +
                                       area_.half_size().y() * area_.half_size().y());
                 weapon_->set_projectile_spawn_position(area_.center() + Point2d<int>(radius * cosf(crosshair_angle),
-                                                                                              radius * sinf(crosshair_angle)));
+                                                                                               radius * sinf(crosshair_angle)));
                 weapon_->set_OX_angle(crosshair_->get_angle());
 
                 set_texture_by_angle_(crosshair_->get_angle());
@@ -240,19 +231,21 @@
         }
 
         float OX_angle_right_semicircle = OX_angle;
-        if (OX_angle < -3.14159f / 2)
+        if (OX_angle < -math_consts::HALF_PI)
         {
-            OX_angle_right_semicircle = -3.14159f - OX_angle;
+            OX_angle_right_semicircle = -math_consts::PI - OX_angle;
         }
-        else if (OX_angle > 3.14159f / 2)
+        else if (OX_angle > math_consts::HALF_PI)
         {
-            OX_angle_right_semicircle = 3.14159f - OX_angle;
+            OX_angle_right_semicircle = math_consts::PI - OX_angle;
         }
         // printf("OX_angle_right_semicircle: %g\n", OX_angle_right_semicircle);
 
-        float step = 3.14159f / 8;
-        float border_angle = 3.14159f / 2 - step;
-        for (uint32_t i = 0; i < 4; ++i)
+        float step = math_consts::PI / 8;
+        float border_angle = math_consts::HALF_PI - step;
+        
+        uint32_t weapon_images_quantity = weapon_->get_weapon_traits()->get_images_quantity();
+        for (uint32_t i = 0; i < weapon_images_quantity; ++i)
         {
             if (OX_angle_right_semicircle >= border_angle)
             {
@@ -265,6 +258,6 @@
             border_angle -= 2 * step;
         }
 
-        load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(4));
+        load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(weapon_images_quantity - 1));
         calculate_scale();
     }
