@@ -124,7 +124,7 @@ public:
             case EventType::TIME_PASSED:
             {
                 const PhysicsObject *camera_tracking = Game::game->get_camera_tracking_object();
-                if ((camera_tracking == nullptr) && Game::game->get_stability())
+                if ((camera_tracking == nullptr) && Game::game->is_stable())
                 {
                     Game::game->set_camera_tracking_object(Game::game->get_character_under_control());
                 }

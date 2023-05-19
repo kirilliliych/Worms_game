@@ -66,6 +66,8 @@ public:
         {
             ++sequence_cur_character_index_;
             sequence_cur_character_index_ %= members_quantity_;
+
+            result = members_[sequence_cur_character_index_];
         }
         ++sequence_cur_character_index_;
         sequence_cur_character_index_ %= members_quantity_;

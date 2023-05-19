@@ -35,7 +35,7 @@ Game::Game(uint32_t window_width, uint32_t window_height,
                        map_height - window_height)),
     emanager_(new EventManager(main_window_)),
     teams_(TEAMS_QUANTITY),
-    active_team_(teams_[0]),
+    active_team_index_(0),
     under_control_(nullptr),
     camera_tracking_(nullptr),
     player_has_control_(true),
@@ -62,6 +62,7 @@ Game::~Game()
 
 void Game::run()
 {
+// creating map
     map_->create_map();
     
 // init teams
@@ -69,9 +70,7 @@ void Game::run()
     teams_[1] = new Team(map_, 3, 700, 200, 30, 40, 0xff00ffff);
     teams_[2] = new Team(map_, 3, 1300, 200, 30, 40, 0xffff0000);
     under_control_ = teams_[0]->get_next_character();
-
-    // under_control_ = team_->get_next_character();
-    // camera_tracking_ = under_control_;
+    camera_tracking_ = under_control_;
     
     clock clock{};
     prev_time_point = clock.now();
@@ -82,15 +81,6 @@ void Game::run()
         time_point cur_time_point = clock.now();
         Game::time_delta = cur_time_point - prev_time_point;
         prev_time_point = cur_time_point;
-
-        Event check_stability_event;
-        check_stability_event.set_type(EventType::STABILITY_EVENT);
-        is_stable_ = !emanager_->handle_event(check_stability_event);
-        if (is_stable_)
-        {
-            Game::game->enable_player_action();
-            Game::game->set_player_has_control(true);
-        }
 
         for (uint32_t events_launched = 0; events_launched < EVENTS_HANDLING_PER_FRAME; ++events_launched)
         {   
@@ -103,6 +93,20 @@ void Game::run()
         emanager_->handle_event(time_event);
 
         main_window_->redraw(camera_->get_position());
+
+        if (player_action_finished_)
+        {
+            Event check_stability_event;
+            check_stability_event.set_type(EventType::STABILITY_EVENT);
+            is_stable_ = !emanager_->handle_event(check_stability_event);
+            if (is_stable_)
+            {
+                enable_player_action();
+                set_player_control(true);
+
+                pass_turn_();
+            }
+        }
     }
 }
 
@@ -143,7 +147,7 @@ bool Game::does_player_have_control() const
     return player_has_control_;
 }
 
-void Game::set_player_has_control(bool whether_has_control)
+void Game::set_player_control(bool whether_has_control)
 {
     player_has_control_ = whether_has_control;
 }
@@ -183,7 +187,7 @@ Point2d<int> Game::get_camera_position() const
     return camera_->get_position();
 }
 
-bool Game::get_stability() const
+bool Game::is_stable() const
 {
     return is_stable_;
 }
@@ -202,4 +206,29 @@ void Game::set_camera_tracking_object(const PhysicsObject *now_tracked_object)
 {
     camera_tracking_ = now_tracked_object;
     camera_->lock();
+}
+
+void Game::pass_turn_()
+{
+    ++active_team_index_;
+    active_team_index_ %= TEAMS_QUANTITY;
+
+    bool all_dead = true;                           // temporary
+    for (uint32_t i = 0; i < TEAMS_QUANTITY; ++i)   //
+    {                                               //
+        if (teams_[i]->is_alive())                  //
+        {                                           //
+            all_dead = false;                       //
+            break;                                  //
+        }                                           //
+    }                                               //
+    assert(!all_dead);                              //
+
+    while (!teams_[active_team_index_]->is_alive())
+    {
+        ++active_team_index_;
+        active_team_index_ %= TEAMS_QUANTITY;
+    }
+
+    under_control_ = teams_[active_team_index_]->get_next_character();
 }

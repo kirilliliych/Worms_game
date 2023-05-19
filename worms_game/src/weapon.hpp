@@ -178,10 +178,9 @@ public:
                             w_traits_ = nullptr;
 
                             Game::game->finish_player_action();
-                            Game::game->set_player_has_control(false);
+                            Game::game->set_player_control(false);
                         }
                     }
-
                     area_.set_left_top(parent_->get_area().left_top());
 
                     if (children_handle_event(event))
@@ -192,13 +191,14 @@ public:
                     break;
                 }
 
-
                 default:
                 {
                     if (children_handle_event(event))
                     {
                         result = true;
                     }
+
+                    break;
                 }
             }
         }

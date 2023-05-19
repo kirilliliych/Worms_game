@@ -48,8 +48,6 @@ public:
 
     bool is_under_control(const AbstractNode *object) const;
 
-    
-
     bool player_action_finished() const;
 
     void finish_player_action();
@@ -58,7 +56,7 @@ public:
 
     bool does_player_have_control() const;
 
-    void set_player_has_control(bool whether_has_control);
+    void set_player_control(bool whether_has_control);
 
     const Character *get_character_under_control() const;
 
@@ -74,7 +72,7 @@ public:
 
     Point2d<int> get_camera_position() const;
 
-    bool get_stability() const;
+    bool is_stable() const;
 
     void lock_camera() const;
 
@@ -83,6 +81,8 @@ public:
     void set_camera_tracking_object(const PhysicsObject *now_tracked_object);
 
 private:
+
+    void pass_turn_();
 //-----------------------------------Variables-------------------------------------
     using clock = std::chrono::system_clock;
     using time_point = std::chrono::time_point<clock>;
@@ -110,7 +110,7 @@ private:
     EventManager *emanager_;
 
     std::vector<Team *> teams_;
-    Team *active_team_;
+    uint32_t active_team_index_;
 
     const Character *under_control_;
     const PhysicsObject * camera_tracking_;

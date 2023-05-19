@@ -147,15 +147,15 @@
 
                 if (distance < event.eedata_.radius)
                 {
-                    float throwing_scale = 1 - distance / event.eedata_.radius;
-                    float new_x_abs_velocity = (600.f * (1 - distance / event.eedata_.radius));
-                    float new_y_abs_velocity = (600.f * (1 - distance / event.eedata_.radius));
+                    float throwing_force_scale = 1 - distance / event.eedata_.radius;
+                    float new_x_abs_velocity = (600.f * throwing_force_scale);
+                    float new_y_abs_velocity = (600.f * throwing_force_scale);
                     velocity_.set_x(new_x_abs_velocity * dx_sign);
                     velocity_.set_y(-new_y_abs_velocity);
 
                     assert(event.eedata_.radius - event.eedata_.full_damage_radius > 0);
-                    float damage_scale = 1 - distance / (event.eedata_.radius - event.eedata_.full_damage_radius);
-                    printf("damage_scale: %d\n", damage_scale);
+                    float damage_scale = std::max(distance / (event.eedata_.radius - event.eedata_.full_damage_radius), 0.f);
+                    printf("damage_scale: %g\n", damage_scale);
                     assert(damage_scale >= 0);
                     int new_hp = get_hp() - event.eedata_.damage * damage_scale;
                     printf("new_hp: %d\n", new_hp);

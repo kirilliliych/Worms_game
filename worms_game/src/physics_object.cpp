@@ -48,8 +48,6 @@ void PhysicsObject::handle_physics()
 
     float new_x = area_.left_top().x() + velocity_.x() * Game::time_delta.count();
     float new_y = area_.left_top().y() + velocity_.y() * Game::time_delta.count();
-    // float new_x_center = new_x + area_.width()  / 2.f;
-    // float new_y_center = new_y + area_.height() / 2.f;
 
     Rect<int> new_position(get_area().width(), get_area().height(),
                              {static_cast<int> (new_x),
