@@ -15,12 +15,7 @@
 
 
 Game *Game::game = nullptr;
-
-
 ImageManager Game::imanager{};
-Game::time_point Game::prev_time_point{};
-Game::time_delta_t Game::time_delta{};
-
 
 Game::Game(uint32_t window_width, uint32_t window_height,
            uint32_t map_width,    uint32_t map_height,
@@ -34,6 +29,7 @@ Game::Game(uint32_t window_width, uint32_t window_height,
                        map_width  - window_width,
                        map_height - window_height)),
     emanager_(new EventManager(main_window_)),
+    turn_time_left_(TURN_TIME),
     teams_(TEAMS_QUANTITY),
     active_team_index_(0),
     under_control_(nullptr),
@@ -66,11 +62,39 @@ void Game::run()
     map_->create_map();
     
 // init teams
-    teams_[0] = new Team(map_, 3, 300, 200, 30, 40, 0xff0000ff);
-    teams_[1] = new Team(map_, 3, 700, 200, 30, 40, 0xff00ffff);
-    teams_[2] = new Team(map_, 3, 1300, 200, 30, 40, 0xffff0000);
+    int window_width = static_cast<int> (get_window_width());
+
+    int team_UI_start_pos_x = 100;
+    int team_UI_start_pos_y = 50;
+    int team_UI_y_step = 50;
+    teams_[0] = new Team(map_,
+                         3,
+                         300,
+                         200,
+                         30,
+                         40,
+                         0xff0000ff,
+                         {window_width - 200, 20, {team_UI_start_pos_x, team_UI_start_pos_y}});
+    team_UI_start_pos_y += team_UI_y_step;
+    teams_[1] = new Team(map_,
+                         3,
+                         700,
+                         200,
+                         30,
+                         40,
+                         0xff00ffff,
+                         {window_width - 200, 20, {team_UI_start_pos_x, team_UI_start_pos_y}});
+    team_UI_start_pos_y += team_UI_y_step;
+    teams_[2] = new Team(map_,
+                         3,
+                         1300,
+                         200,
+                         30,
+                         40,
+                         0xffff0000,
+                         {window_width - 200, 20, {team_UI_start_pos_x, team_UI_start_pos_y}});
     under_control_ = teams_[0]->get_next_character();
-    camera_tracking_ = under_control_;
+    set_camera_tracking_object(under_control_);
     
     clock clock{};
     prev_time_point = clock.now();
@@ -81,6 +105,8 @@ void Game::run()
         time_point cur_time_point = clock.now();
         Game::time_delta = cur_time_point - prev_time_point;
         prev_time_point = cur_time_point;
+        turn_time_left_ -= time_delta.count();
+        printf("cur turn_time_left: %g\n", turn_time_left_);
 
         for (uint32_t events_launched = 0; events_launched < EVENTS_HANDLING_PER_FRAME; ++events_launched)
         {   
@@ -94,18 +120,12 @@ void Game::run()
 
         main_window_->redraw(camera_->get_position());
 
-        if (player_action_finished_)
+        Event check_stability_event;
+        check_stability_event.set_type(EventType::STABILITY_EVENT);
+        is_stable_ = !emanager_->handle_event(check_stability_event);
+        if ((is_stable_) && (player_action_finished_ || (turn_time_left_ < 0)))
         {
-            Event check_stability_event;
-            check_stability_event.set_type(EventType::STABILITY_EVENT);
-            is_stable_ = !emanager_->handle_event(check_stability_event);
-            if (is_stable_)
-            {
-                enable_player_action();
-                set_player_control(true);
-
-                pass_turn_();
-            }
+            pass_turn_();
         }
     }
 }
@@ -209,7 +229,9 @@ void Game::set_camera_tracking_object(const PhysicsObject *now_tracked_object)
 }
 
 void Game::pass_turn_()
-{
+{   
+    uint32_t prev_active_team_index = active_team_index_;
+
     ++active_team_index_;
     active_team_index_ %= TEAMS_QUANTITY;
 
@@ -229,6 +251,16 @@ void Game::pass_turn_()
         ++active_team_index_;
         active_team_index_ %= TEAMS_QUANTITY;
     }
+    if (active_team_index_ == prev_active_team_index)
+    {
+        // game over
+    }
 
     under_control_ = teams_[active_team_index_]->get_next_character();
+    set_camera_tracking_object(under_control_);
+
+    enable_player_action();
+    set_player_control(true);
+
+    turn_time_left_ = TURN_TIME;
 }

@@ -148,7 +148,7 @@ bool AbstractNode::children_handle_event(const Event &event)
 
 bool AbstractNode::load_texture_from_image_manager(const std::string &image_file_name)
 {
-    const Image *texture_image = Game::imanager.get_image(image_file_name);
+    const Image *texture_image = Game::game->imanager.get_image(image_file_name);
     assert(texture_image != nullptr);
 
     return texture_->load_from_image(*texture_image);

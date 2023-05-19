@@ -16,11 +16,13 @@ class Character : public PhysicsObject
 {
 public:
 
-    Character(AbstractNode *parent, const Rect<int> &area, uint32_t color);
+    Character(AbstractNode *parent, const Rect<int> &area, int hp, uint32_t color);
 
-    Character(AbstractNode *parent, const Rect<int> &area, const std::string &texture_file_name, uint32_t color);
+    Character(AbstractNode *parent, const Rect<int> &area, int hp, const std::string &texture_file_name, uint32_t color);
 
     ~Character();
+
+    bool is_alive() const;
 
     int get_hp() const;
 

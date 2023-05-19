@@ -87,14 +87,6 @@ private:
     using clock = std::chrono::system_clock;
     using time_point = std::chrono::time_point<clock>;
     using time_delta_t = std::chrono::duration<float, std::chrono::seconds::period>;
-    static time_point prev_time_point;
-
-public:
-
-    static Game *game;
-
-    static ImageManager imanager;
-    static time_delta_t time_delta;
 
 private:
 
@@ -103,11 +95,25 @@ private:
 
     static constexpr uint32_t EVENTS_HANDLING_PER_FRAME = 2000;
 
+    static constexpr float TURN_TIME = 15.f;
+
+public:
+
+    static Game *game;
+    static ImageManager imanager;
+
+    time_delta_t time_delta;
+    time_point prev_time_point;
+
+private:
+
     Desktop *main_window_;
     Map *map_;
     Camera *camera_;
 
     EventManager *emanager_;
+
+    float turn_time_left_;
 
     std::vector<Team *> teams_;
     uint32_t active_team_index_;
@@ -117,6 +123,9 @@ private:
 
     bool player_has_control_;
     bool player_action_finished_;
+
+    // bool AI_has_control_;
+    // bool AI_action_finished_;
 
     bool is_stable_;
 };

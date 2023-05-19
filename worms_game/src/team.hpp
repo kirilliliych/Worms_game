@@ -20,8 +20,8 @@ class Team : public AbstractNode
 public:
 
     Team(AbstractNode *parent, uint32_t members_quantity, int spawn_position_center_x, int variance,
-         uint32_t character_pixel_width, uint32_t character_pixel_height, uint32_t color)
-      : AbstractNode(parent, {0, 0, {0, 0}}),
+         uint32_t character_pixel_width, uint32_t character_pixel_height, uint32_t color, const Rect<int> &area)
+      : AbstractNode(parent, area),
         members_quantity_(members_quantity),
         members_(members_quantity),
         sequence_(members_quantity),
@@ -38,11 +38,14 @@ public:
                                                            character_consts::SPAWN_Y_COORD
                                                           }
                                                          },
+                                                         DEFAULT_HP,
                                                         "standing.png",
                                                         color);
         }
 
         form_priority_();
+
+        texture_->fill_with_color(color);
     }
 
     ~Team()
@@ -80,7 +83,7 @@ public:
         bool is_team_alive = false;
         for (uint32_t member_index = 0; member_index < members_quantity_; ++member_index)
         {
-            if (members_[member_index]->get_hp() > 0)
+            if (members_[member_index]->is_alive())
             {
                 is_team_alive = true;
 
@@ -94,6 +97,8 @@ public:
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override
     {
         assert(surface != nullptr);
+
+
     }
 
     bool handle_event(const Event &event) override
@@ -145,8 +150,16 @@ private:
         }
     }
 
+
+private:
+
+    static constexpr int DEFAULT_HP = 100;
+
     uint32_t members_quantity_;
     std::vector<Character *> members_;
+
+    // TeamUI
+
     std::vector<uint32_t> sequence_;
     uint32_t sequence_cur_character_index_;
 };

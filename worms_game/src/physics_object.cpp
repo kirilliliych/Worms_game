@@ -44,10 +44,10 @@ void PhysicsObject::handle_physics()
 {
     acceleration_.set_y(2000);
 
-    velocity_ += acceleration_ * Game::time_delta.count();
+    velocity_ += acceleration_ * Game::game->time_delta.count();
 
-    float new_x = area_.left_top().x() + velocity_.x() * Game::time_delta.count();
-    float new_y = area_.left_top().y() + velocity_.y() * Game::time_delta.count();
+    float new_x = area_.left_top().x() + velocity_.x() * Game::game->time_delta.count();
+    float new_y = area_.left_top().y() + velocity_.y() * Game::game->time_delta.count();
 
     Rect<int> new_position(get_area().width(), get_area().height(),
                              {static_cast<int> (new_x),
@@ -383,9 +383,7 @@ void PhysicsObject::handle_physics()
                 if (this == Game::game->get_camera_tracking_object())
                 {
                     Game::game->set_camera_tracking_object(nullptr);
-                    // Game::game->set_camera_tracking_object(Game::game->get_character_under_control());
                 }
-                // printf("character set as center of camera\n");
                 on_bounce_death(area_.center());
             }
         }

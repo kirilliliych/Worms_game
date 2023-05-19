@@ -30,8 +30,7 @@ public:
     enum MapPixelCondition
     {
         SKY = 0,
-        TERRAIN,
-        COLLISION
+        TERRAIN
     };
 
 public:
@@ -44,7 +43,7 @@ public:
         uint64_t landscape_types_quantity = string_consts::landscape_images_names_pool.size();
         for (uint64_t i = 0; i < landscape_types_quantity; ++i)
         {
-            landscape_images_[i] = Game::imanager.get_image(string_consts::landscape_images_names_pool[i]);
+            landscape_images_[i] = Game::game->imanager.get_image(string_consts::landscape_images_names_pool[i]);
         }
 
         texture_->create(static_cast<uint32_t> (area.width()),
