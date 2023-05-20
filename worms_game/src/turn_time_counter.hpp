@@ -2,6 +2,7 @@
 
 
 #include "abstract_node.hpp"
+#include "colors.hpp"
 #include "game.hpp"
 #include "sfmlwrap/clock.hpp"
 #include "sfmlwrap/text.hpp"
@@ -23,7 +24,7 @@ public:
     {
         time_counter_text_.font_load_from_file("./worms_game/fonts/CamingoMono-Regular.ttf");
         time_counter_text_.set_character_size(36);
-        time_counter_text_.set_fill_color(0xffffffff);
+        time_counter_text_.set_fill_color(colors::WHITE);
     }
 
     float get_time_left() const

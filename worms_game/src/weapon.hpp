@@ -2,6 +2,7 @@
 
 
 #include "abstract_node.hpp"
+#include "colors.hpp"
 #include "game.hpp"
 #include "map.hpp"
 #include "maths.hpp"
@@ -284,7 +285,7 @@ inline void WeaponUI::update_charging_line_texture_(float new_charge_level)
     {
         for (int cur_height = 0; cur_height < height; ++cur_height)
         {
-            pixels[cur_height * width + cur_width] = 0xffffffff;
+            pixels[cur_height * width + cur_width] = colors::WHITE;
         }
     }
 

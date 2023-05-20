@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "colors.hpp"
 #include "sfmlwrap/texture.hpp"
 #include "utilities.hpp"
 #include <SFML/Graphics.hpp>
@@ -85,9 +86,9 @@ void extract_part_of_image_(const Image &sprite_sheet, const Rect<int> &area, co
         for (uint32_t x = 0; x < image->get_width(); ++x)
         {
             uint32_t cur_pixel = pixels[y * image->get_width() + x];
-            if ((cur_pixel == 0xff000000) || (cur_pixel == reverse_bytes(background_color)))
+            if ((cur_pixel == colors::BLACK) || (cur_pixel == reverse_bytes(background_color)))
             {
-                image->set_pixel(x, y, 0x00000000);
+                image->set_pixel(x, y, colors::BLACK_TRANSPARENT);
             }
         }
     }
