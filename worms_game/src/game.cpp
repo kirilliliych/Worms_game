@@ -63,10 +63,12 @@ void Game::run()
     
 // init teams
     int window_width = static_cast<int> (get_window_width());
+    // printf("CUR WINDOW WIDTH IS %d\n", window_width);
+    // printf("aboba %u\n", get_window_width());
 
-    int team_UI_start_pos_x = 100;
+    int team_UI_start_pos_x = 50;
     int team_UI_start_pos_y = 50;
-    int team_UI_y_step = 50;
+    int team_UI_y_step = 25;
     teams_[0] = new Team(map_,
                          3,
                          300,
@@ -74,7 +76,7 @@ void Game::run()
                          30,
                          40,
                          0xff0000ff,
-                         {window_width - 200, 20, {team_UI_start_pos_x, team_UI_start_pos_y}});
+                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}});
     team_UI_start_pos_y += team_UI_y_step;
     teams_[1] = new Team(map_,
                          3,
@@ -83,7 +85,7 @@ void Game::run()
                          30,
                          40,
                          0xff00ffff,
-                         {window_width - 200, 20, {team_UI_start_pos_x, team_UI_start_pos_y}});
+                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}});
     team_UI_start_pos_y += team_UI_y_step;
     teams_[2] = new Team(map_,
                          3,
@@ -92,7 +94,7 @@ void Game::run()
                          30,
                          40,
                          0xffff0000,
-                         {window_width - 200, 20, {team_UI_start_pos_x, team_UI_start_pos_y}});
+                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}});
     under_control_ = teams_[0]->get_next_character();
     set_camera_tracking_object(under_control_);
     

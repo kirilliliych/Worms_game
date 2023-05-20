@@ -17,53 +17,6 @@ public:
         texture_->fill_with_color(color);
     }
  
-    // void render_self(Surface *surface, const Point2d<int> &camera_offset) override
-    // {
-    //     assert(surface != nullptr);
-
-    //     int value = character_parent_->get_hp();
-    //     if (value > 0)
-    //     {
-    //         update_hp_texture_(value);
-    //         prev_value_ = value;
- 
-    //         AbstractNode::render_self(surface, camera_offset);
-    //     }
-    // }
- 
-    // bool handle_event(const Event &event) override
-    // {
-    //     bool result = false;
-
-    //     switch (event.get_type())
-    //     {
-    //         case EventType::TIME_PASSED:
-    //         {
-    //             area_.set_left_top({character_parent_->get_area().left_top().x(),
-    //                                 character_parent_->get_area().left_top().y() - 10});
-
-    //             if (children_handle_event(event))
-    //             {
-    //                 result = true;
-    //             }
-
-    //             break;
-    //         }
-
-    //         default:
-    //         {
-    //             if (children_handle_event(event))
-    //             {
-    //                 result = true;
-    //             }
-
-    //             break;
-    //         }
-    //     }
-
-    //     return result;
-    // }
- 
 protected:
  
     void update_value_texture_(int new_value)

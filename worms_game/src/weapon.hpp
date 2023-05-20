@@ -8,7 +8,6 @@
 #include "projectile.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "weapon_traits.hpp"
-#include "weapon_ui.hpp"
 
 
 class Weapon;
