@@ -82,11 +82,8 @@ bool Character::handle_event(const Event &event)
                     {
                         case KeyboardKey::Enter:
                         {
-                            // printf("CHARACTER CAUGHT KEY ENTER\n");
                             velocity_.set_x(400.0f * cosf(crosshair_->get_angle()));
                             velocity_.set_y(400.0f * sinf(crosshair_->get_angle()));
-                            // printf("new velocity is %g %g\n", velocity_.x(), velocity_.y());
-                            // printf("set is_stable to false\n");
                             is_stable_ = false;
 
                             Game::game->lock_camera();
@@ -160,10 +157,10 @@ bool Character::handle_event(const Event &event)
 
                 assert(event.eedata_.radius - event.eedata_.full_damage_radius > 0);
                 float damage_scale = std::max(distance / (event.eedata_.radius - event.eedata_.full_damage_radius), 0.f);
-                printf("damage_scale: %g\n", damage_scale);
+                // printf("damage_scale: %g\n", damage_scale);
                 assert(damage_scale >= 0);
                 int new_hp = get_hp() - event.eedata_.damage * damage_scale;
-                printf("new_hp: %d\n", new_hp);
+                // printf("new_hp: %d\n", new_hp);
                 set_hp(new_hp);
 
                 is_stable_ = false;

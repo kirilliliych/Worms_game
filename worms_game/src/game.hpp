@@ -6,11 +6,11 @@
 #include <chrono>
 #include <ctime>
 #include <iostream>
-#include <list>
 
 #include "abstract_node.hpp"
 #include "image_manager.hpp"
 #include "physics_entity.hpp"
+#include "sfmlwrap/clock.hpp"
 
 
 namespace string_consts
@@ -27,6 +27,7 @@ class Map;
 class PhysicsObject;
 class Projectile;
 class Team;
+class TurnTimeCounter;
 
 class Game
 {
@@ -95,7 +96,7 @@ private:
 
     static constexpr uint32_t EVENTS_HANDLING_PER_FRAME = 2000;
 
-    static constexpr float TURN_TIME = 15.f;
+    // static constexpr float TURN_TIME = 15.f;
 
 public:
 
@@ -113,7 +114,8 @@ private:
 
     EventManager *emanager_;
 
-    float turn_time_left_;
+    // float turn_time_left_;
+    TurnTimeCounter *turn_timer_;
 
     std::vector<Team *> teams_;
     uint32_t active_team_index_;

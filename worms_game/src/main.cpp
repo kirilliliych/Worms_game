@@ -2,7 +2,7 @@
 #include "game.hpp"
 
 
-// time counter, AI, fps and vector, animations, colors into another file, crosshair by mouse click, tombstone texture on character death
+// AI, fps and vector, animations, colors into another file, crosshair by mouse click, tombstone texture on character death
 // out of bounds, character-projectile interaction
 int main()
 {

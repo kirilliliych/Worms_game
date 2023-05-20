@@ -12,6 +12,7 @@
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/events/time_event.hpp"
 #include "team.hpp"
+#include "turn_time_counter.hpp"
 
 
 Game *Game::game = nullptr;
@@ -29,7 +30,8 @@ Game::Game(uint32_t window_width, uint32_t window_height,
                        map_width  - window_width,
                        map_height - window_height)),
     emanager_(new EventManager(main_window_)),
-    turn_time_left_(TURN_TIME),
+    // turn_time_left_(TURN_TIME),
+    turn_timer_(new TurnTimeCounter(map_, {100, 100, {500, 500}})),
     teams_(TEAMS_QUANTITY),
     active_team_index_(0),
     under_control_(nullptr),
@@ -107,8 +109,16 @@ void Game::run()
         time_point cur_time_point = clock.now();
         Game::time_delta = cur_time_point - prev_time_point;
         prev_time_point = cur_time_point;
-        turn_time_left_ -= time_delta.count();
-        printf("cur turn_time_left: %g\n", turn_time_left_);
+        // if (!player_action_finished_)
+        // {
+        //     turn_time_left_ -= time_delta.count();
+
+        // }
+        if (player_action_finished_)
+        {
+            turn_timer_->freeze();
+        }
+        printf("cur turn_time_left: %g\n", turn_timer_->get_time_left());
 
         for (uint32_t events_launched = 0; events_launched < EVENTS_HANDLING_PER_FRAME; ++events_launched)
         {   
@@ -125,10 +135,17 @@ void Game::run()
         Event check_stability_event;
         check_stability_event.set_type(EventType::STABILITY_EVENT);
         is_stable_ = !emanager_->handle_event(check_stability_event);
-        if ((is_stable_) && (player_action_finished_ || (turn_time_left_ < 0)))
+
+        // if (is_stable_ && (player_action_finished_ || (turn_time_left_ < 0)))
+        // {
+        //     pass_turn_();
+        // }
+
+        if (is_stable_ && (player_action_finished_ || turn_timer_->expired()))
         {
             pass_turn_();
         }
+
     }
 }
 
@@ -237,16 +254,16 @@ void Game::pass_turn_()
     ++active_team_index_;
     active_team_index_ %= TEAMS_QUANTITY;
 
-    bool all_dead = true;                           // temporary
-    for (uint32_t i = 0; i < TEAMS_QUANTITY; ++i)   //
-    {                                               //
-        if (teams_[i]->is_alive())                  //
-        {                                           //
-            all_dead = false;                       //
-            break;                                  //
-        }                                           //
-    }                                               //
-    assert(!all_dead);                              //
+    // bool all_dead = true;                           // temporary
+    // for (uint32_t i = 0; i < TEAMS_QUANTITY; ++i)   //
+    // {                                               //
+    //     if (teams_[i]->is_alive())                  //
+    //     {                                           //
+    //         all_dead = false;                       //
+    //         break;                                  //
+    //     }                                           //
+    // }                                               //
+    // assert(!all_dead);                              //
 
     while (!teams_[active_team_index_]->is_alive())
     {
@@ -264,5 +281,6 @@ void Game::pass_turn_()
     enable_player_action();
     set_player_control(true);
 
-    turn_time_left_ = TURN_TIME;
+    turn_timer_->restart();
+    turn_timer_->resume();
 }
