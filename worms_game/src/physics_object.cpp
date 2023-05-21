@@ -395,13 +395,14 @@ void PhysicsObject::handle_physics()
         area_.set_left_top_y(new_y);
     }
 
-    if (velocity_magnitude < 200.f)
-    {
-        // printf("set to true\n");
-        is_stable_ = true;
 
-        // velocity_.set_x(0);
-        // velocity_.set_y(0);
+    if ((get_physics_entity_type() == PhysicsEntity::CHARACTER) && (velocity_magnitude < 300.f))
+    {
+        is_stable_ = true;
+    }
+    else if (velocity_magnitude < 100.f)
+    {
+        is_stable_ = true;
     }
 }
 

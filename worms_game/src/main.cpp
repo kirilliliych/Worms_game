@@ -2,8 +2,7 @@
 #include "game.hpp"
 
 
-// AI, fps and vector, animations, colors into another file, crosshair by mouse click, tombstone texture on character death
-// out of bounds, character-projectile interaction
+// AI, fps and vector
 int main()
 {
     std::srand(std::time(nullptr));

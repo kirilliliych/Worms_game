@@ -62,6 +62,10 @@ public:
         int cur_floor  = std::floor(turn_time_left_);
         if (prev_floor != cur_floor)
         {
+            if (cur_floor < 0)
+            {
+                cur_floor = 0;
+            }
             update_text_(cur_floor);
         }
         surface->draw_text(time_counter_text_);

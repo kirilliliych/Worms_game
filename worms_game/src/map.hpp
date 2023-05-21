@@ -150,14 +150,6 @@ public:
 
             default:
             {
-                if (event.get_type() == EventType::KEY_PRESSED)
-                {
-                    if (event.kedata_.key_code == KeyboardKey::Enter)
-                    {
-                        printf("MAP CAUGHT ENTER\n");
-                    }
-                }
-
                 if (children_handle_event(event))
                 {
                     result = true;

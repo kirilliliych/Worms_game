@@ -80,6 +80,13 @@ void Character::render_self(Surface *surface, const Point2d<int> &camera_offset)
 
 bool Character::handle_event(const Event &event)
 {
+    if (state_ == CharacterState::DEAD)
+    {
+        set_texture_(crosshair_->get_angle());
+
+        return false;
+    }
+
     bool result = false;
 
     switch (event.get_type())
@@ -88,24 +95,17 @@ bool Character::handle_event(const Event &event)
         {
             if (Game::game->does_player_have_control())
             {
-                if (!is_stable_)
-                {
-                    // printf("I AM NOT STABLE\n");
-                }
                 if (Game::game->is_under_control(this) && is_stable_)
                 {
                     switch (event.kedata_.key_code)
                     {
                         case KeyboardKey::Enter:
                         {
-                            // for (int i = 0; i < 100; ++i)
-                            printf("CHARACTER CAUGHT ENTER\n");
-                            velocity_.set_x(400.0f * cosf(crosshair_->get_angle()));
+                            velocity_.set_x(400.0f * (cosf(crosshair_->get_angle()) + 0.15f));
                             velocity_.set_y(400.0f * sinf(crosshair_->get_angle()));
                             is_stable_ = false;
 
                             state_ = CharacterState::MOVING;
-                            // printf("state = MOVING, %d %s\n", __LINE__, __FILE__);
 
                             Game::game->lock_camera();
 
@@ -117,7 +117,6 @@ bool Character::handle_event(const Event &event)
                             weapon_->set_weapon_traits(nullptr);
 
                             state_ = CharacterState::PASSIVE;
-                            // printf("state = PASSIVE, %d %s\n", __LINE__, __FILE__);
 
                             break;
                         }
@@ -128,7 +127,6 @@ bool Character::handle_event(const Event &event)
                             weapon_->set_weapon_traits(&traits::weapon_traits_pool[Weapons::ROCKET_LAUNCHER]);
 
                             state_ = CharacterState::ARMED;
-                            // printf("state = ARMED, %d %s\n", __LINE__, __FILE__);
 
                             break;
                         }
@@ -184,7 +182,6 @@ bool Character::handle_event(const Event &event)
                 if (new_hp <= 0)
                 {
                     state_ = CharacterState::DEAD;
-                    // printf("state = DEAD, %d %s\n", __LINE__, __FILE__);
                 }
                 else
                 {
@@ -197,7 +194,6 @@ bool Character::handle_event(const Event &event)
                     is_stable_ = false;
 
                     state_ = CharacterState::HIT;
-                    // printf("state = HIT, %d %s\n", __LINE__, __FILE__);
                 }
             }
 
@@ -323,7 +319,9 @@ void Character::set_texture_(float OX_angle)
 
         case CharacterState::MOVING:
         {
-            load_texture_from_image_manager("moving.png");
+            new_image = "moving.png";
+            load_texture_from_image_manager(new_image);
+            animation_cur_image_name_ = new_image;
             // calculate_scale();
 
             break;
@@ -349,8 +347,10 @@ void Character::set_texture_(float OX_angle)
             {
                 if (OX_angle_right_semicircle >= border_angle)
                 {
-                    bool loading_result = load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(i));
+                    new_image = weapon_->get_weapon_traits()->get_image_file_name(i);
+                    bool loading_result = load_texture_from_image_manager(new_image);
                     assert(loading_result);
+                    animation_cur_image_name_ = new_image;
                     // calculate_scale();
 
                     return;
@@ -359,7 +359,10 @@ void Character::set_texture_(float OX_angle)
                 border_angle -= 2 * step;
             }
 
-            load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(weapon_images_quantity - 1));
+            new_image = weapon_->get_weapon_traits()->get_image_file_name(weapon_images_quantity - 1);
+            bool res = load_texture_from_image_manager(new_image);
+            animation_cur_image_name_ = new_image;
+
             // calculate_scale();
 
             break;
@@ -367,7 +370,9 @@ void Character::set_texture_(float OX_angle)
 
         case CharacterState::HIT:
         {
-            load_texture_from_image_manager("hit.png");
+            new_image = "hit.png";
+            load_texture_from_image_manager(new_image);
+            animation_cur_image_name_ = new_image;
             // calculate_scale();
 
             break;
@@ -375,7 +380,9 @@ void Character::set_texture_(float OX_angle)
 
         case CharacterState::DEAD:
         {
-            load_texture_from_image_manager("tombstone.png");
+            new_image = "tombstone.png";
+            load_texture_from_image_manager(new_image);
+            animation_cur_image_name_ = new_image;
             // calculate_scale();
 
             break;
