@@ -137,7 +137,7 @@ public:
             {
                 children_.erase(std::remove_if(children_.begin(),
                                                      children_.end(),
-                                                     [](const std::unique_ptr<AbstractNode> &object) {return !object->does_exist();}),
+                                                     [&](const std::unique_ptr<AbstractNode> &object) {return !object->does_exist();}),
                                 children_.cend());
 
                 if (children_handle_event(event))
@@ -150,10 +150,20 @@ public:
 
             default:
             {
+                if (event.get_type() == EventType::KEY_PRESSED)
+                {
+                    if (event.kedata_.key_code == KeyboardKey::Enter)
+                    {
+                        printf("MAP CAUGHT ENTER\n");
+                    }
+                }
+
                 if (children_handle_event(event))
                 {
                     result = true;
                 }
+
+                break;
             }
         }
 

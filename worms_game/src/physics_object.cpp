@@ -42,14 +42,8 @@ bool PhysicsObject::is_stable() const
 
 void PhysicsObject::handle_physics()
 {
-    using clock = std::chrono::system_clock;
-    using time_point = std::chrono::time_point<clock>;
-    using time_delta_t = std::chrono::duration<float, std::chrono::seconds::period>;
-
-    clock clock_{};
-    time_point p1 = clock_.now();
-
     acceleration_.set_y(2000);
+    // assert(acceleration_ == Vector2d<float> (0, 2000));
 
     velocity_ += acceleration_ * Game::game->time_delta.count();
 
@@ -58,7 +52,7 @@ void PhysicsObject::handle_physics()
 
     Rect<int> new_position(get_area().width(), get_area().height(),
                              {static_cast<int> (new_x),
-                                          static_cast<int> (new_y)
+                                        static_cast<int> (new_y)
                                        });
     int new_position_center_x = new_position.center().x();
     int new_position_center_y = new_position.center().y();
@@ -67,7 +61,7 @@ void PhysicsObject::handle_physics()
     acceleration_.set_y(0);
     is_stable_ = false;
 
-    float velocity_threshold = 0.01;
+    float velocity_threshold = 0.01f;
     if (std::abs(velocity_.y()) < velocity_threshold)
     {
         velocity_.set_y(velocity_.y() > 0 ? velocity_threshold : -velocity_threshold);
@@ -151,8 +145,8 @@ void PhysicsObject::handle_physics()
         {
             float test_pos_x = new_x;
             float test_pos_y = new_y + i;
-            if (( above_semicircle_flat_part && (test_pos_y - new_position_center_y <= semicircle_flat_part_k_coef * (test_pos_x - new_position_center_y))) ||
-                (!above_semicircle_flat_part && (test_pos_y - new_position_center_y >  semicircle_flat_part_k_coef * (test_pos_x - new_position_center_y))))
+            if (( above_semicircle_flat_part && (test_pos_y - new_position_center_y <= semicircle_flat_part_k_coef * (test_pos_x - new_position_center_x))) ||
+                (!above_semicircle_flat_part && (test_pos_y - new_position_center_y >  semicircle_flat_part_k_coef * (test_pos_x - new_position_center_x))))
             {
                 Event check_collision_event;
                 check_collision_event.set_type(EventType::COLLISION_EVENT);
@@ -263,7 +257,7 @@ void PhysicsObject::handle_physics()
                     check_collision_event.cedata_.checker = get_physics_entity_type();
                     check_collision_event.cedata_.checker_address = this;
                     check_collision_event.cedata_.position = {static_cast<int> (test_pos_x),
-                                                            static_cast<int> (test_pos_y)
+                                                              static_cast<int> (test_pos_y)
                                                             }; 
                     if (Game::game->launch_event(check_collision_event))
                     {
@@ -290,7 +284,7 @@ void PhysicsObject::handle_physics()
                     check_collision_event.cedata_.checker = get_physics_entity_type();
                     check_collision_event.cedata_.checker_address = this;
                     check_collision_event.cedata_.position = {static_cast<int> (test_pos_x),
-                                                            static_cast<int> (test_pos_y)
+                                                              static_cast<int> (test_pos_y)
                                                             }; 
                     if (Game::game->launch_event(check_collision_event))
                     {
@@ -401,7 +395,7 @@ void PhysicsObject::handle_physics()
         area_.set_left_top_y(new_y);
     }
 
-    if (velocity_magnitude < 1.f)
+    if (velocity_magnitude < 200.f)
     {
         // printf("set to true\n");
         is_stable_ = true;
@@ -409,12 +403,6 @@ void PhysicsObject::handle_physics()
         // velocity_.set_x(0);
         // velocity_.set_y(0);
     }
-
-    time_point p2 = clock_.now();
-    time_delta_t d = p2 - p1;
-    if (d.count() > 1)
-    printf("delta %g\n", d.count());
-
 }
 
 bool PhysicsObject::handle_event(const Event &event)

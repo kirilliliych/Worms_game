@@ -88,6 +88,10 @@ bool Character::handle_event(const Event &event)
         {
             if (Game::game->does_player_have_control())
             {
+                if (!is_stable_)
+                {
+                    // printf("I AM NOT STABLE\n");
+                }
                 if (Game::game->is_under_control(this) && is_stable_)
                 {
                     switch (event.kedata_.key_code)

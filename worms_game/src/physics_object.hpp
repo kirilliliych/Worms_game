@@ -20,6 +20,7 @@ protected:
     PhysicsObject(AbstractNode *parent, const Rect<int> &area, const Vector2d<float> &velocity,
                   const Vector2d<float> &acceleration, float friction, int bounces_before_death,
                   const std::string &texture_file_name);
+                  
     virtual void on_bounce_death(const Point2d<int> &death_position) = 0;
     
 public:
