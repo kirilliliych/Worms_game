@@ -2,11 +2,15 @@
 #include "character_ui.hpp"
 #include "game.hpp"
 #include "maths.hpp"
+#include "sfmlwrap/image.hpp"
 #include "weapon.hpp"
 
 
 Character::Character(AbstractNode *parent, const Rect<int> &area, int hp, uint32_t color)
   : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION, -1),
+    state_(CharacterState::PASSIVE),
+    animation_image_change_cur_delay_(std::rand() % static_cast<int> (ANIMATION_IMAGE_CHANGE_MIN_DELAY)),
+    animation_cur_image_name_(""),
     crosshair_(new Crosshair(this, {10, 10, area_.center()},
                              std::max(area.width(), area_.height()) + 30, color)),
     weapon_(new Weapon(this, area_, nullptr)),
@@ -16,9 +20,12 @@ Character::Character(AbstractNode *parent, const Rect<int> &area, int hp, uint32
     PhysicsObject::type_ = PhysicsEntity::CHARACTER;
 }
 
-Character::Character(AbstractNode *parent, const Rect<int> &area, int hp, const std::string &texture_file_name, uint32_t color)
+Character::Character(AbstractNode *parent, const Rect<int> &area, int hp, const std::string &image_file_name, uint32_t color)
   : PhysicsObject(parent, area, {0, 0}, {0, 0},
-                  DEFAULT_FRICTION, -1, texture_file_name),
+                  DEFAULT_FRICTION, -1, image_file_name),
+    state_(CharacterState::PASSIVE),
+    animation_image_change_cur_delay_(std::rand() % static_cast<int> (ANIMATION_IMAGE_CHANGE_MIN_DELAY)),
+    animation_cur_image_name_(image_file_name),
     crosshair_(new Crosshair(this, {10, 10, area_.center()},
                              std::max(area.width(), area_.height()) + 30, color)),
     weapon_(new Weapon(this, area_, nullptr)),
@@ -53,6 +60,11 @@ void Character::set_hp(int new_hp)
     hp_ = new_hp;
 }
 
+void Character::remove_weapon()
+{
+    state_ = CharacterState::PASSIVE;
+}
+
 void Character::on_bounce_death(const Point2d<int> &death_position)
 {}
 
@@ -82,9 +94,14 @@ bool Character::handle_event(const Event &event)
                     {
                         case KeyboardKey::Enter:
                         {
+                            // for (int i = 0; i < 100; ++i)
+                            printf("CHARACTER CAUGHT ENTER\n");
                             velocity_.set_x(400.0f * cosf(crosshair_->get_angle()));
                             velocity_.set_y(400.0f * sinf(crosshair_->get_angle()));
                             is_stable_ = false;
+
+                            state_ = CharacterState::MOVING;
+                            // printf("state = MOVING, %d %s\n", __LINE__, __FILE__);
 
                             Game::game->lock_camera();
 
@@ -95,6 +112,9 @@ bool Character::handle_event(const Event &event)
                         {
                             weapon_->set_weapon_traits(nullptr);
 
+                            state_ = CharacterState::PASSIVE;
+                            // printf("state = PASSIVE, %d %s\n", __LINE__, __FILE__);
+
                             break;
                         }
 
@@ -102,6 +122,9 @@ bool Character::handle_event(const Event &event)
                         {
                             printf("changing weapon to rocket launcher\n");
                             weapon_->set_weapon_traits(&traits::weapon_traits_pool[Weapons::ROCKET_LAUNCHER]);
+
+                            state_ = CharacterState::ARMED;
+                            // printf("state = ARMED, %d %s\n", __LINE__, __FILE__);
 
                             break;
                         }
@@ -149,21 +172,29 @@ bool Character::handle_event(const Event &event)
 
             if (distance < event.eedata_.radius)
             {
-                float throwing_force_scale = 1 - distance / event.eedata_.radius;
-                float new_x_abs_velocity = (600.f * throwing_force_scale);
-                float new_y_abs_velocity = (600.f * throwing_force_scale);
-                velocity_.set_x(new_x_abs_velocity * dx_sign);
-                velocity_.set_y(-new_y_abs_velocity);
-
                 assert(event.eedata_.radius - event.eedata_.full_damage_radius > 0);
                 float damage_scale = std::max(distance / (event.eedata_.radius - event.eedata_.full_damage_radius), 0.f);
-                // printf("damage_scale: %g\n", damage_scale);
                 assert(damage_scale >= 0);
                 int new_hp = get_hp() - event.eedata_.damage * damage_scale;
-                // printf("new_hp: %d\n", new_hp);
                 set_hp(new_hp);
+                if (new_hp <= 0)
+                {
+                    state_ = CharacterState::DEAD;
+                    // printf("state = DEAD, %d %s\n", __LINE__, __FILE__);
+                }
+                else
+                {
+                    float throwing_force_scale = 1 - distance / event.eedata_.radius;
+                    float new_x_abs_velocity = (600.f * throwing_force_scale);
+                    float new_y_abs_velocity = (600.f * throwing_force_scale);
+                    velocity_.set_x(new_x_abs_velocity * dx_sign);
+                    velocity_.set_y(-new_y_abs_velocity);
 
-                is_stable_ = false;
+                    is_stable_ = false;
+
+                    state_ = CharacterState::HIT;
+                    // printf("state = HIT, %d %s\n", __LINE__, __FILE__);
+                }
             }
 
             if (children_handle_event(event))
@@ -185,7 +216,13 @@ bool Character::handle_event(const Event &event)
                                                                                            radius * sinf(crosshair_angle)));
             weapon_->set_OX_angle(crosshair_->get_angle());
 
-            set_texture_by_angle_(crosshair_->get_angle());
+            
+            if ((is_stable_) && ((state_ == CharacterState::MOVING) || (state_ == CharacterState::HIT)))
+            {
+                state_ = CharacterState::PASSIVE;
+            }
+            animation_image_change_cur_delay_ += Game::game->time_delta.count();
+            set_texture_(crosshair_->get_angle());
 
             if (children_handle_event(event))
             {
@@ -216,50 +253,174 @@ bool Character::handle_event(const Event &event)
             {
                 result = true;
             }
+
+            break;
         }
     }
 
     return result;
 }
 
-void Character::set_texture_by_angle_(float OX_angle)
+void Character::set_texture_(float OX_angle)
 {
-    if (weapon_->get_weapon_traits() == nullptr)
-    {
-        load_texture_from_image_manager("standing.png");
-        calculate_scale();
+    std::string new_image = "";
 
-        return;
-    }
-
-    float OX_angle_right_semicircle = OX_angle;
-    if (OX_angle < -math_consts::HALF_PI)
+    switch (state_)
     {
-        OX_angle_right_semicircle = -math_consts::PI - OX_angle;
-    }
-    else if (OX_angle > math_consts::HALF_PI)
-    {
-        OX_angle_right_semicircle = math_consts::PI - OX_angle;
-    }
-    // printf("OX_angle_right_semicircle: %g\n", OX_angle_right_semicircle);
-
-    float step = math_consts::PI / 8;
-    float border_angle = math_consts::HALF_PI - step;
-    
-    uint32_t weapon_images_quantity = weapon_->get_weapon_traits()->get_images_quantity();
-    for (uint32_t i = 0; i < weapon_images_quantity; ++i)
-    {
-        if (OX_angle_right_semicircle >= border_angle)
+        case CharacterState::PASSIVE:
         {
-            bool loading_result = load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(i));
-            assert(loading_result);
+            int seed = std::rand() % 10;
+            switch (seed)
+            {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                {
+                    new_image = "passive1.png";
 
-            return;
+                    break;
+                }
+
+                case 8:
+                {
+                    new_image = "passive2.png";
+
+                    break;
+                }
+
+                case 9:
+                {
+                    new_image = "passive3.png";
+
+                    break;
+                }
+
+                default:
+                {
+                    break;
+                }
+            }
+
+            if ((new_image != animation_cur_image_name_) && (animation_image_change_cur_delay_ >= ANIMATION_IMAGE_CHANGE_MIN_DELAY))
+            {
+                animation_image_change_cur_delay_ = 0;
+                load_texture_from_image_manager(new_image);
+                // calculate_scale();
+                animation_cur_image_name_ = new_image;
+            }
+
+            break;
         }
 
-        border_angle -= 2 * step;
+        case CharacterState::MOVING:
+        {
+            load_texture_from_image_manager("moving.png");
+            // calculate_scale();
+
+            break;
+        }
+
+        case CharacterState::ARMED:
+        {
+            float OX_angle_right_semicircle = OX_angle;
+            if (OX_angle < -math_consts::HALF_PI)
+            {
+                OX_angle_right_semicircle = -math_consts::PI - OX_angle;
+            }
+            else if (OX_angle > math_consts::HALF_PI)
+            {
+                OX_angle_right_semicircle = math_consts::PI - OX_angle;
+            }
+
+            float step = math_consts::PI / 8;
+            float border_angle = math_consts::HALF_PI - step;
+
+            uint32_t weapon_images_quantity = weapon_->get_weapon_traits()->get_images_quantity();
+            for (uint32_t i = 0; i < weapon_images_quantity; ++i)
+            {
+                if (OX_angle_right_semicircle >= border_angle)
+                {
+                    bool loading_result = load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(i));
+                    assert(loading_result);
+                    // calculate_scale();
+
+                    return;
+                }
+
+                border_angle -= 2 * step;
+            }
+
+            load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(weapon_images_quantity - 1));
+            // calculate_scale();
+
+            break;
+        }
+
+        case CharacterState::HIT:
+        {
+            load_texture_from_image_manager("hit.png");
+            // calculate_scale();
+
+            break;
+        }
+
+        case CharacterState::DEAD:
+        {
+            load_texture_from_image_manager("tombstone.png");
+            // calculate_scale();
+
+            break;
+        }
+        
+        default:
+        {
+            std::cerr << "ERROR: unknown character state" << std::endl;
+
+            break;
+        }
     }
 
-    load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(weapon_images_quantity - 1));
-    calculate_scale();
+    // if (weapon_->get_weapon_traits() == nullptr)
+    // {
+    //     load_texture_from_image_manager("tombstone.png");
+    //     calculate_scale();
+
+    //     return;
+    // }
+
+    // float OX_angle_right_semicircle = OX_angle;
+    // if (OX_angle < -math_consts::HALF_PI)
+    // {
+    //     OX_angle_right_semicircle = -math_consts::PI - OX_angle;
+    // }
+    // else if (OX_angle > math_consts::HALF_PI)
+    // {
+    //     OX_angle_right_semicircle = math_consts::PI - OX_angle;
+    // }
+
+    // float step = math_consts::PI / 8;
+    // float border_angle = math_consts::HALF_PI - step;
+    
+    // uint32_t weapon_images_quantity = weapon_->get_weapon_traits()->get_images_quantity();
+    // for (uint32_t i = 0; i < weapon_images_quantity; ++i)
+    // {
+    //     if (OX_angle_right_semicircle >= border_angle)
+    //     {
+    //         bool loading_result = load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(i));
+    //         assert(loading_result);
+    //         calculate_scale();
+
+    //         return;
+    //     }
+
+    //     border_angle -= 2 * step;
+    // }
+
+    // load_texture_from_image_manager(weapon_->get_weapon_traits()->get_image_file_name(weapon_images_quantity - 1));
+    // calculate_scale();
 }

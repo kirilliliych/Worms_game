@@ -99,8 +99,15 @@ void extract_part_of_image_(const Image &sprite_sheet, const Rect<int> &area, co
 void cropping_function()
 {
     Image worms_sprite_sheet_image;
-    assert(worms_sprite_sheet_image.load_from_file("./worms_game/images/worms_sprite_sheet.png"));
-    extract_part_of_image_(worms_sprite_sheet_image, {23, 32, {7, 7}}, "standing.png");
+    worms_sprite_sheet_image.load_from_file("./worms_game/images/worms_sprite_sheet.png");
+    extract_part_of_image_(worms_sprite_sheet_image, {23, 32, {7, 7}}, "passive1.png");
+    extract_part_of_image_(worms_sprite_sheet_image, {23, 32, {44, 7}}, "passive2.png");
+    extract_part_of_image_(worms_sprite_sheet_image, {23, 32, {117, 7}}, "passive3.png");
+    extract_part_of_image_(worms_sprite_sheet_image, {23, 32, {190, 7}}, "moving.png");
+    extract_part_of_image_(worms_sprite_sheet_image, {23, 32, {1010, 7}}, "hit.png");
+    Image tombstone_skin;
+    assert(tombstone_skin.load_from_file("./worms_game/images/tombstone_skin.png"));
+    extract_part_of_image_(tombstone_skin, {23, 32, {7, 7}}, "tombstone.png");
 
     extract_part_of_image_(worms_sprite_sheet_image, {23, 32, {600, 46}}, "rocket_launcher_left.png");
     extract_part_of_image_(worms_sprite_sheet_image, {23, 32, {639, 46}}, "rocket_launcher_up.png");

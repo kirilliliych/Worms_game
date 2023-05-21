@@ -5,6 +5,7 @@
 #include <cstdint>
 #include "abstract_node.hpp"
 #include "game.hpp"
+#include "maths.hpp"
 #include "sfmlwrap/events/event.hpp"
 
 
@@ -14,7 +15,7 @@ public:
 
     Crosshair(AbstractNode *parent, const Rect<int> &area, int spin_radius, uint32_t color)
       : AbstractNode(parent, area),
-        OX_angle_(-3.14359f),
+        OX_angle_(-math_consts::PI),
         spin_radius_(spin_radius)
     {
         form_crosshair_texture_(color);
@@ -27,7 +28,7 @@ public:
 
     bool is_right_semicircle() const
     {
-        return (-3.14159f / 2 <= OX_angle_) && (OX_angle_ <= 3.14159f / 2);
+        return (-math_consts::HALF_PI <= OX_angle_) && (OX_angle_ <= math_consts::HALF_PI);
     }
 
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override
@@ -55,9 +56,9 @@ public:
                         if (Game::game->is_under_control(parent_))
                         {
                             OX_angle_ -= 15.f * Game::game->time_delta.count();
-                            if (OX_angle_ < -3.14159f)
+                            if (OX_angle_ < -math_consts::PI)
                             {
-                                OX_angle_ += 3.14159f * 2;
+                                OX_angle_ += math_consts::PI * 2;
                             }
                         }
 
@@ -69,9 +70,9 @@ public:
                         if (Game::game->is_under_control(parent_))
                         {
                             OX_angle_ += 15.f * Game::game->time_delta.count();
-                            if (OX_angle_ > 3.14159f)
+                            if (OX_angle_ > math_consts::PI)
                             {
-                                OX_angle_ -= 3.14159f * 2;
+                                OX_angle_ -= math_consts::PI * 2;
                             }
                         }
 
@@ -91,7 +92,7 @@ public:
             {
                 area_.set_left_top(parent_->get_area().center() +
                                    Point2d<int>(static_cast<int> (cosf(OX_angle_) * spin_radius_),
-                                                static_cast<int> (sinf(OX_angle_) * spin_radius_)) + Point2d<int>(5, 5));
+                                                static_cast<int> (sinf(OX_angle_) * spin_radius_)));
 
                 break;
             }

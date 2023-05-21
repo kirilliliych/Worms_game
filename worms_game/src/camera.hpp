@@ -133,23 +133,6 @@ public:
                 {
                     set_position(camera_tracking->get_area().left_top() - area_.half_size());
                 }
-                
-                // if (target_x_ < 0)
-                // {
-                    // target_x_ = 0;
-                // }
-                // if (target_x_ > static_cast<int> (max_x_))
-                // {
-                    // target_x_ = max_x_;
-                // }
-                // if (target_y_ < 0)
-                // {
-                    // target_y_ = 0;
-                // }
-                // if (target_y_ > static_cast<int> (max_y_))
-                // {
-                    // target_y_ = max_y_;
-                // }
 
                 if (area_.left_top().x() < 0)
                 {
@@ -172,9 +155,6 @@ public:
                 {
                     result = true;
                 }
-
-                // area_.set_left_top({area_.get_left_x() + static_cast<int>((target_x_ - area_.get_left_x()) * 5.f * Game::game->time_delta.count()),  // now bugged
-                                  //  area_.get_top_y()  + static_cast<int>((target_y_ - area_.get_top_y())  * 5.f * Game::game->time_delta.count())});
 
                 break;
             }

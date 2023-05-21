@@ -100,43 +100,6 @@ public:
 
         switch (event.get_type())
         {
-            case EventType::MOUSE_BUTTON_PRESSED:
-            {
-                switch (event.mbedata_.button)
-                {
-                    case MouseButton::LEFT:
-                    {
-                        Event eevent;
-                        eevent.set_type(EventType::EXPLOSION_EVENT);
-                        eevent.eedata_.radius = 40;
-                        eevent.eedata_.position = event.mbedata_.position;
-                        Game::game->launch_event(eevent);
-
-                        break;
-                    }
-
-                    case MouseButton::RIGHT:
-                    {
-                        // Game::game->add_to_map_children(new Projectile(this, {40, 40, event.mbedata_.position}, "rocket.png"));
-                        new Projectile(this, event.mbedata_.position, -3.14159f, 0.5, traits::weapon_traits_pool[0].get_ammo_traits());
-
-                        break;
-                    }
-
-                    default:
-                    {
-                        break;
-                    }
-                }
-
-                if (children_handle_event(event))
-                {
-                    result = true;
-                }
-
-                break;
-            }
-
             case EventType::EXPLOSION_EVENT:
             {
                 make_crater_(event.eedata_.position, event.eedata_.radius);

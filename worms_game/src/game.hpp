@@ -41,7 +41,6 @@ public:
     
     ~Game();
 
-
     void run();
 
     void add_to_map_children(AbstractNode *object);
@@ -95,7 +94,7 @@ private:
     static constexpr uint32_t TEAMS_QUANTITY   = 3;
     static constexpr uint32_t MEMBERS_QUANTITY = 3; 
 
-    static constexpr uint32_t EVENTS_HANDLING_PER_FRAME = 2000;
+    static constexpr uint32_t EVENTS_HANDLING_PER_FRAME = 1;
 
     // static constexpr float TURN_TIME = 15.f;
 

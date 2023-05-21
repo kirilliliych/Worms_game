@@ -9,6 +9,16 @@
 #include "sfmlwrap/texture.hpp"
 
 
+enum class CharacterState
+{
+    PASSIVE,
+    MOVING,
+    ARMED,
+    HIT,
+    DEAD,
+    UNKNOWN
+};
+
 class CharacterUI;
 class Weapon;
 
@@ -18,7 +28,7 @@ public:
 
     Character(AbstractNode *parent, const Rect<int> &area, int hp, uint32_t color);
 
-    Character(AbstractNode *parent, const Rect<int> &area, int hp, const std::string &texture_file_name, uint32_t color);
+    Character(AbstractNode *parent, const Rect<int> &area, int hp, const std::string &image_file_name, uint32_t color);
 
     ~Character();
 
@@ -28,6 +38,8 @@ public:
 
     void set_hp(int new_hp);
 
+    void remove_weapon();
+
     void on_bounce_death(const Point2d<int> &death_position) override;
 
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override;
@@ -36,12 +48,16 @@ public:
 
 private:
 
-    void set_texture_by_angle_(float OX_angle);
+    void set_texture_(float OX_angle);
 
 private:
-public:
 
-    static constexpr float DEFAULT_FRICTION = 0.000002;
+    static constexpr float DEFAULT_FRICTION = 0.000002f;
+    static constexpr float ANIMATION_IMAGE_CHANGE_MIN_DELAY = 2.f;
+
+    CharacterState state_;
+    float animation_image_change_cur_delay_;
+    std::string animation_cur_image_name_;
 
     Crosshair *crosshair_;    
     Weapon *weapon_;

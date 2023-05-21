@@ -75,7 +75,7 @@ public:
                                                           }
                                                          },
                                                          DEFAULT_HP,
-                                                        "standing.png",
+                                                        "passive1.png",
                                                         color);
         }
 

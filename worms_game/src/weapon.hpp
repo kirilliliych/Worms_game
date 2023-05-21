@@ -2,6 +2,7 @@
 
 
 #include "abstract_node.hpp"
+#include "character.hpp"
 #include "colors.hpp"
 #include "game.hpp"
 #include "map.hpp"
@@ -164,21 +165,25 @@ public:
 
                         if (fires_)
                         {
+                            Game::game->finish_player_action();
+                            Game::game->set_player_control(false);
+                            Character *character_parent = dynamic_cast<Character *> (parent_);
+                            if ((character_parent != nullptr) && (Game::game->get_character_under_control() == character_parent))
+                            {
+                                character_parent->remove_weapon();
+                            }
+
                             Projectile *spawned_projectile = new Projectile(nullptr, projectile_spawn_position_,
                                                                            OX_angle_, charge_level_,
                                                                            w_traits_->get_ammo_traits());
                             Game::game->add_to_map_children(spawned_projectile);
                             Game::game->set_camera_tracking_object(spawned_projectile);
-                            // printf("projectile set as center of camera\n");
 
                             is_charging_ = false;
                             charge_level_ = 0;
                             fires_ = false;
 
                             w_traits_ = nullptr;
-
-                            Game::game->finish_player_action();
-                            Game::game->set_player_control(false);
                         }
                     }
                     area_.set_left_top(parent_->get_area().left_top());

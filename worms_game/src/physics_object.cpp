@@ -42,6 +42,13 @@ bool PhysicsObject::is_stable() const
 
 void PhysicsObject::handle_physics()
 {
+    using clock = std::chrono::system_clock;
+    using time_point = std::chrono::time_point<clock>;
+    using time_delta_t = std::chrono::duration<float, std::chrono::seconds::period>;
+
+    clock clock_{};
+    time_point p1 = clock_.now();
+
     acceleration_.set_y(2000);
 
     velocity_ += acceleration_ * Game::game->time_delta.count();
@@ -402,6 +409,12 @@ void PhysicsObject::handle_physics()
         // velocity_.set_x(0);
         // velocity_.set_y(0);
     }
+
+    time_point p2 = clock_.now();
+    time_delta_t d = p2 - p1;
+    if (d.count() > 1)
+    printf("delta %g\n", d.count());
+
 }
 
 bool PhysicsObject::handle_event(const Event &event)
