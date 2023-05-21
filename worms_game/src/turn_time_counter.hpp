@@ -25,6 +25,7 @@ public:
         time_counter_text_.font_load_from_file("./worms_game/fonts/CamingoMono-Regular.ttf");
         time_counter_text_.set_character_size(36);
         time_counter_text_.set_fill_color(colors::WHITE);
+        time_counter_text_.set_position(area_.left_x(), area_.top_y());
     }
 
     float get_time_left() const
@@ -106,8 +107,8 @@ private:
 
     void update_text_(int new_value)
     {
-        const uint32_t MAX_STR_SIZE = 16;
-        char text_str[MAX_STR_SIZE] = {};
+        const uint32_t MAX_TIME_COUNTER_STR_SIZE = 16;
+        char text_str[MAX_TIME_COUNTER_STR_SIZE] = {};
         sprintf(text_str, "%d\n", new_value);
 
         time_counter_text_.set_string(text_str);

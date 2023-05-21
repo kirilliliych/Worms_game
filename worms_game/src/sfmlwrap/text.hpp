@@ -31,10 +31,17 @@ public:
         text_->setString(str);
     }
 
-    void font_load_from_file(const std::string &font_file_name)
+    bool font_load_from_file(const std::string &font_file_name)
     {
-        font_.load_from_file(font_file_name);
+        if (!font_.load_from_file(font_file_name))
+        {
+            std::cerr << "ERROR: font " << font_file_name << " was not found" << std::endl;
+
+            return false; 
+        }
         text_->setFont(*font_.font_);
+
+        return true;
     }
 
     void set_character_size(uint32_t size)

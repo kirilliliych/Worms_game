@@ -5,6 +5,7 @@
 #include "colors.hpp"
 #include "desktop.hpp"
 #include "event_manager.hpp"
+#include "fps.hpp"
 #include "game.hpp"
 #include "image_manager.hpp"
 #include "map.hpp"
@@ -31,8 +32,8 @@ Game::Game(uint32_t window_width, uint32_t window_height,
                        map_width  - window_width,
                        map_height - window_height)),
     emanager_(new EventManager(main_window_)),
-    // turn_time_left_(TURN_TIME),
-    turn_timer_(new TurnTimeCounter(map_, {100, 100, {500, 500}})),
+    turn_timer_(new TurnTimeCounter(map_, {100, 100, {50, 150}})),
+    fps_counter_(new FPSCounter(map_, {100, 100, {0, 0}})),
     teams_(TEAMS_QUANTITY),
     active_team_index_(0),
     under_control_(nullptr),
@@ -51,6 +52,8 @@ Game::~Game()
     delete map_;
     delete camera_;
     delete emanager_;
+    delete turn_timer_;
+    delete fps_counter_;
 
     for (uint32_t i = 0; i < TEAMS_QUANTITY; ++i)
     {
@@ -66,8 +69,6 @@ void Game::run()
     
 // init teams
     int window_width = static_cast<int> (get_window_width());
-    // printf("CUR WINDOW WIDTH IS %d\n", window_width);
-    // printf("aboba %u\n", get_window_width());
 
     int team_UI_start_pos_x = 50;
     int team_UI_start_pos_y = 50;
@@ -110,11 +111,6 @@ void Game::run()
         time_point cur_time_point = clock.now();
         Game::time_delta = cur_time_point - prev_time_point;
         prev_time_point = cur_time_point;
-        // if (!player_action_finished_)
-        // {
-        //     turn_time_left_ -= time_delta.count();
-
-        // }
         if (player_action_finished_)
         {
             turn_timer_->freeze();
@@ -136,11 +132,6 @@ void Game::run()
         Event check_stability_event;
         check_stability_event.set_type(EventType::STABILITY_EVENT);
         is_stable_ = !emanager_->handle_event(check_stability_event);
-
-        // if (is_stable_ && (player_action_finished_ || (turn_time_left_ < 0)))
-        // {
-        //     pass_turn_();
-        // }
 
         if (is_stable_ && (player_action_finished_ || turn_timer_->expired()))
         {

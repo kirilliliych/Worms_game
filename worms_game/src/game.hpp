@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "abstract_node.hpp"
+#include "fps.hpp"
 #include "image_manager.hpp"
 #include "physics_entity.hpp"
 #include "sfmlwrap/clock.hpp"
@@ -114,8 +115,8 @@ private:
 
     EventManager *emanager_;
 
-    // float turn_time_left_;
     TurnTimeCounter *turn_timer_;
+    FPSCounter *fps_counter_;
 
     std::vector<Team *> teams_;
     uint32_t active_team_index_;
