@@ -99,7 +99,7 @@ void extract_part_of_image_(const Image &sprite_sheet, const Rect<int> &area, co
 void cropping_function()
 {
     Image worms_sprite_sheet_image;
-    worms_sprite_sheet_image.load_from_file("./worms_game/images/worms_sprite_sheet.png");
+    assert(worms_sprite_sheet_image.load_from_file("./worms_game/images/worms_sprite_sheet.png"));
     extract_part_of_image_(worms_sprite_sheet_image, {23, 32, {7, 7}}, "passive1.png");
     extract_part_of_image_(worms_sprite_sheet_image, {23, 32, {44, 7}}, "passive2.png");
     extract_part_of_image_(worms_sprite_sheet_image, {23, 32, {117, 7}}, "passive3.png");

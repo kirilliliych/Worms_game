@@ -21,7 +21,8 @@
 namespace string_consts
 {
     const std::vector<std::string> landscape_images_names_pool{"seamless_sky.png",
-                                                               "dirt1.png"};
+                                                               "dirt1.png",
+                                                                "lava.png"};
 }
 
 
@@ -31,7 +32,8 @@ public:
     enum MapPixelCondition
     {
         SKY = 0,
-        TERRAIN
+        TERRAIN,
+        LAVA
     };
 
 public:
@@ -73,12 +75,14 @@ public:
         noise_seed[0] = 0.5f;   // means terrain starts and ends halfway up due to algorithm implementation
 
         std::vector<float> surface = PerlinNoise1D_(noise_seed, 8, 2.0f);
-        for (uint32_t y = 0; y < height; ++y)
+        float lava_level = 0.2f;
+        for (uint32_t x = 0; x < width; ++x)
         {
-            for (uint32_t x = 0; x < width; ++x)
+            for (uint32_t y = 0; y < height; ++y)
             {
-                map_[(height - 1 - y) * width + x] = y >= surface[x] * height ? MapPixelCondition::SKY :
-                                                                                MapPixelCondition::TERRAIN;  // currently there are two types of landscape...
+                map_[(height - 1 - y) * width + x] = y >=              surface[x] * height ? MapPixelCondition::SKY  :
+                                                     y <= lava_level * surface[x] * height ? MapPixelCondition::LAVA :
+                                                                                             MapPixelCondition::TERRAIN;
             }
         }
 
@@ -122,9 +126,10 @@ public:
             case EventType::COLLISION_EVENT:
             {
                 Rect<int> checker_area = event.cedata_.checker_address->get_area();
-                if ((checker_area.right_x() < 0) ||
-                    (checker_area.left_x() > area_.width()) ||
-                    (checker_area.top_y()  > area_.height()))
+                if ((checker_area.right_x() < 0)                ||
+                    (checker_area.left_x() > area_.width())     ||
+                    (checker_area.top_y()  > area_.height())    ||
+                    ((map_[event.cedata_.position.y() * area_.width() + event.cedata_.position.x()] == MapPixelCondition::LAVA)))
                 {
                     event.cedata_.checker_address->kill();
                 }
@@ -192,7 +197,7 @@ private:
                         uint32_t image_width  = landscape_images_[MapPixelCondition::SKY]->get_width();
                         uint32_t image_height = landscape_images_[MapPixelCondition::SKY]->get_height();
                         pixels[y * width + x] = landscape_images_[MapPixelCondition::SKY]->get_pixel(x % image_width,
-                                                                                                          y % image_height);
+                                                                                                     y % image_height);
                         break;
                     }
 
@@ -201,7 +206,16 @@ private:
                         uint32_t image_width  = landscape_images_[MapPixelCondition::TERRAIN]->get_width();
                         uint32_t image_height = landscape_images_[MapPixelCondition::TERRAIN]->get_height();
                         pixels[y * width + x] = landscape_images_[MapPixelCondition::TERRAIN]->get_pixel(x % image_width,
-                                                                                                              y % image_height);
+                                                                                                         y % image_height);
+                        break;
+                    }
+
+                    case MapPixelCondition::LAVA:
+                    {
+                        uint32_t image_width  = landscape_images_[MapPixelCondition::LAVA]->get_width();
+                        uint32_t image_height = landscape_images_[MapPixelCondition::LAVA]->get_height();
+                        pixels[y * width + x] = landscape_images_[MapPixelCondition::LAVA]->get_pixel(x % image_width,
+                                                                                                      y % image_height);
                         break;
                     }
 
@@ -254,13 +268,20 @@ private:
 			int x = 0;
 			int y = radius;
 			int p = 3 - 2 * radius;
-			if (!radius) return;
+			if (!radius)
+            {
+                return;
+            }
 
 			auto drawline = [&](int sx, int ex, int ny)
 			{
 				for (int i = sx; i < ex; ++i)
-					if (ny >= 0 && ny < area_.height() && i >= 0 && i < area_.width())
-						map_[ny * area_.width() + i] = MapPixelCondition::SKY;
+                {
+                    if ((ny >= 0) && (ny < area_.height()) && (i >= 0) && (i < area_.width()) && (map_[ny * area_.width() + i] != MapPixelCondition::LAVA))
+                    {
+                        map_[ny * area_.width() + i] = MapPixelCondition::SKY;
+                    }
+                }
 			};
 
 			while (y >= x) 
