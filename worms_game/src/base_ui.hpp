@@ -30,7 +30,11 @@ protected:
         int width  = area_.width();
         int height = area_.height();
 
-        int new_width = static_cast<float> (new_value) / max_value_ * width; 
+        int new_width = static_cast<float> (new_value) / max_value_ * width;
+        if (new_width <= 0)
+        {
+            new_width = 1;
+        }
         std::vector<uint32_t> pixels(width * height, 0);
         for (int cur_width = 0; cur_width < new_width; ++cur_width)
         {

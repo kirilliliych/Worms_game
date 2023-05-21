@@ -68,6 +68,18 @@ void Character::remove_weapon()
 void Character::on_bounce_death(const Point2d<int> &death_position)
 {}
 
+void Character::kill()
+{
+    set_hp(-1);
+    state_ = CharacterState::DEAD;
+
+    if (this == Game::game->get_character_under_control())
+    {
+        Game::game->finish_player_action();
+        Game::game->set_player_control(false);
+    }
+}
+
 void Character::render_self(Surface *surface, const Point2d<int> &camera_offset)
 {
     assert(surface != nullptr);
@@ -80,12 +92,12 @@ void Character::render_self(Surface *surface, const Point2d<int> &camera_offset)
 
 bool Character::handle_event(const Event &event)
 {
-    if (state_ == CharacterState::DEAD)
-    {
-        set_texture_(crosshair_->get_angle());
+    // if (state_ == CharacterState::DEAD)
+    // {
+    //     set_texture_(crosshair_->get_angle());
 
-        return false;
-    }
+    //     return false;
+    // }
 
     bool result = false;
 
@@ -93,7 +105,7 @@ bool Character::handle_event(const Event &event)
     {
         case EventType::KEY_PRESSED:
         {
-            if (Game::game->does_player_have_control())
+            if (Game::game->does_player_have_control() && (state_ != CharacterState::DEAD))
             {
                 if (Game::game->is_under_control(this) && is_stable_)
                 {
@@ -165,41 +177,44 @@ bool Character::handle_event(const Event &event)
 
         case EventType::EXPLOSION_EVENT:
         {
-            float center_x = area_.center_x();
-            float center_y = area_.center_y();
-            float dx = center_x - event.eedata_.position.x();
-            float dy = center_y - event.eedata_.position.y();
-            int dx_sign = dx >= 0 ? dx > 0 ? 1 : 0 : -1;
-            float distance = sqrtf(dx * dx + dy * dy);
-
-            if (distance < event.eedata_.radius)
+            if (state_ != CharacterState::DEAD)
             {
-                assert(event.eedata_.radius - event.eedata_.full_damage_radius > 0);
-                float damage_scale = std::max(distance / (event.eedata_.radius - event.eedata_.full_damage_radius), 0.f);
-                assert(damage_scale >= 0);
-                int new_hp = get_hp() - event.eedata_.damage * damage_scale;
-                set_hp(new_hp);
-                if (new_hp <= 0)
+                float center_x = area_.center_x();
+                float center_y = area_.center_y();
+                float dx = center_x - event.eedata_.position.x();
+                float dy = center_y - event.eedata_.position.y();
+                int dx_sign = dx >= 0 ? dx > 0 ? 1 : 0 : -1;
+                float distance = sqrtf(dx * dx + dy * dy);
+
+                if (distance < event.eedata_.radius)
                 {
-                    state_ = CharacterState::DEAD;
+                    assert(event.eedata_.radius - event.eedata_.full_damage_radius > 0);
+                    float damage_scale = std::max(distance / (event.eedata_.radius - event.eedata_.full_damage_radius), 0.f);
+                    assert(damage_scale >= 0);
+                    int new_hp = get_hp() - event.eedata_.damage * damage_scale;
+                    set_hp(new_hp);
+                    if (new_hp <= 0)
+                    {
+                        state_ = CharacterState::DEAD;
+                    }
+                    else
+                    {
+                        float throwing_force_scale = 1 - distance / event.eedata_.radius;
+                        float new_x_abs_velocity = (600.f * throwing_force_scale);
+                        float new_y_abs_velocity = (600.f * throwing_force_scale);
+                        velocity_.set_x(new_x_abs_velocity * dx_sign);
+                        velocity_.set_y(-new_y_abs_velocity);
+
+                        is_stable_ = false;
+
+                        state_ = CharacterState::HIT;
+                    }
                 }
-                else
+
+                if (children_handle_event(event))
                 {
-                    float throwing_force_scale = 1 - distance / event.eedata_.radius;
-                    float new_x_abs_velocity = (600.f * throwing_force_scale);
-                    float new_y_abs_velocity = (600.f * throwing_force_scale);
-                    velocity_.set_x(new_x_abs_velocity * dx_sign);
-                    velocity_.set_y(-new_y_abs_velocity);
-
-                    is_stable_ = false;
-
-                    state_ = CharacterState::HIT;
+                    result = true;
                 }
-            }
-
-            if (children_handle_event(event))
-            {
-                result = true;
             }
 
             break;
@@ -207,27 +222,31 @@ bool Character::handle_event(const Event &event)
 
         case EventType::TIME_PASSED:
         {
+            set_texture_(crosshair_->get_angle());
             handle_physics();
 
-            float crosshair_angle = crosshair_->get_angle();
-            int radius = sqrtf(area_.half_size().x() * area_.half_size().x() +
-                                  area_.half_size().y() * area_.half_size().y());
-            weapon_->set_projectile_spawn_position(area_.center() + Point2d<int>(radius * cosf(crosshair_angle),
-                                                                                           radius * sinf(crosshair_angle)));
-            weapon_->set_OX_angle(crosshair_->get_angle());
+            if (state_ != CharacterState::DEAD)
+            {
+                float crosshair_angle = crosshair_->get_angle();
+                int radius = sqrtf(area_.half_size().x() * area_.half_size().x() +
+                                      area_.half_size().y() * area_.half_size().y());
+                weapon_->set_projectile_spawn_position(area_.center() + Point2d<int>(radius * cosf(crosshair_angle),
+                                                                                               radius * sinf(crosshair_angle)));
+                weapon_->set_OX_angle(crosshair_->get_angle());
 
+
+                if ((is_stable_) && ((state_ == CharacterState::MOVING) || (state_ == CharacterState::HIT)))
+                {
+                    state_ = CharacterState::PASSIVE;
+                }
+                animation_image_change_cur_delay_ += Game::game->time_delta.count();
+
+                if (children_handle_event(event))
+                {
+                    result = true;
+                }
+            }
             
-            if ((is_stable_) && ((state_ == CharacterState::MOVING) || (state_ == CharacterState::HIT)))
-            {
-                state_ = CharacterState::PASSIVE;
-            }
-            animation_image_change_cur_delay_ += Game::game->time_delta.count();
-            set_texture_(crosshair_->get_angle());
-
-            if (children_handle_event(event))
-            {
-                result = true;
-            }
 
             break;
         }
@@ -310,7 +329,6 @@ void Character::set_texture_(float OX_angle)
             {
                 animation_image_change_cur_delay_ = 0;
                 load_texture_from_image_manager(new_image);
-                // calculate_scale();
                 animation_cur_image_name_ = new_image;
             }
 
@@ -320,9 +338,11 @@ void Character::set_texture_(float OX_angle)
         case CharacterState::MOVING:
         {
             new_image = "moving.png";
-            load_texture_from_image_manager(new_image);
+            if (new_image != animation_cur_image_name_)
+            {
+                load_texture_from_image_manager(new_image);
+            }
             animation_cur_image_name_ = new_image;
-            // calculate_scale();
 
             break;
         }
@@ -348,10 +368,12 @@ void Character::set_texture_(float OX_angle)
                 if (OX_angle_right_semicircle >= border_angle)
                 {
                     new_image = weapon_->get_weapon_traits()->get_image_file_name(i);
-                    bool loading_result = load_texture_from_image_manager(new_image);
-                    assert(loading_result);
+                    if (new_image != animation_cur_image_name_)
+                    {
+                        bool loading_result = load_texture_from_image_manager(new_image);
+                        assert(loading_result);
+                    }
                     animation_cur_image_name_ = new_image;
-                    // calculate_scale();
 
                     return;
                 }
@@ -360,10 +382,11 @@ void Character::set_texture_(float OX_angle)
             }
 
             new_image = weapon_->get_weapon_traits()->get_image_file_name(weapon_images_quantity - 1);
-            bool res = load_texture_from_image_manager(new_image);
+            if (new_image != animation_cur_image_name_)
+            {
+                load_texture_from_image_manager(new_image);
+            }
             animation_cur_image_name_ = new_image;
-
-            // calculate_scale();
 
             break;
         }
@@ -371,9 +394,11 @@ void Character::set_texture_(float OX_angle)
         case CharacterState::HIT:
         {
             new_image = "hit.png";
-            load_texture_from_image_manager(new_image);
+            if (new_image != animation_cur_image_name_)
+            {
+                load_texture_from_image_manager(new_image);
+            }
             animation_cur_image_name_ = new_image;
-            // calculate_scale();
 
             break;
         }
@@ -381,9 +406,11 @@ void Character::set_texture_(float OX_angle)
         case CharacterState::DEAD:
         {
             new_image = "tombstone.png";
-            load_texture_from_image_manager(new_image);
+            if (new_image != animation_cur_image_name_)
+            {
+                load_texture_from_image_manager(new_image);
+            }
             animation_cur_image_name_ = new_image;
-            // calculate_scale();
 
             break;
         }

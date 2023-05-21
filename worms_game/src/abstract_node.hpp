@@ -4,11 +4,12 @@
 #include <cassert>
 #include <memory>
 #include "point2d.hpp"
-#include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/surface.hpp"
 #include "sfmlwrap/texture.hpp"
 #include "sfmlwrap/rect.hpp"
 
+
+class Event;
 
 class AbstractNode
 {
@@ -34,6 +35,8 @@ public:
     void add_child(AbstractNode *child);
 
     bool does_exist() const;
+
+    virtual void kill();
 
     virtual bool handle_event(const Event &event);
 

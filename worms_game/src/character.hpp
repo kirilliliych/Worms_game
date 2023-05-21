@@ -42,6 +42,8 @@ public:
 
     void on_bounce_death(const Point2d<int> &death_position) override;
 
+    void kill() override;
+
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override;
 
     bool handle_event(const Event &event) override;

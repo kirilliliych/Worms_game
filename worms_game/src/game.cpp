@@ -108,45 +108,31 @@ void Game::run()
     main_window_->open();
     while (main_window_->is_open())
     {
-        // printf("aboba %d %s\n", __LINE__, __FILE__);
-        // time_point p1 = clock.now();
         time_point cur_time_point = clock.now();
         Game::time_delta = cur_time_point - prev_time_point;
         prev_time_point = cur_time_point;
-        // printf("aboba %d %s\n", __LINE__, __FILE__);
         if (player_action_finished_)
         {
             turn_timer_->freeze();
         }
-        // printf("aboba %d %s\n", __LINE__, __FILE__);
 
-        // printf("aboba %d %s\n", __LINE__, __FILE__);
         for (uint32_t events_launched = 0; events_launched < EVENTS_HANDLING_PER_FRAME; ++events_launched)
         {   
             emanager_->process_external_events(main_window_);
         }
-        // printf("aboba %d %s\n", __LINE__, __FILE__);
 
-        // printf("aboba %d %s\n", __LINE__, __FILE__);
         Event time_event;
         time_event.set_type(EventType::TIME_PASSED);
         time_event.dt_ = Game::time_delta;
         emanager_->handle_event(time_event);
-        // printf("aboba %d %s\n", __LINE__, __FILE__);
         main_window_->redraw(camera_->get_position());
-        // printf("aboba %d %s\n", __LINE__, __FILE__);
         Event check_stability_event;
         check_stability_event.set_type(EventType::STABILITY_EVENT);
         is_stable_ = !emanager_->handle_event(check_stability_event);
-        // printf("aboba %d %s\n", __LINE__, __FILE__);
         if (is_stable_ && (player_action_finished_ || turn_timer_->expired()))
         {
             pass_turn_();
         }
-        // printf("aboba %d %s\n", __LINE__, __FILE__);
-        // time_point p2 = clock.now();
-        // time_delta_t a = p2 - p1;
-        // printf("drawing delta time is %g\n", a.count());
     }
 }
 
@@ -254,17 +240,6 @@ void Game::pass_turn_()
 
     ++active_team_index_;
     active_team_index_ %= TEAMS_QUANTITY;
-
-    // bool all_dead = true;                           // temporary
-    // for (uint32_t i = 0; i < TEAMS_QUANTITY; ++i)   //
-    // {                                               //
-    //     if (teams_[i]->is_alive())                  //
-    //     {                                           //
-    //         all_dead = false;                       //
-    //         break;                                  //
-    //     }                                           //
-    // }                                               //
-    // assert(!all_dead);                              //
 
     while (!teams_[active_team_index_]->is_alive())
     {

@@ -1,4 +1,5 @@
 #include "abstract_node.hpp"
+#include "sfmlwrap/events/event.hpp"
 #include "game.hpp"
 
 
@@ -111,6 +112,11 @@ void AbstractNode::add_child(AbstractNode *child)
 bool AbstractNode::does_exist() const
 {
     return exists_;
+}
+
+void AbstractNode::kill()
+{
+    exists_ = false;
 }
 
 bool AbstractNode::handle_event(const Event &event)

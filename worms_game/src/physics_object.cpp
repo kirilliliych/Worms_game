@@ -364,15 +364,11 @@ void PhysicsObject::handle_physics()
         // reflection vector
         float response_x_norm = response_x / response_magnitude;
         float response_y_norm = response_y / response_magnitude;
-        // printf("response_x_norm: %g\n", response_x_norm);
-        // printf("response_y_norm: %g\n", response_y_norm);
         float dot = velocity_.x() * response_x_norm +
                     velocity_.y() * response_y_norm;
 
-        // printf("before collision velocity is %g %g\n", velocity_.x(), velocity_.y());
         velocity_.set_x((-2.0f * dot * response_x_norm + velocity_.x()) * friction_);
         velocity_.set_y((-2.0f * dot * response_y_norm + velocity_.y()) * friction_);
-        // printf("after collision velocity is %g %g\n", velocity_.x(), velocity_.y());
 
         if (bounces_before_death_ > 0)
         {
@@ -396,7 +392,7 @@ void PhysicsObject::handle_physics()
     }
 
 
-    if ((get_physics_entity_type() == PhysicsEntity::CHARACTER) && (velocity_magnitude < 300.f))
+    if ((get_physics_entity_type() == PhysicsEntity::CHARACTER) && (velocity_magnitude < 150.f))
     {
         is_stable_ = true;
     }

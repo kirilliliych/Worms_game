@@ -2,7 +2,6 @@
 #include "game.hpp"
 
 
-// AI, fps and vector
 int main()
 {
     std::srand(std::time(nullptr));

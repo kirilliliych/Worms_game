@@ -8,6 +8,7 @@
 #include "abstract_node.hpp"
 #include "debris.hpp"
 #include "game.hpp"
+#include "physics_entity.hpp"
 #include "physics_object.hpp"
 #include "projectile.hpp"
 #include "sfmlwrap/events/event.hpp"
@@ -120,7 +121,16 @@ public:
 
             case EventType::COLLISION_EVENT:
             {
-                if (map_[event.cedata_.position.y() * area_.width() + event.cedata_.position.x()] != MapPixelCondition::SKY)
+                Rect<int> checker_area = event.cedata_.checker_address->get_area();
+                if ((checker_area.right_x() < 0) ||
+                    (checker_area.left_x() > area_.width()) ||
+                    (checker_area.top_y()  > area_.height()))
+                {
+                    event.cedata_.checker_address->kill();
+                }
+
+                int checked_byte = event.cedata_.position.y() * area_.width() + event.cedata_.position.x();
+                if ((checked_byte >= 0) && (map_[checked_byte] != MapPixelCondition::SKY))
                 {
                     result = true;
                 }
@@ -248,7 +258,7 @@ private:
 
 			auto drawline = [&](int sx, int ex, int ny)
 			{
-				for (int i = sx; i < ex; i++)
+				for (int i = sx; i < ex; ++i)
 					if (ny >= 0 && ny < area_.height() && i >= 0 && i < area_.width())
 						map_[ny * area_.width() + i] = MapPixelCondition::SKY;
 			};

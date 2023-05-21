@@ -2,6 +2,7 @@
 
 
 #include <chrono>
+#include "abstract_node.hpp"
 #include "physics_entity.hpp"
 #include "point2d.hpp"
 
@@ -167,7 +168,7 @@ struct MouseWheelEventData
 
 struct CollisionEventData
 {
-    const void *checker_address;
+    AbstractNode *checker_address;
     PhysicsEntity checker;
     Point2d<int> position;
 };
