@@ -31,7 +31,8 @@ my own implementations of _vector_, _std::move_, _std::forward_ and other things
 ![ALT](readme_pictures/stl_vector4.png)
 ![ALT](readme_pictures/my_vector4.png)
 
-As it can be seen, tests have shown only a slight difference which can be neglected.
+As it can be seen, tests have shown only a slight difference which can be neglected. My pseudo-STL
+did not bring significant benefit.
 ***
 ## How can I help
 I explicitly welcome any outside contributors. Use my mail: _ilichev.kv@phystech.edu_.
