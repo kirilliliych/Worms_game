@@ -354,7 +354,7 @@ void PhysicsObject::handle_physics()
         }
     }
 
-    if (collision_happened && !is_stable_)
+    if (collision_happened)
     {
         is_stable_ = true;
                 
@@ -391,12 +391,8 @@ void PhysicsObject::handle_physics()
         area_.set_left_top_y(new_y);
     }
 
-
-    if ((get_physics_entity_type() == PhysicsEntity::CHARACTER) && (velocity_magnitude < 150.f))
-    {
-        is_stable_ = true;
-    }
-    else if (velocity_magnitude < 100.f)
+    float stability_threshold = 20.f;
+    if (velocity_magnitude < stability_threshold)
     {
         is_stable_ = true;
     }

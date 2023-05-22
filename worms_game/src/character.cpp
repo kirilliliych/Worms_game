@@ -105,15 +105,15 @@ bool Character::handle_event(const Event &event)
     {
         case EventType::KEY_PRESSED:
         {
-            if (Game::game->does_player_have_control() && (state_ != CharacterState::DEAD))
+            if (Game::game->does_player_have_control() && Game::game->is_under_control(this) &&
+                ((state_ == CharacterState::ARMED) || (state_ == CharacterState::PASSIVE)))
             {
-                if (Game::game->is_under_control(this) && is_stable_)
-                {
                     switch (event.kedata_.key_code)
                     {
                         case KeyboardKey::Enter:
                         {
-                            velocity_.set_x(400.0f * (cosf(crosshair_->get_angle()) + 0.15f));
+                            float velocity_x_offset = 80.f;
+                            velocity_.set_x(400.0f * cosf(crosshair_->get_angle()) + velocity_x_offset);
                             velocity_.set_y(400.0f * sinf(crosshair_->get_angle()));
                             is_stable_ = false;
 
@@ -148,7 +148,6 @@ bool Character::handle_event(const Event &event)
                             break;
                         }
                     }
-                }
 
                 if (children_handle_event(event))
                 {
@@ -234,8 +233,7 @@ bool Character::handle_event(const Event &event)
                                                                                                radius * sinf(crosshair_angle)));
                 weapon_->set_OX_angle(crosshair_->get_angle());
 
-
-                if ((is_stable_) && ((state_ == CharacterState::MOVING) || (state_ == CharacterState::HIT)))
+                if (is_stable_ && ((state_ == CharacterState::MOVING) || (state_ == CharacterState::HIT)))
                 {
                     state_ = CharacterState::PASSIVE;
                 }
@@ -246,7 +244,6 @@ bool Character::handle_event(const Event &event)
                     result = true;
                 }
             }
-            
 
             break;
         }
@@ -327,7 +324,7 @@ void Character::set_texture_(float OX_angle)
 
             if ((new_image != animation_cur_image_name_) && (animation_image_change_cur_delay_ >= ANIMATION_IMAGE_CHANGE_MIN_DELAY))
             {
-                animation_image_change_cur_delay_ = 0;
+                animation_image_change_cur_delay_ = 0.f;
                 load_texture_from_image_manager(new_image);
                 animation_cur_image_name_ = new_image;
             }
@@ -341,8 +338,8 @@ void Character::set_texture_(float OX_angle)
             if (new_image != animation_cur_image_name_)
             {
                 load_texture_from_image_manager(new_image);
+                animation_cur_image_name_ = new_image;
             }
-            animation_cur_image_name_ = new_image;
 
             break;
         }
@@ -372,8 +369,8 @@ void Character::set_texture_(float OX_angle)
                     {
                         bool loading_result = load_texture_from_image_manager(new_image);
                         assert(loading_result);
+                        animation_cur_image_name_ = new_image;
                     }
-                    animation_cur_image_name_ = new_image;
 
                     return;
                 }
@@ -385,8 +382,8 @@ void Character::set_texture_(float OX_angle)
             if (new_image != animation_cur_image_name_)
             {
                 load_texture_from_image_manager(new_image);
+                animation_cur_image_name_ = new_image;
             }
-            animation_cur_image_name_ = new_image;
 
             break;
         }
@@ -397,8 +394,8 @@ void Character::set_texture_(float OX_angle)
             if (new_image != animation_cur_image_name_)
             {
                 load_texture_from_image_manager(new_image);
+                animation_cur_image_name_ = new_image;
             }
-            animation_cur_image_name_ = new_image;
 
             break;
         }
@@ -409,8 +406,8 @@ void Character::set_texture_(float OX_angle)
             if (new_image != animation_cur_image_name_)
             {
                 load_texture_from_image_manager(new_image);
+                animation_cur_image_name_ = new_image;
             }
-            animation_cur_image_name_ = new_image;
 
             break;
         }
