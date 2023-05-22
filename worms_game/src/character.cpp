@@ -47,6 +47,11 @@ Character::~Character()
     delete character_ui_;
 }
 
+CharacterState Character::get_state() const
+{
+    return state_;
+}
+
 bool Character::is_alive() const
 {
     return hp_ > 0;

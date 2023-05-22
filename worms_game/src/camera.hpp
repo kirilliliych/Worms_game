@@ -19,9 +19,8 @@ public:
       : AbstractNode(parent, area),
         max_x_(max_x),
         max_y_(max_y),
-        target_x_(0),
-        target_y_(0),
         move_speed_(DEFAULT_MOVE_SPEED),
+        turn_time_(TURN_TIME),
         is_locked_(false)
     {}
     
@@ -48,20 +47,16 @@ public:
     void set_x(int x)
     {
         area_.set_left_top_x(x);
-        // target_x_ = x;
     }
 
     void set_y(int y)
     {
         area_.set_left_top_y(y);
-        // target_y_ = y;
     }
 
     void set_position(Point2d<int> position)
     {
         area_.set_left_top(position);
-        // target_x_ = position.x();
-        // target_y_ = position.y();
     }
 
     void lock()
@@ -123,10 +118,14 @@ public:
 
             case EventType::TIME_PASSED:
             {
+                turn_time_ -= Game::game->time_delta.count();
+
                 const PhysicsObject *camera_tracking = Game::game->get_camera_tracking_object();
-                if ((camera_tracking == nullptr) && Game::game->is_stable())
+                if ((camera_tracking == nullptr) && (Game::game->is_stable() || turn_time_ <= 0))
                 {
                     Game::game->set_camera_tracking_object(Game::game->get_character_under_control());
+
+                    turn_time_ = TURN_TIME;
                 }
 
                 if ((camera_tracking != nullptr) && is_locked_)
@@ -175,14 +174,15 @@ private:
 
     static constexpr float DEFAULT_MOVE_SPEED = 5000.f;
     static constexpr int DEFAULT_CAMERA_MOVE_MARGIN = 30;
-    
+
+    static constexpr float TURN_TIME = 15.f;
+
     uint32_t max_x_;
     uint32_t max_y_;
 
-    int target_x_;
-    int target_y_;
-
     float move_speed_;
+
+    float turn_time_;
 
     bool is_locked_;
 };

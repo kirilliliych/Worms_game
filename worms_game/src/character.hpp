@@ -32,6 +32,8 @@ public:
 
     ~Character();
 
+    CharacterState get_state() const;
+
     bool is_alive() const;
 
     int get_hp() const;

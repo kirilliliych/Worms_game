@@ -96,8 +96,6 @@ private:
 
     static constexpr uint32_t EVENTS_HANDLING_PER_FRAME = 1;
 
-    // static constexpr float TURN_TIME = 15.f;
-
 public:
 
     static Game *game;

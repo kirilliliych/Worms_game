@@ -103,7 +103,7 @@ public:
         assert(is_alive());
 
         const Character *result = members_[sequence_cur_character_index_];
-        while (result->get_hp() < 0)
+        while ((result->get_hp() <= 0) || (result->get_state() == CharacterState::DEAD))
         {
             ++sequence_cur_character_index_;
             sequence_cur_character_index_ %= members_quantity_;
