@@ -63,7 +63,7 @@ public:
         sequence_(members_quantity),
         sequence_cur_character_index_(0)
     {
-        Vector<int> spawn_positions_x = randomize_positions_(spawn_position_center_x,
+        vector<int> spawn_positions_x = randomize_positions_(spawn_position_center_x,
                                                                   variance);
 
         for (uint32_t member_index = 0; member_index < members_quantity; ++member_index)
@@ -172,9 +172,9 @@ public:
 
 private:
 
-    Vector<int> randomize_positions_(int spawn_position_center_x, int variance)
+    vector<int> randomize_positions_(int spawn_position_center_x, int variance)
     {
-        Vector<int> result(members_quantity_);
+        vector<int> result(members_quantity_);
         for (uint32_t i = 0; i < members_quantity_; ++i)
         {
             result[i] = std::rand() % variance - variance / 2 + spawn_position_center_x;
@@ -186,7 +186,7 @@ private:
     void form_priority_()
     {
         uint32_t left_to_generate = members_quantity_;
-        Vector<uint32_t> marks(members_quantity_);
+        vector<uint32_t> marks(members_quantity_);
         for (uint32_t i = 0; i < members_quantity_; ++i)
         {
             marks[i] = i;
@@ -206,11 +206,11 @@ private:
     static constexpr int DEFAULT_HP = 100;
 
     uint32_t members_quantity_;
-    Vector<Character *> members_;
+    vector<Character *> members_;
 
     TeamUI *team_ui_;
 
-    Vector<uint32_t> sequence_;
+    vector<uint32_t> sequence_;
     uint32_t sequence_cur_character_index_;
 };
 

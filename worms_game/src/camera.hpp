@@ -15,7 +15,7 @@ class Camera : public AbstractNode
 {
 public:
 
-    Camera(AbstractNode *parent, const Rect<int> &area, uint32_t max_x, uint32_t max_y)
+    Camera(AbstractNode *parent, const Rect<int> &&area, uint32_t max_x, uint32_t max_y)
       : AbstractNode(parent, area),
         max_x_(max_x),
         max_y_(max_y),

@@ -285,7 +285,7 @@ inline void WeaponUI::update_charging_line_texture_(float new_charge_level)
 {
     int width  = area_.width();
     int height = area_.height();
-    Vector<uint32_t> pixels(width * height, 0);
+    vector<uint32_t> pixels(width * height, 0);
     for (int cur_width = 0; cur_width < width * new_charge_level; ++cur_width)
     {
         for (int cur_height = 0; cur_height < height; ++cur_height)

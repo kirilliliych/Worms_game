@@ -117,7 +117,7 @@ private:
         uint32_t thickness = min_dim / 8 + 1;
         uint32_t texture_horizontal_line_top_edge_y = height / 2 - thickness / 2;
         uint32_t texture_vertical_line_left_edge_x  = width  / 2 - thickness / 2;
-        Vector<uint32_t> pixels(width * height, 0);
+        vector<uint32_t> pixels(width * height, 0);
         for (uint32_t cur_width = 0; cur_width < width; ++cur_width)
         {
             for (uint32_t cur_thickness = 0; cur_thickness < thickness; ++cur_thickness)

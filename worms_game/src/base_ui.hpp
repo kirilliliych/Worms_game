@@ -2,6 +2,7 @@
 
 
 #include "abstract_node.hpp"
+#include "stl.hpp"
 
 
 class BaseUI : public AbstractNode
@@ -35,7 +36,7 @@ protected:
         {
             new_width = 1;
         }
-        Vector<uint32_t> pixels(width * height, 0);
+        vector<uint32_t> pixels(width * height, 0);
         for (int cur_width = 0; cur_width < new_width; ++cur_width)
         {
             for (int cur_height = 0; cur_height < height; ++cur_height)

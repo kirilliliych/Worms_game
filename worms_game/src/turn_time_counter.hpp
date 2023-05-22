@@ -14,7 +14,7 @@ class TurnTimeCounter : public AbstractNode
 {
 public:
 
-    TurnTimeCounter(AbstractNode *parent, const Rect<int> &area, float turn_time_limit = TURN_TIME_LIMIT)
+    TurnTimeCounter(AbstractNode *parent, const Rect<int> &&area, float turn_time_limit = TURN_TIME_LIMIT)
       : AbstractNode(parent, area),
         time_counter_text_(),
         turn_time_left_(turn_time_limit),

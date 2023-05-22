@@ -1,5 +1,5 @@
-#include "my_stl/vector.hpp"
 #include "sfmlwrap/texture.hpp"
+#include "stl.hpp"
 #include "surface.hpp"
 
 
@@ -82,7 +82,7 @@ void Texture::fill_with_color(uint32_t color)
 {
     uint32_t width  = get_width();
     uint32_t height = get_height();
-    Vector<uint32_t> pixels(width * height, 0);
+    vector<uint32_t> pixels(width * height, 0);
 
     for (uint32_t cur_height = 0; cur_height < height; ++cur_height)
     {

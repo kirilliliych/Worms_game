@@ -3,8 +3,8 @@
 
 #include "ammo_traits.hpp"
 #include "maths.hpp"
-#include "my_stl/vector.hpp"
 #include "sfmlwrap/image.hpp"
+#include "stl.hpp"
 
 
 enum Weapons
@@ -17,7 +17,7 @@ class WeaponTraits
 {
 public:
 
-    WeaponTraits(const Vector<std::string> &image_file_names, float charging_speed, const AmmoTraits &a_traits)
+    WeaponTraits(const vector<std::string> &image_file_names, float charging_speed, const AmmoTraits &a_traits)
       : image_file_names_(image_file_names),
         charging_speed_(charging_speed),
         a_traits_(a_traits)
@@ -45,7 +45,7 @@ public:
 
 private:
 
-    const Vector<std::string> image_file_names_;
+    const vector<std::string> image_file_names_;
     float charging_speed_;
 
     AmmoTraits a_traits_;

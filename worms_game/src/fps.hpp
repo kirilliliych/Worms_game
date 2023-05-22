@@ -11,7 +11,7 @@ class FPSCounter : public AbstractNode
 {
 public:
 
-    FPSCounter(AbstractNode *parent, const Rect<int> &area)
+    FPSCounter(AbstractNode *parent, const Rect<int> &&area)
       : AbstractNode(parent, area),
         FPS_sum_(0),
         frames_passed_(0)

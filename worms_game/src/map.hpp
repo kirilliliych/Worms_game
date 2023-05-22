@@ -21,7 +21,7 @@
 
 namespace string_consts
 {
-    const Vector<std::string> landscape_images_names_pool{"seamless_sky.png",
+    const vector<std::string> landscape_images_names_pool{"seamless_sky.png",
                                                                "dirt1.png",
                                                                 "lava.png"};
 }
@@ -39,7 +39,7 @@ public:
 
 public:
 //---------------------------------------------------------------------------------
-    Map(AbstractNode *parent, const Rect<int> &area)
+    Map(AbstractNode *parent, Rect<int> &&area)
       : AbstractNode(parent, area),
         map_(static_cast<uint32_t> (area_.width() * area.height()), 0),
         landscape_images_(string_consts::landscape_images_names_pool.size())
@@ -69,13 +69,13 @@ public:
         uint32_t height = static_cast<uint32_t> (area_.height()); 
 
         // std::vector<float> noise_seed(width, 0);
-        Vector<float> noise_seed(width, 0);
+        vector<float> noise_seed(width, 0);
         for (uint32_t i = 1; i < width; ++i)
         {
             noise_seed[i] = static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX);
         }
         noise_seed[0] = 0.5f;   // means terrain starts and ends halfway up due to algorithm implementation
-        Vector<float> surface = PerlinNoise1D_(noise_seed, 8, 2.0f);
+        vector<float> surface = PerlinNoise1D_(noise_seed, 8, 2.0f);
         float lava_level = 0.2f;
         for (uint32_t x = 0; x < width; ++x)
         {
@@ -201,7 +201,7 @@ private:
         uint32_t width  = static_cast<uint32_t> (area_.width());
         uint32_t height = static_cast<uint32_t> (area_.height()); 
 
-        Vector<uint32_t> pixels(width * height);
+        vector<uint32_t> pixels(width * height);
 
         for (uint32_t y = 0; y < height; ++y)
         {
@@ -249,11 +249,11 @@ private:
         texture_->update(reinterpret_cast<const uint8_t *> (pixels.data()), width, height, 0, 0);
     }
 
-    Vector<float> PerlinNoise1D_(const Vector<float> &noise_seed, int octaves_quantity, float bias)
+    vector<float> PerlinNoise1D_(const vector<float> &noise_seed, int octaves_quantity, float bias)
 	{
         int size = static_cast<int> (noise_seed.size());
 
-        Vector<float> result(size);
+        vector<float> result(size);
 		for (int x = 0; x < size; x++)
 		{
 			float noise     = 0.0f;
@@ -318,9 +318,9 @@ private:
 private:
 public:
 //-----------------------------------Variables-------------------------------------
-    Vector<uint8_t> map_;
+    vector<uint8_t> map_;
 
-    Vector<const Image *> landscape_images_;
+    vector<const Image *> landscape_images_;
 };
 
 #endif
