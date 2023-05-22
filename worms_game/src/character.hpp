@@ -58,8 +58,9 @@ private:
     static constexpr float ANIMATION_IMAGE_CHANGE_MIN_DELAY = 2.f;
 
     CharacterState state_;
-    float animation_image_change_cur_delay_;
     std::string animation_cur_image_name_;
+    float animation_image_change_cur_delay_;
+    bool switch_to_passive_stance_;
 
     Crosshair *crosshair_;    
     Weapon *weapon_;

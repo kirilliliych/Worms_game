@@ -9,8 +9,9 @@
 Character::Character(AbstractNode *parent, const Rect<int> &area, int hp, uint32_t color)
   : PhysicsObject(parent, area, {0, 0}, {0, 0}, DEFAULT_FRICTION, -1),
     state_(CharacterState::PASSIVE),
-    animation_image_change_cur_delay_(std::rand() % static_cast<int> (ANIMATION_IMAGE_CHANGE_MIN_DELAY)),
     animation_cur_image_name_(""),
+    animation_image_change_cur_delay_(std::rand() % static_cast<int> (ANIMATION_IMAGE_CHANGE_MIN_DELAY)),
+    switch_to_passive_stance_(false),
     crosshair_(new Crosshair(this, {10, 10, area_.center()},
                              std::max(area.width(), area_.height()) + 30, color)),
     weapon_(new Weapon(this, area_, nullptr)),
@@ -24,8 +25,9 @@ Character::Character(AbstractNode *parent, const Rect<int> &area, int hp, const 
   : PhysicsObject(parent, area, {0, 0}, {0, 0},
                   DEFAULT_FRICTION, -1, image_file_name),
     state_(CharacterState::PASSIVE),
-    animation_image_change_cur_delay_(std::rand() % static_cast<int> (ANIMATION_IMAGE_CHANGE_MIN_DELAY)),
     animation_cur_image_name_(image_file_name),
+    animation_image_change_cur_delay_(std::rand() % static_cast<int> (ANIMATION_IMAGE_CHANGE_MIN_DELAY)),
+    switch_to_passive_stance_(false),
     crosshair_(new Crosshair(this, {10, 10, area_.center()},
                              std::max(area.width(), area_.height()) + 30, color)),
     weapon_(new Weapon(this, area_, nullptr)),
@@ -237,7 +239,22 @@ bool Character::handle_event(const Event &event)
                 {
                     state_ = CharacterState::PASSIVE;
                 }
-                animation_image_change_cur_delay_ += Game::game->time_delta.count();
+                if (state_ != CharacterState::PASSIVE)
+                {
+                    animation_image_change_cur_delay_ = ANIMATION_IMAGE_CHANGE_MIN_DELAY;
+                }
+                else
+                {
+                    if (switch_to_passive_stance_)
+                    {
+                        switch_to_passive_stance_ = false;
+                        animation_image_change_cur_delay_ = Game::game->time_delta.count();
+                    }
+                    else
+                    {
+                        animation_image_change_cur_delay_ += Game::game->time_delta.count();
+                    }
+                }
 
                 if (children_handle_event(event))
                 {
