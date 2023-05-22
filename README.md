@@ -42,5 +42,9 @@ __A strong request__:
 * Do not destruct previous functionality with additions
 
 ***
+### Special thanks
+Graphical part of the game is implemented via [SFML library](https://www.sfml-dev.org/).
+
+***
 ## Where to ask questions
 Use the mail mentioned earlier.
