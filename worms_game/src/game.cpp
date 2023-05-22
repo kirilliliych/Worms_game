@@ -1,5 +1,6 @@
 #include <chrono>
 #include <cstdlib>
+#include "ai.hpp"
 #include "camera.hpp"
 #include "character.hpp"
 #include "colors.hpp"
@@ -35,10 +36,11 @@ Game::Game(uint32_t window_width, uint32_t window_height,
     turn_timer_(new TurnTimeCounter(map_, {100, 100, {10, 120}})),
     fps_counter_(new FPSCounter(map_, {100, 100, {0, 0}})),
     teams_(TEAMS_QUANTITY),
-    active_team_index_(0),
+    active_team_index_(TEAMS_QUANTITY - 1),
+    ai_(new AI()),
     under_control_(nullptr),
     camera_tracking_(nullptr),
-    player_has_control_(true),
+    player_has_control_(false),
     player_action_finished_(false),
     is_stable_(false)
 {
@@ -59,6 +61,8 @@ Game::~Game()
     {
         delete teams_[i];
     }
+
+    delete ai_;
 }
 
 
@@ -80,7 +84,8 @@ void Game::run()
                          30,
                          40,
                          colors::RED,
-                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}});
+                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}},
+                         true);
     team_UI_start_pos_y += team_UI_y_step;
     teams_[1] = new Team(map_,
                          3,
@@ -89,7 +94,8 @@ void Game::run()
                          30,
                          40,
                          colors::GREEN,
-                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}});
+                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}},
+                         false);
     team_UI_start_pos_y += team_UI_y_step;
     teams_[2] = new Team(map_,
                          3,
@@ -98,8 +104,9 @@ void Game::run()
                          30,
                          40,
                          colors::YELLOW,
-                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}});
-    under_control_ = teams_[0]->get_next_character();
+                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}},
+                         false);
+    pass_turn_();
     set_camera_tracking_object(under_control_);
     
     clock clock{};
@@ -116,15 +123,21 @@ void Game::run()
             turn_timer_->freeze();
         }
 
-        for (uint32_t events_launched = 0; events_launched < EVENTS_HANDLING_PER_FRAME; ++events_launched)
-        {   
-            emanager_->process_external_events(main_window_);
-        }
-
         Event time_event;
         time_event.set_type(EventType::TIME_PASSED);
         time_event.dt_ = Game::time_delta;
         emanager_->handle_event(time_event);
+
+        for (uint32_t events_launched = 0; events_launched < EVENTS_HANDLING_PER_FRAME; ++events_launched)
+        {   
+            emanager_->process_external_events(main_window_);
+            
+            if (!player_has_control_)
+            {
+                ai_->act();
+            }
+        }
+
         main_window_->redraw(camera_->get_position());
         Event check_stability_event;
         check_stability_event.set_type(EventType::STABILITY_EVENT);
@@ -255,8 +268,22 @@ void Game::pass_turn_()
     set_camera_tracking_object(under_control_);
 
     enable_player_action();
-    set_player_control(true);
+    if (!teams_[active_team_index_]->is_AI_controlled())
+    {
+        set_player_control(true);
+    }
+    else
+    {
+        set_player_control(false);
+        ai_->set_controlled_team(teams_[active_team_index_]);
+    }
 
     turn_timer_->restart();
     turn_timer_->resume();
+   
+}
+
+Team *Game::get_team(uint32_t index)
+{
+    return teams_[index % TEAMS_QUANTITY];
 }

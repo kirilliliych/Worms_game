@@ -118,14 +118,14 @@ public:
 
             case EventType::TIME_PASSED:
             {
-                turn_time_ -= Game::game->time_delta.count();
+                // turn_time_ -= Game::game->time_delta.count();
 
                 const PhysicsObject *camera_tracking = Game::game->get_camera_tracking_object();
-                if ((camera_tracking == nullptr) && (Game::game->is_stable() || turn_time_ <= 0))
+                if ((camera_tracking == nullptr) && (Game::game->is_stable() /*|| turn_time_ <= 0*/))
                 {
                     Game::game->set_camera_tracking_object(Game::game->get_character_under_control());
 
-                    turn_time_ = TURN_TIME; // bug?
+                    // turn_time_ = TURN_TIME; // bug?
                 }
 
                 if ((camera_tracking != nullptr) && is_locked_)

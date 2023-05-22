@@ -28,6 +28,7 @@ class Map;
 class PhysicsObject;
 class Projectile;
 class Team;
+class AI;
 class TurnTimeCounter;
 
 class Game
@@ -81,6 +82,8 @@ public:
 
     void set_camera_tracking_object(const PhysicsObject *now_tracked_object);
 
+    Team *get_team(uint32_t index);
+
 private:
 
     void pass_turn_();
@@ -89,14 +92,12 @@ private:
     using time_point = std::chrono::time_point<clock>;
     using time_delta_t = std::chrono::duration<float, std::chrono::seconds::period>;
 
-private:
+public:
 
     static constexpr uint32_t TEAMS_QUANTITY   = 3;
     static constexpr uint32_t MEMBERS_QUANTITY = 3; 
 
     static constexpr uint32_t EVENTS_HANDLING_PER_FRAME = 1;
-
-public:
 
     static Game *game;
     static ImageManager imanager;
@@ -118,14 +119,13 @@ private:
     vector<Team *> teams_;
     uint32_t active_team_index_;
 
+    AI *ai_;
+
     const Character *under_control_;
     const PhysicsObject * camera_tracking_;
 
     bool player_has_control_;
     bool player_action_finished_;
-
-    // bool AI_has_control_;
-    // bool AI_action_finished_;
 
     bool is_stable_;
 };

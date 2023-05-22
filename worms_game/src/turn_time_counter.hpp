@@ -111,9 +111,10 @@ private:
 
     void update_text_(int new_value)
     {
-        const uint32_t MAX_TIME_COUNTER_STR_SIZE = 16;
-        char text_str[MAX_TIME_COUNTER_STR_SIZE] = {};
-        sprintf(text_str, "%d\n", new_value);
+        const uint32_t MAX_TIME_COUNTER_STR_SIZE = 32;
+        const uint32_t TIME_COUNTER_VALUE_POS = 11;
+        char text_str[MAX_TIME_COUNTER_STR_SIZE] = "Time left: 00";
+        sprintf(text_str + TIME_COUNTER_VALUE_POS, "%d\n", new_value);
 
         time_counter_text_.set_string(text_str);
     }

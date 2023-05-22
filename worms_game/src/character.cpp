@@ -67,6 +67,11 @@ void Character::set_hp(int new_hp)
     hp_ = new_hp;
 }
 
+float Character::get_shooting_angle() const
+{
+    return crosshair_->get_angle();
+}
+
 void Character::remove_weapon()
 {
     state_ = CharacterState::PASSIVE;
@@ -99,12 +104,6 @@ void Character::render_self(Surface *surface, const Point2d<int> &camera_offset)
 
 bool Character::handle_event(const Event &event)
 {
-    // if (state_ == CharacterState::DEAD)
-    // {
-    //     set_texture_(crosshair_->get_angle());
-
-    //     return false;
-    // }
 
     bool result = false;
 
@@ -112,7 +111,7 @@ bool Character::handle_event(const Event &event)
     {
         case EventType::KEY_PRESSED:
         {
-            if (Game::game->does_player_have_control() && Game::game->is_under_control(this) &&
+            if (/*Game::game->does_player_have_control() && */Game::game->is_under_control(this) &&
                 ((state_ == CharacterState::ARMED) || (state_ == CharacterState::PASSIVE)))
             {
                     switch (event.kedata_.key_code)
@@ -133,6 +132,7 @@ bool Character::handle_event(const Event &event)
 
                         case KeyboardKey::Num0:
                         {
+                            printf("WEAPON WAS REMOVED\n");
                             weapon_->set_weapon_traits(nullptr);
 
                             state_ = CharacterState::PASSIVE;
@@ -142,7 +142,7 @@ bool Character::handle_event(const Event &event)
 
                         case KeyboardKey::Num1:
                         {
-                            printf("changing weapon to rocket launcher\n");
+                            printf("WEAPON WAS CHANGED TO ROCKET LAUNCHER\n");
                             weapon_->set_weapon_traits(&traits::weapon_traits_pool[Weapons::ROCKET_LAUNCHER]);
 
                             state_ = CharacterState::ARMED;

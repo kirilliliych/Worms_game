@@ -40,6 +40,8 @@ public:
 
     void set_hp(int new_hp);
 
+    float get_shooting_angle() const;
+
     void remove_weapon();
 
     void on_bounce_death(const Point2d<int> &death_position) override;

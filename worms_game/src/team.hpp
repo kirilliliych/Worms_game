@@ -22,25 +22,8 @@ class TeamUI : public BaseUI
 public:
 
     TeamUI(AbstractNode *parent, const Rect<int> &area, int max_value, uint32_t color);
-    //   : BaseUI(parent, area, max_value, color),
-    //     team_parent_(dynamic_cast<const Team *> (parent))
-    // {
-    //     assert(team_parent_ != nullptr);
-    // }
 
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override;
-    // {
-    //     assert(surface != nullptr);
-
-    //     int value = team_parent_->get_hp();
-    //     if (value > 0)
-    //     {
-    //         update_value_texture_(value);
-    //         prev_value_ = value;
-
-    //         AbstractNode::render_self(surface, camera_offset);
-    //     }
-    // }
 
     bool handle_event(const Event &event) override;
 
@@ -52,16 +35,19 @@ private:
 
 class Team : public AbstractNode
 {
+    friend class AI;
+    
 public:
 
     Team(AbstractNode *parent, uint32_t members_quantity, int spawn_position_center_x, int variance,
-         uint32_t character_pixel_width, uint32_t character_pixel_height, uint32_t color, const Rect<int> &team_hp_area)
+         uint32_t character_pixel_width, uint32_t character_pixel_height, uint32_t color, const Rect<int> &team_hp_area, bool AI_controlled)
       : AbstractNode(parent, team_hp_area),
         members_quantity_(members_quantity),
         members_(members_quantity),
         team_ui_(new TeamUI(this, team_hp_area, members_quantity * DEFAULT_HP, color)),
         sequence_(members_quantity),
-        sequence_cur_character_index_(0)
+        sequence_cur_character_index_(members_quantity - 1),
+        AI_controlled_(AI_controlled)
     {
         vector<int> spawn_positions_x = randomize_positions_(spawn_position_center_x,
                                                                   variance);
@@ -86,22 +72,48 @@ public:
 
     ~Team()
     {
-        // auto members_iterator = members_.cbegin();
-        // auto members_end = members_.cend();
-        // while (members_iterator != members_end)
-        // {
-        //     delete *members_iterator;
+        auto members_iterator = members_.cbegin();
+        auto members_end = members_.cend();
+        while (members_iterator != members_end)
+        {
+            delete *members_iterator;
 
-        //     ++members_iterator;
-        // }
+            ++members_iterator;
+        }
 
         delete team_ui_;
+    }
+
+    bool is_AI_controlled() const
+    {
+        return AI_controlled_;
+    }
+
+    Character *get_healthiest_character()
+    {
+        Character *result = members_[0];
+        for (uint32_t member_index = 1; member_index < members_quantity_; ++member_index)
+        {
+            if (result->get_hp() < members_[member_index]->get_hp())
+            {
+                result = members_[member_index];
+            }
+        }
+
+        return result;
+    }
+
+    Character *get_cur_character()
+    {
+        return members_[sequence_cur_character_index_];
     }
 
     const Character *get_next_character()
     {
         assert(is_alive());
 
+        ++sequence_cur_character_index_;
+        sequence_cur_character_index_ %= members_quantity_;
         const Character *result = members_[sequence_cur_character_index_];
         while ((result->get_hp() <= 0) || (result->get_state() == CharacterState::DEAD))
         {
@@ -110,8 +122,7 @@ public:
 
             result = members_[sequence_cur_character_index_];
         }
-        ++sequence_cur_character_index_;
-        sequence_cur_character_index_ %= members_quantity_;
+        
 
         return result;
     }
@@ -212,6 +223,8 @@ private:
 
     vector<uint32_t> sequence_;
     uint32_t sequence_cur_character_index_;
+
+    bool AI_controlled_;
 };
 
 
