@@ -125,7 +125,7 @@ public:
                 {
                     Game::game->set_camera_tracking_object(Game::game->get_character_under_control());
 
-                    turn_time_ = TURN_TIME;
+                    turn_time_ = TURN_TIME; // bug?
                 }
 
                 if ((camera_tracking != nullptr) && is_locked_)

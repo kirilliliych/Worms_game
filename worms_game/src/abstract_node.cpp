@@ -13,7 +13,8 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area)
 {
     if (parent != nullptr)
     {
-        parent->children_.push_back(std::unique_ptr<AbstractNode> (this));
+        // parent->children_.push_back(std::unique_ptr<AbstractNode> (this));
+        parent->children_.push_back(this);
     }
 
     uint32_t width  = static_cast<uint32_t> (area.width());
@@ -35,7 +36,8 @@ AbstractNode::AbstractNode(AbstractNode *parent, const Rect<int> &area, const st
 {
     if (parent != nullptr)
     {
-        parent->children_.push_back(std::unique_ptr<AbstractNode> (this));
+        // parent->children_.push_back(std::unique_ptr<AbstractNode> (this));
+        parent->children_.push_back(this);
     }
 
     load_texture_from_image_manager(image_file_name);
@@ -105,7 +107,8 @@ void AbstractNode::add_child(AbstractNode *child)
 {
     assert(child != nullptr);
 
-    children_.push_back(std::unique_ptr<AbstractNode> (child));
+    // children_.push_back(std::unique_ptr<AbstractNode> (child));
+    children_.push_back(child);
     child->parent_ = this;
 }
 

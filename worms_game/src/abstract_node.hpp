@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <memory>
+#include "my_stl/vector.hpp"
 #include "point2d.hpp"
 #include "sfmlwrap/surface.hpp"
 #include "sfmlwrap/texture.hpp"
@@ -47,7 +48,7 @@ protected:
     bool load_texture_from_image_manager(const std::string &image_file_name);
 
     AbstractNode *parent_;
-    std::vector<std::unique_ptr<AbstractNode>> children_;
+    Vector<AbstractNode *> children_;
 
     Rect<int> area_;
 

@@ -15,12 +15,13 @@
 #include "sfmlwrap/image.hpp"
 #include "sfmlwrap/rect.hpp"
 #include "sfmlwrap/texture.hpp"
+#include "my_stl/vector.hpp"
 #include "weapon_traits.hpp"
 
 
 namespace string_consts
 {
-    const std::vector<std::string> landscape_images_names_pool{"seamless_sky.png",
+    const Vector<std::string> landscape_images_names_pool{"seamless_sky.png",
                                                                "dirt1.png",
                                                                 "lava.png"};
 }
@@ -67,14 +68,14 @@ public:
         uint32_t width  = static_cast<uint32_t> (area_.width());
         uint32_t height = static_cast<uint32_t> (area_.height()); 
 
-        std::vector<float> noise_seed(width, 0);
+        // std::vector<float> noise_seed(width, 0);
+        Vector<float> noise_seed(width, 0);
         for (uint32_t i = 1; i < width; ++i)
         {
             noise_seed[i] = static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX);
         }
         noise_seed[0] = 0.5f;   // means terrain starts and ends halfway up due to algorithm implementation
-
-        std::vector<float> surface = PerlinNoise1D_(noise_seed, 8, 2.0f);
+        Vector<float> surface = PerlinNoise1D_(noise_seed, 8, 2.0f);
         float lava_level = 0.2f;
         for (uint32_t x = 0; x < width; ++x)
         {
@@ -150,10 +151,26 @@ public:
 
             case EventType::TIME_PASSED:
             {
-                children_.erase(std::remove_if(children_.begin(),
-                                                     children_.end(),
-                                                     [&](const std::unique_ptr<AbstractNode> &object) {return !object->does_exist();}),
-                                children_.cend());
+                int child_index = 0;
+                int children_size = static_cast<int> (children_.size());
+    
+                while (child_index < children_size)
+                {
+                    if (!children_[child_index]->does_exist())
+                    {
+                        children_.erase(children_.cbegin() + child_index);
+
+                        --child_index;
+                        --children_size;
+                    }
+
+                    ++child_index;
+                }
+
+                // children_.erase(std::remove_if(children_.begin(),
+                                                    //  children_.end(),
+                                                    //  [&](const std::unique_ptr<AbstractNode> &object) {return !object->does_exist();}),
+                                // children_.cend());
 
                 if (children_handle_event(event))
                 {
@@ -184,7 +201,7 @@ private:
         uint32_t width  = static_cast<uint32_t> (area_.width());
         uint32_t height = static_cast<uint32_t> (area_.height()); 
 
-        std::vector<uint32_t> pixels(width * height);
+        Vector<uint32_t> pixels(width * height);
 
         for (uint32_t y = 0; y < height; ++y)
         {
@@ -232,11 +249,11 @@ private:
         texture_->update(reinterpret_cast<const uint8_t *> (pixels.data()), width, height, 0, 0);
     }
 
-    std::vector<float> PerlinNoise1D_(const std::vector<float> &noise_seed, int octaves_quantity, float bias)
+    Vector<float> PerlinNoise1D_(const Vector<float> &noise_seed, int octaves_quantity, float bias)
 	{
         int size = static_cast<int> (noise_seed.size());
 
-        std::vector<float> result(size);
+        Vector<float> result(size);
 		for (int x = 0; x < size; x++)
 		{
 			float noise     = 0.0f;
@@ -301,9 +318,9 @@ private:
 private:
 public:
 //-----------------------------------Variables-------------------------------------
-    std::vector<uint8_t> map_;
+    Vector<uint8_t> map_;
 
-    std::vector<const Image *> landscape_images_;
+    Vector<const Image *> landscape_images_;
 };
 
 #endif
