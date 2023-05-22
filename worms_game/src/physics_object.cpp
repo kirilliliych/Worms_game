@@ -78,7 +78,7 @@ void PhysicsObject::handle_physics()
         above_semicircle_flat_part = false;
     }
 
-    std::vector<bool> is_corner_in_correct_halfplane(4, false);
+    Vector<bool> is_corner_in_correct_halfplane(4, false);
 
     if (point_is_in_correct_semicircle_zone_(semicircle_flat_part_k_coef,
                                              above_semicircle_flat_part,

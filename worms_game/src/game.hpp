@@ -115,7 +115,7 @@ private:
     TurnTimeCounter *turn_timer_;
     FPSCounter *fps_counter_;
 
-    std::vector<Team *> teams_;
+    Vector<Team *> teams_;
     uint32_t active_team_index_;
 
     const Character *under_control_;
