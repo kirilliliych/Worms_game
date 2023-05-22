@@ -1,5 +1,4 @@
-#ifndef TEXTURE_HPP
-#define TEXTURE_HPP
+#pragma once
 
 #include <SFML/Graphics/Texture.hpp>
 #include "rect.hpp"
@@ -64,9 +63,6 @@ public:
     void fill_with_color(uint32_t color);
 
 private:
-public:
+
     Texture_ *texture_;
 };
-
-
-#endif

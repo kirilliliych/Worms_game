@@ -1,4 +1,5 @@
 #include "sfmlwrap/texture.hpp"
+#include "stl.hpp"
 #include "surface.hpp"
 
 
@@ -36,13 +37,12 @@ bool Texture::load_from_image(const Image &image, const Rect<int> &area)
 Image Texture::copy_to_image() const
 {
     sf::Image texture_image = texture_->copyToImage();
-    printf("texture: copied image size: %u %u\n", texture_image.getSize().x, texture_image.getSize().y);
+    // printf("texture: copied image size: %u %u\n", texture_image.getSize().x, texture_image.getSize().y);
 
     Image result;
-    // result.create(150, 200); // changes here
     result.create(texture_->getSize().x, texture_->getSize().y);
     result.image_->copy(texture_image, 0, 0);
-    printf("texture: result image size: %u %u\n", result.get_width(), result.get_height());
+    // printf("texture: result image size: %u %u\n", result.get_width(), result.get_height());
     
     return result;
 }
@@ -82,7 +82,7 @@ void Texture::fill_with_color(uint32_t color)
 {
     uint32_t width  = get_width();
     uint32_t height = get_height();
-    std::vector<uint32_t> pixels(width * height, 0);
+    vector<uint32_t> pixels(width * height, 0);
 
     for (uint32_t cur_height = 0; cur_height < height; ++cur_height)
     {

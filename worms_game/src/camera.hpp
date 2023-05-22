@@ -2,6 +2,7 @@
 
 
 #include "abstract_node.hpp"
+#include "character.hpp"
 #include "game.hpp"
 #include "physics_object.hpp"
 #include "sfmlwrap/events/mouse_events.hpp"
@@ -14,11 +15,12 @@ class Camera : public AbstractNode
 {
 public:
 
-    Camera(AbstractNode *parent, const Rect<int> &area, uint32_t max_x, uint32_t max_y)
+    Camera(AbstractNode *parent, const Rect<int> &&area, uint32_t max_x, uint32_t max_y)
       : AbstractNode(parent, area),
         max_x_(max_x),
         max_y_(max_y),
         move_speed_(DEFAULT_MOVE_SPEED),
+        turn_time_(TURN_TIME),
         is_locked_(false)
     {}
     
@@ -88,22 +90,22 @@ public:
                 if (event.mmedata_.position.x() - area_.left_top().x() < DEFAULT_CAMERA_MOVE_MARGIN)
                 {
                     is_locked_ = false;
-                    area_.set_left_top_x(static_cast<float> (area_.left_top().x()) - move_speed_ * Game::time_delta.count());
+                    area_.set_left_top_x(static_cast<float> (area_.left_top().x()) - move_speed_ * Game::game->time_delta.count());
                 }
-                if (event.mmedata_.position.x() - area_.left_top().x() > area_.get_width() - DEFAULT_CAMERA_MOVE_MARGIN)
+                if (event.mmedata_.position.x() - area_.left_top().x() > area_.width() - DEFAULT_CAMERA_MOVE_MARGIN)
                 {
                     is_locked_ = false;
-                    area_.set_left_top_x(static_cast<float> (area_.left_top().x()) + move_speed_ * Game::time_delta.count());
+                    area_.set_left_top_x(static_cast<float> (area_.left_top().x()) + move_speed_ * Game::game->time_delta.count());
                 }
                 if (event.mmedata_.position.y() - area_.left_top().y() < DEFAULT_CAMERA_MOVE_MARGIN)
                 {
                     is_locked_ = false;
-                    area_.set_left_top_y(static_cast<float> (area_.left_top().y()) - move_speed_ * Game::time_delta.count());
+                    area_.set_left_top_y(static_cast<float> (area_.left_top().y()) - move_speed_ * Game::game->time_delta.count());
                 }
-                if (event.mmedata_.position.y() - area_.left_top().y() > area_.get_height() - DEFAULT_CAMERA_MOVE_MARGIN)
+                if (event.mmedata_.position.y() - area_.left_top().y() > area_.height() - DEFAULT_CAMERA_MOVE_MARGIN)
                 {
                     is_locked_ = false;
-                    area_.set_left_top_y(static_cast<float> (area_.left_top().y()) + move_speed_ * Game::time_delta.count());
+                    area_.set_left_top_y(static_cast<float> (area_.left_top().y()) + move_speed_ * Game::game->time_delta.count());
                 }
 
                 if (children_handle_event(event))
@@ -113,14 +115,24 @@ public:
 
                 break;
             }
+
             case EventType::TIME_PASSED:
             {
+                // turn_time_ -= Game::game->time_delta.count();
+
                 const PhysicsObject *camera_tracking = Game::game->get_camera_tracking_object();
+                if ((camera_tracking == nullptr) && (Game::game->is_stable() /*|| turn_time_ <= 0*/))
+                {
+                    Game::game->set_camera_tracking_object(Game::game->get_character_under_control());
+
+                    // turn_time_ = TURN_TIME; // bug?
+                }
+
                 if ((camera_tracking != nullptr) && is_locked_)
                 {
                     set_position(camera_tracking->get_area().left_top() - area_.half_size());
                 }
-                
+
                 if (area_.left_top().x() < 0)
                 {
                     area_.set_left_top_x(0);
@@ -162,11 +174,15 @@ private:
 
     static constexpr float DEFAULT_MOVE_SPEED = 5000.f;
     static constexpr int DEFAULT_CAMERA_MOVE_MARGIN = 30;
-    
+
+    static constexpr float TURN_TIME = 15.f;
+
     uint32_t max_x_;
     uint32_t max_y_;
 
     float move_speed_;
+
+    float turn_time_;
 
     bool is_locked_;
 };

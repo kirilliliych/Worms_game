@@ -2,12 +2,14 @@
 
 
 #include "abstract_node.hpp"
+#include "character.hpp"
+#include "colors.hpp"
 #include "game.hpp"
 #include "map.hpp"
+#include "maths.hpp"
 #include "projectile.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "weapon_traits.hpp"
-#include "weapon_ui.hpp"
 
 
 class Weapon;
@@ -40,13 +42,13 @@ public:
 
     Weapon(AbstractNode *parent, const Rect<int> &area, const WeaponTraits *w_traits) // w_traits == nullptr means character does not hold a weapon
       : AbstractNode(parent, area),
-        OX_angle_(-3.14159f / 2),
+        OX_angle_(-math_consts::HALF_PI),
         projectile_spawn_position_(area_.center()),
         w_traits_(w_traits),
         charge_level_(0),
         is_charging_(false),
         fires_(false),
-        weapon_ui_(new WeaponUI(this, {area.get_width(), 5, {area.get_left_x(), area.get_bottom_y() + 10}}))
+        weapon_ui_(new WeaponUI(this, {area.width(), 5, {area.left_x(), area.bottom_y() + 10}}))
     {
         calculate_scale();
     }
@@ -76,7 +78,7 @@ public:
         OX_angle_ = OX_angle;
     }
 
-    void set_weapon_traits(const WeaponTraits *weapon_traits)
+    void set_weapon_traits(WeaponTraits *weapon_traits)
     {
         w_traits_ = weapon_traits;
     }
@@ -163,9 +165,19 @@ public:
 
                         if (fires_)
                         {
-                            Game::game->add_to_map_children(new Projectile(nullptr, projectile_spawn_position_,
+                            Game::game->finish_player_action();
+                            Game::game->set_player_control(false);
+                            Character *character_parent = dynamic_cast<Character *> (parent_);
+                            if ((character_parent != nullptr) && (Game::game->get_character_under_control() == character_parent))
+                            {
+                                character_parent->remove_weapon();
+                            }
+
+                            Projectile *spawned_projectile = new Projectile(nullptr, projectile_spawn_position_,
                                                                            OX_angle_, charge_level_,
-                                                                           w_traits_->get_ammo_traits()));
+                                                                           w_traits_->get_ammo_traits());
+                            Game::game->add_to_map_children(spawned_projectile);
+                            Game::game->set_camera_tracking_object(spawned_projectile);
 
                             is_charging_ = false;
                             charge_level_ = 0;
@@ -174,7 +186,6 @@ public:
                             w_traits_ = nullptr;
                         }
                     }
-
                     area_.set_left_top(parent_->get_area().left_top());
 
                     if (children_handle_event(event))
@@ -185,13 +196,14 @@ public:
                     break;
                 }
 
-
                 default:
                 {
                     if (children_handle_event(event))
                     {
                         result = true;
                     }
+
+                    break;
                 }
             }
         }
@@ -271,14 +283,14 @@ inline bool WeaponUI::handle_event(const Event &event)
 
 inline void WeaponUI::update_charging_line_texture_(float new_charge_level)
 {
-    int width  = area_.get_width();
-    int height = area_.get_height();
-    std::vector<uint32_t> pixels(width * height, 0);
+    int width  = area_.width();
+    int height = area_.height();
+    vector<uint32_t> pixels(width * height, 0);
     for (int cur_width = 0; cur_width < width * new_charge_level; ++cur_width)
     {
         for (int cur_height = 0; cur_height < height; ++cur_height)
         {
-            pixels[cur_height * width + cur_width] = 0xffffffff;
+            pixels[cur_height * width + cur_width] = colors::WHITE;
         }
     }
 

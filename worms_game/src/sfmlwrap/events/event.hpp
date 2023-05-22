@@ -2,6 +2,7 @@
 
 
 #include <chrono>
+#include "abstract_node.hpp"
 #include "physics_entity.hpp"
 #include "point2d.hpp"
 
@@ -20,6 +21,7 @@ enum class EventType
     QUIT_EVENT,
     EXPLOSION_EVENT,
     COLLISION_EVENT,
+    STABILITY_EVENT,
     OTHER_EVENT,
     EVENT_TYPE_CNT
 };
@@ -166,7 +168,7 @@ struct MouseWheelEventData
 
 struct CollisionEventData
 {
-    const void *checker_address;
+    AbstractNode *checker_address;
     PhysicsEntity checker;
     Point2d<int> position;
 };
@@ -174,6 +176,8 @@ struct CollisionEventData
 struct ExplosionEventData
 {
     float radius;
+    float full_damage_radius;
+    int damage;
     Point2d<int> position;
 };
 

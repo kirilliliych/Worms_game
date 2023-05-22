@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include "colors.hpp"
 #include "rect.hpp"
 #include "utilities.hpp"
 
@@ -38,7 +39,7 @@ public:
         return image_->loadFromFile(file_name);
     }
 
-    void create(uint32_t width, uint32_t height, uint32_t color = 0x000000ff)
+    void create(uint32_t width, uint32_t height, uint32_t color = colors::BLACK)
     {
         image_->create(width, height, sf::Color(color));
     }

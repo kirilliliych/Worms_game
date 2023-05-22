@@ -62,29 +62,13 @@ public:
                 {
                     result = true;
                 }
+
+                break;
             }
         }
 
         return result;
     }
-
-    // void process_events()
-    // {
-    //     Event event;
-    //     while (poll_event(&event))
-    //     {
-    //         // if ((event.get_type() == EventType::MOUSE_BUTTON_PRESSED)  ||
-    //         //     (event.get_type() == EventType::MOUSE_BUTTON_RELEASED))
-    //         // {
-    //         //     event.mbedata_.position += camera_->get_position();
-    //         // }
-    //         // if (event.get_type() == EventType::MOUSE_MOVED)
-    //         // {
-    //         //     event.mmedata_.position += camera_->get_position();
-    //         // }
-    //         handle_event(event);
-    //     }
-    // }
 
 private:
 

@@ -5,6 +5,7 @@
 #include <cstdint>
 #include "abstract_node.hpp"
 #include "game.hpp"
+#include "maths.hpp"
 #include "sfmlwrap/events/event.hpp"
 
 
@@ -12,12 +13,12 @@ class Crosshair : public AbstractNode
 {
 public:
 
-    Crosshair(AbstractNode *parent, const Rect<int> &area, int spin_radius)
+    Crosshair(AbstractNode *parent, const Rect<int> &area, int spin_radius, uint32_t color)
       : AbstractNode(parent, area),
-        OX_angle_(-3.14359f),
+        OX_angle_(-math_consts::PI),
         spin_radius_(spin_radius)
     {
-        form_crosshair_texture_(0xff0000ff);
+        form_crosshair_texture_(color);
     }
 
     float get_angle() const
@@ -27,7 +28,7 @@ public:
 
     bool is_right_semicircle() const
     {
-        return (-3.14159f / 2 <= OX_angle_) && (OX_angle_ <= 3.14159f / 2);
+        return (-math_consts::HALF_PI <= OX_angle_) && (OX_angle_ <= math_consts::HALF_PI);
     }
 
     void render_self(Surface *surface, const Point2d<int> &camera_offset) override
@@ -55,9 +56,9 @@ public:
                         if (Game::game->is_under_control(parent_))
                         {
                             OX_angle_ -= 15.f * Game::game->time_delta.count();
-                            if (OX_angle_ < -3.14159f)
+                            if (OX_angle_ < -math_consts::PI)
                             {
-                                OX_angle_ += 3.14159f * 2;
+                                OX_angle_ += math_consts::PI * 2;
                             }
                         }
 
@@ -69,9 +70,9 @@ public:
                         if (Game::game->is_under_control(parent_))
                         {
                             OX_angle_ += 15.f * Game::game->time_delta.count();
-                            if (OX_angle_ > 3.14159f)
+                            if (OX_angle_ > math_consts::PI)
                             {
-                                OX_angle_ -= 3.14159f * 2;
+                                OX_angle_ -= math_consts::PI * 2;
                             }
                         }
 
@@ -116,7 +117,7 @@ private:
         uint32_t thickness = min_dim / 8 + 1;
         uint32_t texture_horizontal_line_top_edge_y = height / 2 - thickness / 2;
         uint32_t texture_vertical_line_left_edge_x  = width  / 2 - thickness / 2;
-        std::vector<uint32_t> pixels(width * height, 0);
+        vector<uint32_t> pixels(width * height, 0);
         for (uint32_t cur_width = 0; cur_width < width; ++cur_width)
         {
             for (uint32_t cur_thickness = 0; cur_thickness < thickness; ++cur_thickness)

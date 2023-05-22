@@ -1,9 +1,12 @@
 #include <chrono>
 #include <cstdlib>
+#include "ai.hpp"
 #include "camera.hpp"
 #include "character.hpp"
+#include "colors.hpp"
 #include "desktop.hpp"
 #include "event_manager.hpp"
+#include "fps.hpp"
 #include "game.hpp"
 #include "image_manager.hpp"
 #include "map.hpp"
@@ -12,21 +15,16 @@
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/events/time_event.hpp"
 #include "team.hpp"
+#include "turn_time_counter.hpp"
 
 
 Game *Game::game = nullptr;
-
-
 ImageManager Game::imanager{};
-Game::time_point Game::prev_time_point{};
-Game::time_delta_t Game::time_delta{};
-
 
 Game::Game(uint32_t window_width, uint32_t window_height,
            uint32_t map_width,    uint32_t map_height,
            const std::string &title)
-  : state_(GameState::UNINITIALIZED),
-    main_window_(new Desktop(window_width, window_height, title)),
+  : main_window_(new Desktop(window_width, window_height, title)),
     map_(new Map(main_window_, {static_cast<int> (map_width),
                                             static_cast<int> (map_height),
                                                     {0, 0}})),
@@ -35,8 +33,16 @@ Game::Game(uint32_t window_width, uint32_t window_height,
                        map_width  - window_width,
                        map_height - window_height)),
     emanager_(new EventManager(main_window_)),
+    turn_timer_(new TurnTimeCounter(map_, {100, 100, {10, 120}})),
+    fps_counter_(new FPSCounter(map_, {100, 100, {0, 0}})),
+    teams_(TEAMS_QUANTITY),
+    active_team_index_(TEAMS_QUANTITY - 1),
+    ai_(new AI()),
     under_control_(nullptr),
-    camera_tracking_(nullptr)
+    camera_tracking_(nullptr),
+    player_has_control_(false),
+    player_action_finished_(false),
+    is_stable_(false)
 {
     assert(game == nullptr);    // singleton
     game = this;
@@ -48,23 +54,60 @@ Game::~Game()
     delete map_;
     delete camera_;
     delete emanager_;
+    delete turn_timer_;
+    delete fps_counter_;
 
-    delete team_;
+    for (uint32_t i = 0; i < TEAMS_QUANTITY; ++i)
+    {
+        delete teams_[i];
+    }
+
+    delete ai_;
 }
 
 
 void Game::run()
 {
-    // state_ = GameState::CHOOSING_MODE;
-
-    // state_ = GameState::GENERATING_TERRAIN;
+// creating map
     map_->create_map();
+    
+// init teams
+    int window_width = static_cast<int> (get_window_width());
 
-    // state_ = GameState::GENERATING_UNITS;
-    team_ = new Team(map_, 3, 700, 300, 30, 40);
-    under_control_ = team_->get_next_character();
-    camera_tracking_ = under_control_;
-    // state_ = GameState::READY;
+    int team_UI_start_pos_x = 50;
+    int team_UI_start_pos_y = 50;
+    int team_UI_y_step = 25;
+    teams_[0] = new Team(map_,
+                         3,
+                         300,
+                         200,
+                         30,
+                         40,
+                         colors::RED,
+                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}},
+                         true);
+    team_UI_start_pos_y += team_UI_y_step;
+    teams_[1] = new Team(map_,
+                         3,
+                         700,
+                         200,
+                         30,
+                         40,
+                         colors::GREEN,
+                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}},
+                         false);
+    team_UI_start_pos_y += team_UI_y_step;
+    teams_[2] = new Team(map_,
+                         3,
+                         1300,
+                         200,
+                         30,
+                         40,
+                         colors::YELLOW,
+                         {static_cast<int> (window_width * 0.9f), 10, {team_UI_start_pos_x, team_UI_start_pos_y}},
+                         false);
+    pass_turn_();
+    set_camera_tracking_object(under_control_);
     
     clock clock{};
     prev_time_point = clock.now();
@@ -75,18 +118,34 @@ void Game::run()
         time_point cur_time_point = clock.now();
         Game::time_delta = cur_time_point - prev_time_point;
         prev_time_point = cur_time_point;
-
-        // main_window_->process_events();
-        for (int i = 0; i < 2000; ++i)
-        emanager_->process_external_events(main_window_);
+        if (player_action_finished_)
+        {
+            turn_timer_->freeze();
+        }
 
         Event time_event;
         time_event.set_type(EventType::TIME_PASSED);
         time_event.dt_ = Game::time_delta;
-        // main_window_->handle_event(time_event);
         emanager_->handle_event(time_event);
 
+        for (uint32_t events_launched = 0; events_launched < EVENTS_HANDLING_PER_FRAME; ++events_launched)
+        {   
+            emanager_->process_external_events(main_window_);
+            
+            if (!player_has_control_)
+            {
+                ai_->act();
+            }
+        }
+
         main_window_->redraw(camera_->get_position());
+        Event check_stability_event;
+        check_stability_event.set_type(EventType::STABILITY_EVENT);
+        is_stable_ = !emanager_->handle_event(check_stability_event);
+        if (is_stable_ && (player_action_finished_ || turn_timer_->expired()))
+        {
+            pass_turn_();
+        }
     }
 }
 
@@ -97,28 +156,6 @@ void Game::add_to_map_children(AbstractNode *object)
     map_->add_child(object);
 }
 
-// bool Game::check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const
-// {
-//     assert(checker_address != nullptr);
-
-//     Event collision_event;
-//     collision_event.set_type(EventType::COLLISION_EVENT);
-//     collision_event.cedata_.checker  = checker;
-//     collision_event.cedata_.position = collision_point;
-    
-//     return main_window_->handle_event(collision_event);
-// }
-
-// void Game::process_explosion(float radius, const Point2d<int> &position)
-// {
-//     Event explosion_event;
-//     explosion_event.set_type(EventType::EXPLOSION_EVENT);
-//     explosion_event.eedata_.radius   = radius;
-//     explosion_event.eedata_.position = position;
-
-//     main_window_->handle_event(explosion_event); 
-// }
-
 bool Game::launch_event(const Event &event)
 {
     return emanager_->handle_event(event);
@@ -127,6 +164,31 @@ bool Game::launch_event(const Event &event)
 bool Game::is_under_control(const AbstractNode *object) const
 {
     return under_control_ == object;
+}
+
+bool Game::player_action_finished() const
+{
+    return player_action_finished_;
+}
+
+void Game::finish_player_action()
+{
+    player_action_finished_ = true;
+}
+
+void Game::enable_player_action()
+{
+    player_action_finished_ = false;
+}
+
+bool Game::does_player_have_control() const
+{
+    return player_has_control_;
+}
+
+void Game::set_player_control(bool whether_has_control)
+{
+    player_has_control_ = whether_has_control;
 }
 
 const Character *Game::get_character_under_control() const
@@ -164,7 +226,64 @@ Point2d<int> Game::get_camera_position() const
     return camera_->get_position();
 }
 
+bool Game::is_stable() const
+{
+    return is_stable_;
+}
+
 void Game::lock_camera() const
 {
     camera_->lock();
+}
+
+void Game::set_character_under_control(const Character *now_under_control)
+{
+    under_control_ = now_under_control;
+}
+
+void Game::set_camera_tracking_object(const PhysicsObject *now_tracked_object)
+{
+    camera_tracking_ = now_tracked_object;
+    camera_->lock();
+}
+
+void Game::pass_turn_()
+{   
+    uint32_t prev_active_team_index = active_team_index_;
+
+    ++active_team_index_;
+    active_team_index_ %= TEAMS_QUANTITY;
+
+    while (!teams_[active_team_index_]->is_alive())
+    {
+        ++active_team_index_;
+        active_team_index_ %= TEAMS_QUANTITY;
+    }
+    if (active_team_index_ == prev_active_team_index)
+    {
+        // game over
+    }
+
+    under_control_ = teams_[active_team_index_]->get_next_character();
+    set_camera_tracking_object(under_control_);
+
+    enable_player_action();
+    if (!teams_[active_team_index_]->is_AI_controlled())
+    {
+        set_player_control(true);
+    }
+    else
+    {
+        set_player_control(false);
+        ai_->set_controlled_team(teams_[active_team_index_]);
+    }
+
+    turn_timer_->restart();
+    turn_timer_->resume();
+   
+}
+
+Team *Game::get_team(uint32_t index)
+{
+    return teams_[index % TEAMS_QUANTITY];
 }

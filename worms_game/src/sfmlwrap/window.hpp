@@ -72,12 +72,12 @@ public:
 
     uint32_t get_width() const
     {
-        return window_->getSize().x;
+        return width_;
     }
 
     uint32_t get_height() const
     {
-        return window_->getSize().y;
+        return height_;
     }
 
     bool poll_event(Event *event) const
@@ -93,8 +93,6 @@ public:
                     event->kedata_ = *reinterpret_cast<KeyEventData *> (&sf_event.key);
 
                     break;
-                    // printf("sfml polling events: key_pressed\n");
-                    // return KeyPressedEvent(*(reinterpret_cast<KeyboardKey *> (&sf_event.key)));
                 }
 
                 case sf::Event::KeyReleased:
@@ -103,8 +101,6 @@ public:
                     event->kedata_ = *reinterpret_cast<KeyEventData *> (&sf_event.key);
 
                     break;
-                    // printf("sfml polling events: key_released\n");
-                    // return KeyReleasedEvent(*(reinterpret_cast<KeyboardKey *> (&sf_event.key)));
                 }
 
                 case sf::Event::Closed:
@@ -112,8 +108,6 @@ public:
                     event->set_type(EventType::QUIT_EVENT);
 
                     break;
-                    // printf("sfml polling events: quit_event\n");
-                    // return QuitEvent();
                 }
 
                 case sf::Event::MouseButtonPressed:
@@ -125,9 +119,6 @@ public:
                                                };
 
                     break;
-                    // printf("sfml polling events: mouse_button_pressed\n");
-                    // return MouseClickedEvent(recognize_mouse_button_(sf_event), {sf_event.mouseButton.x,
-                                                                                //   sf_event.mouseButton.y});
                 }
 
                 case sf::Event::MouseButtonReleased:
@@ -139,9 +130,6 @@ public:
                                                };
 
                     break;
-                    // printf("sfml polling events: mouse_button_released\n");
-                    // return MouseReleasedEvent(recognize_mouse_button_(sf_event), {sf_event.mouseButton.x,
-                                                                                        //  sf_event.mouseButton.y});
                 }
 
                 case sf::Event::MouseMoved:
@@ -152,9 +140,6 @@ public:
                                                };
 
                     break;
-                    // printf("sfml polling events: mouse_moved\n");
-                    // return MouseMovedEvent({sf_event.mouseMove.x,
-                                            //  sf_event.mouseMove.y});
                 }
 
                 default:
@@ -162,7 +147,6 @@ public:
                     event->set_type(EventType::OTHER_EVENT);
 
                     return false;
-                    // return OtherEvent();
                 }
             }
 

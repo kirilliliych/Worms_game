@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include "../point2d.hpp"
 #include "sprite.hpp"
+#include "text.hpp"
 #include "texture.hpp"
 
 
@@ -36,10 +37,16 @@ public:
         return *surface_texture_;
     }
 
-    void draw_sprite(const Sprite &sprite, const Point2d<int> &offset = Point2d<int>())
+    void draw_sprite(const Sprite &sprite)
     {
         surface_->draw(*sprite.sprite_);
 
+        update();
+    }
+
+    void draw_text(const Text &text)
+    {
+        surface_->draw(*text.text_);
         update();
     }
 
@@ -56,7 +63,6 @@ public:
 
 private:
 public:
-
     Surface_ *surface_;
     Texture *surface_texture_;
 };

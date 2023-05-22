@@ -40,7 +40,7 @@
 //         OX_angle_ = OX_angle;
 //     }
 
-//     void Weapon::set_weapon_traits(const WeaponTraits *weapon_traits)
+//     void Weapon::set_weapon_traits(WeaponTraits *weapon_traits)
 //     {
 //         w_traits_ = weapon_traits;
 //     }

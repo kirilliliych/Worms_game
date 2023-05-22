@@ -80,7 +80,7 @@ public:
 
     bool operator ==(const Vector2d &another_point) const
     {
-        return ((x_ == another_point.x_) && (y_ == another_point.y_));
+        return (x_ == another_point.x_) && (y_ == another_point.y_);
     }
 
     bool operator !=(const Vector2d &another_point) const

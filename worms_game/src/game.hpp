@@ -6,11 +6,12 @@
 #include <chrono>
 #include <ctime>
 #include <iostream>
-#include <list>
 
 #include "abstract_node.hpp"
+#include "fps.hpp"
 #include "image_manager.hpp"
 #include "physics_entity.hpp"
+#include "sfmlwrap/clock.hpp"
 
 
 namespace string_consts
@@ -27,20 +28,11 @@ class Map;
 class PhysicsObject;
 class Projectile;
 class Team;
+class AI;
+class TurnTimeCounter;
 
 class Game
 {
-    enum class GameState
-    {
-        UNINITIALIZED,
-        CHOOSING_MODE,
-        GENERATING_TERRAIN,
-        GENERATING_UNITS,
-        READY,
-        PLAYER_CONTROL,
-        CAMERA_CONTROL,
-        EXITED
-    };
 
 public:
 
@@ -50,18 +42,23 @@ public:
     
     ~Game();
 
-
     void run();
 
     void add_to_map_children(AbstractNode *object);
 
-    // bool check_collision(const void *checker_address, PhysicsEntity checker, const Point2d<int> &collision_point) const;
-
-    // void process_explosion(float radius, const Point2d<int> &position);
-
     bool launch_event(const Event &event);
 
     bool is_under_control(const AbstractNode *object) const;
+
+    bool player_action_finished() const;
+
+    void finish_player_action();
+
+    void enable_player_action();
+
+    bool does_player_have_control() const;
+
+    void set_player_control(bool whether_has_control);
 
     const Character *get_character_under_control() const;
 
@@ -77,25 +74,38 @@ public:
 
     Point2d<int> get_camera_position() const;
 
+    bool is_stable() const;
+
     void lock_camera() const;
 
+    void set_character_under_control(const Character *now_under_control);
+
+    void set_camera_tracking_object(const PhysicsObject *now_tracked_object);
+
+    Team *get_team(uint32_t index);
+
 private:
+
+    void pass_turn_();
 //-----------------------------------Variables-------------------------------------
     using clock = std::chrono::system_clock;
     using time_point = std::chrono::time_point<clock>;
     using time_delta_t = std::chrono::duration<float, std::chrono::seconds::period>;
-    static time_point prev_time_point;
 
 public:
+
+    static constexpr uint32_t TEAMS_QUANTITY   = 3;
+    static constexpr uint32_t MEMBERS_QUANTITY = 3; 
+
+    static constexpr uint32_t EVENTS_HANDLING_PER_FRAME = 1;
 
     static Game *game;
-
     static ImageManager imanager;
-    static time_delta_t time_delta;
+
+    time_delta_t time_delta;
+    time_point prev_time_point;
 
 private:
-public:
-    GameState state_;
 
     Desktop *main_window_;
     Map *map_;
@@ -103,8 +113,19 @@ public:
 
     EventManager *emanager_;
 
-public:
+    TurnTimeCounter *turn_timer_;
+    FPSCounter *fps_counter_;
+
+    vector<Team *> teams_;
+    uint32_t active_team_index_;
+
+    AI *ai_;
+
     const Character *under_control_;
-    const PhysicsObject * camera_tracking_; 
-    Team *team_;   // list of teams?
+    const PhysicsObject * camera_tracking_;
+
+    bool player_has_control_;
+    bool player_action_finished_;
+
+    bool is_stable_;
 };

@@ -63,21 +63,21 @@ public:
     template<typename OtherType>
     Point2d operator +(const Point2d<OtherType> &another_point) const
     {      
-        return {this->x_ + static_cast<Type> (another_point.x_),
-                this->y_ + static_cast<Type> (another_point.y_)};
+        return {x_ + static_cast<Type> (another_point.x_),
+                y_ + static_cast<Type> (another_point.y_)};
     }
     
         template<typename OtherType>
     Point2d operator -(const Point2d<OtherType> &another_point) const
     {
-        return {this->x_ - static_cast<Type> (another_point.x_),
-                this->y_ - static_cast<Type> (another_point.y_)};
+        return {x_ - static_cast<Type> (another_point.x_),
+                y_ - static_cast<Type> (another_point.y_)};
     }
 
     Point2d operator -() const
     {
-        return {-this->x_,
-                -this->y_};
+        return {-x_,
+                -y_};
     }
 
     template<typename OtherType>

@@ -8,19 +8,22 @@
 #include "abstract_node.hpp"
 #include "debris.hpp"
 #include "game.hpp"
+#include "physics_entity.hpp"
 #include "physics_object.hpp"
 #include "projectile.hpp"
 #include "sfmlwrap/events/event.hpp"
 #include "sfmlwrap/image.hpp"
 #include "sfmlwrap/rect.hpp"
 #include "sfmlwrap/texture.hpp"
+#include "my_stl/vector.hpp"
 #include "weapon_traits.hpp"
 
 
 namespace string_consts
 {
-    const std::vector<std::string> landscape_images_names_pool{"seamless_sky.png",
-                                                               "dirt1.png"};
+    const vector<std::string> landscape_images_names_pool{"seamless_sky.png",
+                                                               "dirt1.png",
+                                                                "lava.png"};
 }
 
 
@@ -31,24 +34,24 @@ public:
     {
         SKY = 0,
         TERRAIN,
-        COLLISION
+        LAVA
     };
 
 public:
 //---------------------------------------------------------------------------------
-    Map(AbstractNode *parent, const Rect<int> &area)
+    Map(AbstractNode *parent, Rect<int> &&area)
       : AbstractNode(parent, area),
-        map_(static_cast<uint32_t> (area_.get_width() * area.get_height()), 0),
+        map_(static_cast<uint32_t> (area_.width() * area.height()), 0),
         landscape_images_(string_consts::landscape_images_names_pool.size())
     {
         uint64_t landscape_types_quantity = string_consts::landscape_images_names_pool.size();
         for (uint64_t i = 0; i < landscape_types_quantity; ++i)
         {
-            landscape_images_[i] = Game::imanager.get_image(string_consts::landscape_images_names_pool[i]);
+            landscape_images_[i] = Game::game->imanager.get_image(string_consts::landscape_images_names_pool[i]);
         }
 
-        texture_->create(static_cast<uint32_t> (area.get_width()),
-                         static_cast<uint32_t> (area_.get_height()));
+        texture_->create(static_cast<uint32_t> (area.width()),
+                         static_cast<uint32_t> (area_.height()));
     }
 
     Map(const Map &other) = delete;
@@ -62,23 +65,25 @@ public:
 //---------------------------------------------------------------------------------
     void create_map()
     {
-        uint32_t width  = static_cast<uint32_t> (area_.get_width());
-        uint32_t height = static_cast<uint32_t> (area_.get_height()); 
+        uint32_t width  = static_cast<uint32_t> (area_.width());
+        uint32_t height = static_cast<uint32_t> (area_.height()); 
 
-        std::vector<float> noise_seed(width, 0);
+        // std::vector<float> noise_seed(width, 0);
+        vector<float> noise_seed(width, 0);
         for (uint32_t i = 1; i < width; ++i)
         {
             noise_seed[i] = static_cast<float> (std::rand()) / static_cast<float> (RAND_MAX);
         }
         noise_seed[0] = 0.5f;   // means terrain starts and ends halfway up due to algorithm implementation
-
-        std::vector<float> surface = PerlinNoise1D_(noise_seed, 8, 2.0f);
-        for (uint32_t y = 0; y < height; ++y)
+        vector<float> surface = PerlinNoise1D_(noise_seed, 8, 2.0f);
+        float lava_level = 0.2f;
+        for (uint32_t x = 0; x < width; ++x)
         {
-            for (uint32_t x = 0; x < width; ++x)
+            for (uint32_t y = 0; y < height; ++y)
             {
-                map_[(height - 1 - y) * width + x] = y >= surface[x] * height ? MapPixelCondition::SKY :
-                                                                                MapPixelCondition::TERRAIN;  // currently there are two types of landscape...
+                map_[(height - 1 - y) * width + x] = y >=              surface[x] * height ? MapPixelCondition::SKY  :
+                                                     y <= lava_level * surface[x] * height ? MapPixelCondition::LAVA :
+                                                                                             MapPixelCondition::TERRAIN;
             }
         }
 
@@ -87,12 +92,12 @@ public:
 
     uint32_t get_width() const
     {
-        return area_.get_width();
+        return area_.width();
     }
 
     uint32_t get_height() const
     {
-        return area_.get_height();
+        return area_.height();
     }
 
     bool handle_event(const Event &event)
@@ -101,54 +106,14 @@ public:
 
         switch (event.get_type())
         {
-            case EventType::MOUSE_BUTTON_PRESSED:
-            {
-                switch (event.mbedata_.button)
-                {
-                    case MouseButton::LEFT:
-                    {
-                        // Game::game->process_explosion(40, event.mbedata_.position);
-                        Event eevent;
-                        eevent.set_type(EventType::EXPLOSION_EVENT);
-                        eevent.eedata_.radius = 40;
-                        eevent.eedata_.position = event.mbedata_.position;
-                        Game::game->launch_event(eevent);
-
-                        break;
-                    }
-
-                    case MouseButton::RIGHT:
-                    {
-                        // Game::game->add_to_map_children(new Projectile(this, {40, 40, event.mbedata_.position}, "rocket.png"));
-                        new Projectile(this, event.mbedata_.position, -3.14159f, 0.5, traits::weapon_traits_pool[0].get_ammo_traits());
-
-                        break;
-                    }
-
-                    default:
-                    {
-                        break;
-                    }
-                }
-
-                if (children_handle_event(event))
-                {
-                    result = true;
-                }
-
-                break;
-            }
-
             case EventType::EXPLOSION_EVENT:
             {
-                // printf("map explosion position: %d %d camera: %d %d\n", event.eedata_.position.x(), event.eedata_.position.y(), Game::game->get_camera_position().x(), Game::game->get_camera_position().y());
                 make_crater_(event.eedata_.position, event.eedata_.radius);
                 update_map_texture_();
 
                 for (uint32_t i = 0; i < event.eedata_.radius / 2; ++i)
                 {
-                    Game::game->add_to_map_children(new Debris(nullptr, {8, 8, event.eedata_.position},
-                                                    "debris.png"));     // just new here
+                    new Debris(this, {8, 8, event.eedata_.position}, "debris.png");
                 }
 
                 if (children_handle_event(event))
@@ -161,7 +126,17 @@ public:
 
             case EventType::COLLISION_EVENT:
             {
-                if (map_[event.cedata_.position.y() * area_.get_width() + event.cedata_.position.x()] != MapPixelCondition::SKY)
+                Rect<int> checker_area = event.cedata_.checker_address->get_area();
+                if ((checker_area.right_x() < 0)                ||
+                    (checker_area.left_x() > area_.width())     ||
+                    (checker_area.top_y()  > area_.height())    ||
+                    ((map_[event.cedata_.position.y() * area_.width() + event.cedata_.position.x()] == MapPixelCondition::LAVA)))
+                {
+                    event.cedata_.checker_address->kill();
+                }
+
+                int checked_byte = event.cedata_.position.y() * area_.width() + event.cedata_.position.x();
+                if ((checked_byte >= 0) && (map_[checked_byte] != MapPixelCondition::SKY))
                 {
                     result = true;
                 }
@@ -176,10 +151,26 @@ public:
 
             case EventType::TIME_PASSED:
             {
-                children_.erase(std::remove_if(children_.begin(),
-                                                     children_.end(),
-                                                     [](const std::unique_ptr<AbstractNode> &object) {return !object->does_exist();}),
-                                children_.cend());
+                int child_index = 0;
+                int children_size = static_cast<int> (children_.size());
+    
+                while (child_index < children_size)
+                {
+                    if (!children_[child_index]->does_exist())
+                    {
+                        children_.erase(children_.cbegin() + child_index);
+
+                        --child_index;
+                        --children_size;
+                    }
+
+                    ++child_index;
+                }
+
+                // children_.erase(std::remove_if(children_.begin(),
+                                                    //  children_.end(),
+                                                    //  [&](const std::unique_ptr<AbstractNode> &object) {return !object->does_exist();}),
+                                // children_.cend());
 
                 if (children_handle_event(event))
                 {
@@ -195,6 +186,8 @@ public:
                 {
                     result = true;
                 }
+
+                break;
             }
         }
 
@@ -202,13 +195,13 @@ public:
     }
 
 private:
-public:
-    void update_map_texture_()      // ВНИМАНИЕ: ЦВЕТ, ВЫТАСКИВАЕМЫЙ ЧЕРЕЗ to_Integer ИЗ sf::Color, НЕКОРРЕКТЕН! ТРЕБУЕТСЯ ПОБАЙТОВОЕ РАЗВОРАЧИВАНИЕ
-    {
-        uint32_t width  = static_cast<uint32_t> (area_.get_width());
-        uint32_t height = static_cast<uint32_t> (area_.get_height()); 
 
-        std::vector<uint32_t> pixels(width * height);
+    void update_map_texture_()
+    {
+        uint32_t width  = static_cast<uint32_t> (area_.width());
+        uint32_t height = static_cast<uint32_t> (area_.height()); 
+
+        vector<uint32_t> pixels(width * height);
 
         for (uint32_t y = 0; y < height; ++y)
         {
@@ -221,7 +214,7 @@ public:
                         uint32_t image_width  = landscape_images_[MapPixelCondition::SKY]->get_width();
                         uint32_t image_height = landscape_images_[MapPixelCondition::SKY]->get_height();
                         pixels[y * width + x] = landscape_images_[MapPixelCondition::SKY]->get_pixel(x % image_width,
-                                                                                                          y % image_height);
+                                                                                                     y % image_height);
                         break;
                     }
 
@@ -230,7 +223,16 @@ public:
                         uint32_t image_width  = landscape_images_[MapPixelCondition::TERRAIN]->get_width();
                         uint32_t image_height = landscape_images_[MapPixelCondition::TERRAIN]->get_height();
                         pixels[y * width + x] = landscape_images_[MapPixelCondition::TERRAIN]->get_pixel(x % image_width,
-                                                                                                              y % image_height);
+                                                                                                         y % image_height);
+                        break;
+                    }
+
+                    case MapPixelCondition::LAVA:
+                    {
+                        uint32_t image_width  = landscape_images_[MapPixelCondition::LAVA]->get_width();
+                        uint32_t image_height = landscape_images_[MapPixelCondition::LAVA]->get_height();
+                        pixels[y * width + x] = landscape_images_[MapPixelCondition::LAVA]->get_pixel(x % image_width,
+                                                                                                      y % image_height);
                         break;
                     }
 
@@ -247,11 +249,11 @@ public:
         texture_->update(reinterpret_cast<const uint8_t *> (pixels.data()), width, height, 0, 0);
     }
 
-    std::vector<float> PerlinNoise1D_(const std::vector<float> &noise_seed, int octaves_quantity, float bias)
+    vector<float> PerlinNoise1D_(const vector<float> &noise_seed, int octaves_quantity, float bias)
 	{
         int size = static_cast<int> (noise_seed.size());
 
-        std::vector<float> result(size);
+        vector<float> result(size);
 		for (int x = 0; x < size; x++)
 		{
 			float noise     = 0.0f;
@@ -283,13 +285,20 @@ public:
 			int x = 0;
 			int y = radius;
 			int p = 3 - 2 * radius;
-			if (!radius) return;
+			if (!radius)
+            {
+                return;
+            }
 
 			auto drawline = [&](int sx, int ex, int ny)
 			{
-				for (int i = sx; i < ex; i++)
-					if (ny >= 0 && ny < area_.get_height() && i >= 0 && i < area_.get_width())
-						map_[ny * area_.get_width() + i] = MapPixelCondition::SKY;
+				for (int i = sx; i < ex; ++i)
+                {
+                    if ((ny >= 0) && (ny < area_.height()) && (i >= 0) && (i < area_.width()) && (map_[ny * area_.width() + i] != MapPixelCondition::LAVA))
+                    {
+                        map_[ny * area_.width() + i] = MapPixelCondition::SKY;
+                    }
+                }
 			};
 
 			while (y >= x) 
@@ -309,9 +318,9 @@ public:
 private:
 public:
 //-----------------------------------Variables-------------------------------------
-    std::vector<uint8_t> map_;
+    vector<uint8_t> map_;
 
-    std::vector<const Image *> landscape_images_;
+    vector<const Image *> landscape_images_;
 };
 
 #endif
